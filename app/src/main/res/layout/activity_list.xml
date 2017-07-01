@@ -24,28 +24,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
-            tools:text="SongName" />
+            tools:text="SongName"
+            android:fontFamily="sans-serif-condensed"/>
 
         <TextView
             android:id="@+id/songId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
-            tools:text="Id" />
+            tools:text="Id"
+            android:fontFamily="sans-serif-condensed"/>
 
         <TextView
             android:id="@+id/songArtist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
-            tools:text="artist"/>
+            tools:text="artist"
+            android:fontFamily="cursive"/>
 
         <TextView
             android:id="@+id/songDuration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
-            tools:text="duration" />
+            tools:text="duration"
+            android:fontFamily="sans-serif-condensed"/>
     </LinearLayout>
 
 

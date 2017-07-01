@@ -1,6 +1,7 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -8,11 +9,13 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -55,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 songList.add(new Songs(currentTitle, currentId, currentDuration, currentArtist));
             }
         }
-
 
         //ListView creation
         ListView listView = (ListView) findViewById(R.id.lv);
@@ -175,4 +177,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.setting_menu:
+                Toast.makeText(this, "Will be Added Soon !!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.about_menu:
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent);
+                break;
+
+        }
+        return true;
+    }
 }
