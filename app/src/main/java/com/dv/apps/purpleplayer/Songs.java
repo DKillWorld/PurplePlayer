@@ -6,14 +6,15 @@ package com.dv.apps.purpleplayer;
 
 public class Songs {
 
-    private String title;
+    private String title, artist;
     private long id;
-    private int duration;
+    private int duration, image;
 
-    public Songs(String title, long id, int duration) {
+    public Songs(String title, long id, int duration, String artist) {
         this.title = title;
         this.id = id;
         this.duration = duration;
+        this.artist = artist;
     }
 
     public String getTitle(){
@@ -26,6 +27,10 @@ public class Songs {
 
     public int getDuration(){
         return duration;
+    }
+
+    public String getArtist(){
+        return artist;
     }
 
 }

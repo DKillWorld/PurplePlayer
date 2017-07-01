@@ -30,13 +30,15 @@ public class SongAdapter extends ArrayAdapter<Songs> {
             view = LayoutInflater.from(getContext()).inflate(R.layout.activity_list, parent, false);
         }
 
-        TextView textView = (TextView) view.findViewById(R.id.textView);
-        TextView textView2 = (TextView) view.findViewById(R.id.textView2);
-        TextView textView3 = (TextView) view.findViewById(R.id.textView3);
+        TextView textView = (TextView) view.findViewById(R.id.songName);
+        TextView textView2 = (TextView) view.findViewById(R.id.songId);
+        TextView textView3 = (TextView) view.findViewById(R.id.songDuration);
+        TextView textView4 = (TextView) view.findViewById(R.id.songArtist);
 
         textView.setText(songs.getTitle());
         textView2.setText(songs.getId() + "");
         textView3.setText(songs.getDuration() + "");
+        textView4.setText(songs.getArtist());
 
         return view;
     }

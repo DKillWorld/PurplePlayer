@@ -44,15 +44,18 @@ public class MainActivity extends AppCompatActivity {
             int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
             int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
 
             while (songCursor.moveToNext()){
                 String currentTitle = songCursor.getString(songTitle);
                 long currentId = songCursor.getLong(songId);
                 int currentDuration = songCursor.getInt(songDuration);
-                songList.add(new Songs(currentTitle, currentId, currentDuration));
-            }
+                String currentArtist = songCursor.getString(songArtist);
 
+                songList.add(new Songs(currentTitle, currentId, currentDuration, currentArtist));
+            }
         }
+
 
         //ListView creation
         ListView listView = (ListView) findViewById(R.id.lv);
@@ -162,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
