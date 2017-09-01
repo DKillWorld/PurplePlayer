@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -31,12 +32,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, MediaPlayer.OnPreparedListener {
 
-    MediaPlayer mediaPlayer = new MediaPlayer();
+    static MediaPlayer mediaPlayer;
     Uri uri, songUri;
     ContentResolver contentResolver;
     ArrayList<Songs> songList;
@@ -44,12 +46,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ImageButton playPause, loop, next, prev, shuffle, playPauseMain;
     TextView tvMain;
     Cursor songCursor;
-    boolean randomize = false;
-    boolean looping = false;
+    static boolean randomize = false;
+    static boolean looping = false;
     SeekBar seekBar;
     SearchView searchView;
+    AudioManager audioManager;
+    int focusResult;
 
     static MainActivity mainActivity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +67,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         playPauseMain.setOnClickListener(this);
+
+
+
+        AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+            @Override
+            public void onAudioFocusChange(int focusChange) {
+                audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+                switch (focusChange) {
+
+                    case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK):
+                        mediaPlayer.setVolume(0.2f, 0.2f);
+                        break;
+
+                    case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
+                        mediaPlayer.pause();
+                        break;
+
+                    case (AudioManager.AUDIOFOCUS_LOSS):
+                        mediaPlayer.pause();
+                        break;
+
+                    case (AudioManager.AUDIOFOCUS_GAIN):
+                        mediaPlayer.setVolume(1f, 1f);
+                        mediaPlayer.start();
+                        break;
+
+                }
+
+            }
+        };
+
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        focusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener , AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
     }
+
 
     public static MainActivity getInstance(){
         return mainActivity;
@@ -123,8 +165,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         String _id = songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media._ID));
         songUri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, _id);
-        mediaPlayer = MediaPlayer.create(getApplicationContext(), songUri);
-        mediaPlayer.start();
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(getApplicationContext(), songUri);
+            mediaPlayer.prepare();
+            mediaPlayer.setOnPreparedListener(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        /**
+         * Old code to Play Song, Stored for reference
+         * mediaPlayer = MediaPlayer.create(getApplicationContext(), songUri);   //Old Code to play song
+         * mediaPlayer.start();   //Old Code to play song
+         *
+         */
+
+
         tvMain = (TextView) findViewById(R.id.tvMain);
         tvMain.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
         tvMain.setSelected(true);
@@ -170,20 +229,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
 
-            case R.id.playPause:
-                if (mediaPlayer != null) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
-                        playPause.setImageResource(R.mipmap.ic_launcher);
-                    } else {
-                        mediaPlayer.start();
-                        if (mediaPlayer.isPlaying()) {
-                            playPause.setImageResource(R.mipmap.ic_pause);
-                        }
-                    }
-                }
-                break;
-
             case R.id.next:
                 if (randomize){
                     play(getRandom());
@@ -202,30 +247,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 songCursor.moveToPosition(songCursor.getPosition() - 1);
                 play(songCursor.getPosition());
-                break;
-
-            case R.id.loop:
-                if (!looping){
-                    mediaPlayer.setLooping(true);
-//                    loop.setBackgroundResource(R.drawable.background_button_selected);
-                    looping = true;
-                }else{
-                    mediaPlayer.setLooping(false);
-//                    loop.setBackgroundResource(R.drawable.background_buttons);
-                    looping = false;
-                }
-                break;
-
-            case R.id.shuffle:
-                if (!randomize){
-                    randomize = true;
-//                    shuffle.setBackgroundResource(R.drawable.background_button_selected);
-                    Toast.makeText(getApplicationContext(), "Random ON!!", Toast.LENGTH_SHORT).show();
-                }else{
-                    randomize = false;
-//                    shuffle.setBackgroundResource(R.drawable.background_buttons);
-                    Toast.makeText(getApplicationContext(), "Random OFF!!", Toast.LENGTH_SHORT).show();
-                }
                 break;
 
             case R.id.tvMain:
@@ -353,6 +374,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        if (focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            mediaPlayer.start();
+        }
     }
 }
 

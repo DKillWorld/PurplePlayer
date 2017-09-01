@@ -11,6 +11,11 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import static com.dv.apps.purpleplayer.MainActivity.looping;
+import static com.dv.apps.purpleplayer.MainActivity.mediaPlayer;
+import static com.dv.apps.purpleplayer.MainActivity.randomize;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -26,15 +31,21 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.detail_activity);
 
         detailActivity = this;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Play Pause Button
         playPause = (ImageButton) findViewById(R.id.playPause);
-        playPause.setOnClickListener(MainActivity.getInstance());
+        playPause.setOnClickListener(this);
 
-        //Stop Button
+        //Loop Button
         loop = (ImageButton) findViewById(R.id.loop);
-        loop.setOnClickListener(MainActivity.getInstance());
+        loop.setOnClickListener(this);
+
+        //shuffle Button
+        shuffle = (ImageButton) findViewById(R.id.shuffle);
+        shuffle.setOnClickListener(this);
+
+        showLyrics = (ImageButton) findViewById(R.id.showLyrics);
+        showLyrics.setOnClickListener(this);
 
         //Next Song Button
         next = (ImageButton) findViewById(R.id.next);
@@ -44,17 +55,22 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         prev = (ImageButton) findViewById(R.id.prev);
         prev.setOnClickListener(MainActivity.getInstance());
 
-        //shuffle Button
-        shuffle = (ImageButton) findViewById(R.id.shuffle);
-        shuffle.setOnClickListener(MainActivity.getInstance());
-
         //Seekbar
         seekBar = (SeekBar) findViewById(R.id.seekbar);
         seekBar.setOnSeekBarChangeListener(MainActivity.getInstance());
         updateSeekbar();
 
-        showLyrics = (ImageButton) findViewById(R.id.showLyrics);
-        showLyrics.setOnClickListener(this);
+        //Setting Loop and Shuffle Button to correct State
+        if (looping){
+            loop.setBackgroundResource(R.drawable.background_button_selected);
+        }
+        if (randomize){
+            shuffle.setBackgroundResource(R.drawable.background_button_selected);
+        }
+        if (mediaPlayer.isPlaying()){
+            playPause.setImageResource(R.mipmap.ic_pause);
+        }
+
 
 
     }
@@ -96,6 +112,47 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 }else {
                     installQL();
                 }
+                break;
+
+            case R.id.playPause:
+                if (mediaPlayer != null) {
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.pause();
+                        playPause.setImageResource(R.mipmap.ic_launcher);
+                    } else {
+                        mediaPlayer.start();
+                        if (mediaPlayer.isPlaying()) {
+                            playPause.setImageResource(R.mipmap.ic_pause);
+                        }
+                    }
+                }
+                break;
+
+            case R.id.loop:
+                if (!looping){
+                    mediaPlayer.setLooping(true);
+                    loop.setBackgroundResource(R.drawable.background_button_selected);
+                    Toast.makeText(getApplicationContext(), "Repeat ON!!", Toast.LENGTH_SHORT).show();
+                    looping = true;
+                }else{
+                    mediaPlayer.setLooping(false);
+                    loop.setBackgroundResource(R.drawable.background_buttons);
+                    Toast.makeText(getApplicationContext(), "Repeat OFF!!", Toast.LENGTH_SHORT).show();
+                    looping = false;
+                }
+                break;
+
+            case R.id.shuffle:
+                if (!randomize){
+                    randomize = true;
+                    shuffle.setBackgroundResource(R.drawable.background_button_selected);
+                    Toast.makeText(getApplicationContext(), "Shuffle ON!!", Toast.LENGTH_SHORT).show();
+                }else{
+                    randomize = false;
+                    shuffle.setBackgroundResource(R.drawable.background_buttons);
+                    Toast.makeText(getApplicationContext(), "Shuffle OFF!!", Toast.LENGTH_SHORT).show();
+                }
+                break;
 
 
         }
