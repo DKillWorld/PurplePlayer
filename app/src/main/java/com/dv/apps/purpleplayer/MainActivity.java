@@ -214,7 +214,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (IOException e) {
             e.printStackTrace();
         }
-        DetailActivity.getInstance().updateViews();
+        if (DetailActivity.getInstance() != null) {
+            DetailActivity.getInstance().updateViews();
+        }
 
 
         /**
