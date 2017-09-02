@@ -57,7 +57,6 @@ public class SongAdapter extends ArrayAdapter<Songs> {
         }else {
             myholder = (Myholder) view.getTag();
         }
-//        imageView.setImageURI(songs.getImage());
 
 
         //Calculating HH:MM:SS from milliseconds
@@ -72,9 +71,9 @@ public class SongAdapter extends ArrayAdapter<Songs> {
         }
 
         myholder.textView.setText(song.getTitle());
-//        textView2.setText(song.getId() + "");
         myholder.textView2.setText(song.getArtist() + "");
         myholder.textView3.setText(songTime + "");
+//        myholder.imageView.setImageURI(song.getImage());
 
 
         return view;

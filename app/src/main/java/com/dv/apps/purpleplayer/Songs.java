@@ -38,9 +38,9 @@ public class Songs {
         return artist;
     }
 
-//    public Uri getImage() {
-//        return image;
-//    }
+    public Uri getImage() {
+        return image;
+    }
 
 
 }

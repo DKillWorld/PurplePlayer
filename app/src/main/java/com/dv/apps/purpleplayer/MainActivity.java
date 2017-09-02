@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,16 +38,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnPreparedListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
     static MediaPlayer mediaPlayer;
+    static Cursor songCursor;
     Uri uri, songUri;
     ContentResolver contentResolver;
     ArrayList<Songs> songList;
     SongAdapter adapter;
     ImageButton playPause, loop, next, prev, shuffle, playPauseMain;
     TextView tvMain;
-    Cursor songCursor;
     static boolean randomize = false;
     static boolean looping = false;
     SeekBar seekBar;
@@ -60,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean("Theme_Key", false)){
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         songList = new ArrayList<Songs>();
@@ -78,11 +83,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            mediaPlayer.setOnCompletionListener(this);
 
             tvMain = (TextView) findViewById(R.id.tvMain);
             tvMain.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
             tvMain.setSelected(true);
             tvMain.setOnClickListener(this);
+
+            randomize = preferences.getBoolean("Shuffle_Status", false);
+            looping = preferences.getBoolean("Loop_Status", false);
+
         }
 
         mainActivity = this;
@@ -131,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         if (mediaPlayer.isPlaying()){
             playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+        }else {
+            playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
         }
     }
 
@@ -202,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (IOException e) {
             e.printStackTrace();
         }
+        DetailActivity.getInstance().updateViews();
 
 
         /**
@@ -222,18 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                if (randomize){
-                    play(getRandom());
-                } else {
-                    songCursor.moveToPosition(songCursor.getPosition() + 1);
-                    play(songCursor.getPosition());
-                }
-
-            }
-        });
+        mediaPlayer.setOnCompletionListener(this);
     }
 
 //Notofication
@@ -354,6 +356,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         preferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("Cursor_Pos", songCursor.getPosition());
+        editor.putBoolean("Shuffle_Status", randomize);
+        editor.putBoolean("Loop_Status", looping);
         editor.apply();
     }
 
@@ -405,6 +409,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onPrepared(MediaPlayer mp) {
         if (focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mediaPlayer.start();
+        }
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        if (randomize){
+            play(getRandom());
+        } else {
+            songCursor.moveToPosition(songCursor.getPosition() + 1);
+            play(songCursor.getPosition());
         }
     }
 }

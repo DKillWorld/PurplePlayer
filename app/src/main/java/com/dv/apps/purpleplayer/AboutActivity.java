@@ -7,16 +7,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 public class AboutActivity extends AppCompatActivity {
 
     ImageButton imageButton;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        textView = (TextView) findViewById(R.id.version_about);
+        textView.setText("v " + BuildConfig.VERSION_NAME);
 
         imageButton = (ImageButton) findViewById(R.id.contact_icon);
         imageButton.setOnClickListener(new View.OnClickListener() {
