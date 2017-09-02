@@ -8,6 +8,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, MediaPlayer.OnPreparedListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnPreparedListener{
 
     static MediaPlayer mediaPlayer;
     Uri uri, songUri;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SearchView searchView;
     AudioManager audioManager;
     int focusResult;
+    SharedPreferences preferences;
 
     static MainActivity mainActivity;
 
@@ -63,13 +65,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         songList = new ArrayList<Songs>();
         setupPermissions();
 
+        preferences = getPreferences(MODE_PRIVATE);
+        if (preferences != null){
+            songCursor.moveToPosition(preferences.getInt("Cursor_Pos",0));
+            String _id = songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media._ID));
+            songUri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, _id);
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            try {
+                mediaPlayer.setDataSource(getApplicationContext(), songUri);
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            tvMain = (TextView) findViewById(R.id.tvMain);
+            tvMain.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+            tvMain.setSelected(true);
+            tvMain.setOnClickListener(this);
+        }
+
         mainActivity = this;
 
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         playPauseMain.setOnClickListener(this);
 
-
-
+//AudioManager Code
         AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
             @Override
             public void onAudioFocusChange(int focusChange) {
@@ -105,6 +126,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mediaPlayer.isPlaying()){
+            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+        }
+    }
 
     public static MainActivity getInstance(){
         return mainActivity;
@@ -301,6 +329,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.setting_menu:
+                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(sIntent);
                 Toast.makeText(this, "Under Construction!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.about_menu:
@@ -319,14 +349,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("Cursor_Pos", songCursor.getPosition());
+        editor.apply();
+    }
+
+    @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (mediaPlayer != null) {
             mediaPlayer.reset();
             mediaPlayer.release();
         }
         mediaPlayer = null;
 
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 
     //permissionHandler
@@ -355,25 +399,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (fromUser) {
-            if (mediaPlayer != null) {
-                mediaPlayer.seekTo(progress);
-            }
-        }
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
     }
 
     @Override

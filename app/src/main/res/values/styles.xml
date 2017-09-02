@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
     </style>
     <style name="BackgroundPurpleTheme" parent="AppTheme">
         <item name="android:background">@drawable/background_buttons</item>
@@ -44,6 +45,7 @@
     <style name="BlackThemeBackground" parent="MyBlackTheme">
         <item name="android:background">@android:color/darker_gray</item>
     </style>
+
 
 
 </resources>

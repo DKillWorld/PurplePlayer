@@ -17,7 +17,7 @@ import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.mediaPlayer;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
 
-public class DetailActivity extends AppCompatActivity implements View.OnClickListener{
+public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     TextView textView1, textView2;
     ImageButton playPause, loop, next, prev, shuffle, showLyrics;
@@ -47,6 +47,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         showLyrics = (ImageButton) findViewById(R.id.showLyrics);
         showLyrics.setOnClickListener(this);
 
+        //Seekbar
+        seekBar = (SeekBar) findViewById(R.id.seekbar);
+        seekBar.setOnSeekBarChangeListener(this);
+        updateSeekbar();
+
         //Next Song Button
         next = (ImageButton) findViewById(R.id.next);
         next.setOnClickListener(MainActivity.getInstance());
@@ -54,11 +59,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         //Prev Song Button
         prev = (ImageButton) findViewById(R.id.prev);
         prev.setOnClickListener(MainActivity.getInstance());
-
-        //Seekbar
-        seekBar = (SeekBar) findViewById(R.id.seekbar);
-        seekBar.setOnSeekBarChangeListener(MainActivity.getInstance());
-        updateSeekbar();
 
         //Setting Loop and Shuffle Button to correct State
         if (looping){
@@ -72,7 +72,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
 
 
-
     }
 
     public static DetailActivity getInstance(){
@@ -81,14 +80,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     //Seekbar Mechanism
     public void updateSeekbar() {
-        seekBar.setMax(MainActivity.getInstance().mediaPlayer.getDuration());
         seekBar.setProgress(0);
         final Handler seekHandler = new Handler();
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (MainActivity.getInstance().mediaPlayer != null) {
-                    seekBar.setProgress(MainActivity.getInstance().mediaPlayer.getCurrentPosition());
+                if (mediaPlayer != null) {
+                    seekBar.setMax(mediaPlayer.getDuration());
+                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     seekHandler.postDelayed(this, 1000);
                 }
             }
@@ -172,5 +171,24 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("market://details?id=com.geecko.QuickLyric"));
         startActivity(intent);
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser){
+            if (mediaPlayer != null){
+                mediaPlayer.seekTo(progress);
+            }
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }
