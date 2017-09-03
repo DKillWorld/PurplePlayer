@@ -38,7 +38,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnPreparedListener
+        , MediaPlayer.OnCompletionListener{
 
     static MediaPlayer mediaPlayer;
     static Cursor songCursor;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView tvMain;
     static boolean randomize = false;
     static boolean looping = false;
+    static boolean userStopped = true;
     SeekBar seekBar;
     SearchView searchView;
     AudioManager audioManager;
@@ -71,8 +73,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupPermissions();
 
         preferences = getPreferences(MODE_PRIVATE);
-        if (preferences != null){
-            songCursor.moveToPosition(preferences.getInt("Cursor_Pos",0));
+        if ((preferences != null) && (songCursor != null)){
+            songCursor.moveToPosition(preferences.getInt("Cursor_Pos", 0));
+            if (songCursor.getPosition() == songList.size()){
+                songCursor.moveToPosition(0);
+            }
             String _id = songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media._ID));
             songUri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, _id);
             mediaPlayer = new MediaPlayer();
@@ -114,15 +119,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
                         mediaPlayer.pause();
+                        userStopped = false;
                         break;
 
                     case (AudioManager.AUDIOFOCUS_LOSS):
                         mediaPlayer.pause();
+                        userStopped = false;
                         break;
 
                     case (AudioManager.AUDIOFOCUS_GAIN):
-                        mediaPlayer.setVolume(1f, 1f);
-                        mediaPlayer.start();
+                        if ((mediaPlayer != null) && (!userStopped)) {
+                            mediaPlayer.setVolume(1f, 1f);
+                            mediaPlayer.start();
+                        }
                         break;
 
                 }
@@ -139,10 +148,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        if (mediaPlayer.isPlaying()){
-            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-        }else {
-            playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+            } else {
+                playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            }
         }
     }
 
@@ -218,7 +229,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DetailActivity.getInstance().updateViews();
         }
 
-
         /**
          * Old code to Play Song, Stored for reference
          * mediaPlayer = MediaPlayer.create(getApplicationContext(), songUri);   //Old Code to play song
@@ -234,13 +244,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startNotification();
 
         tvMain.setOnClickListener(this);
-
-
-
         mediaPlayer.setOnCompletionListener(this);
+        updatePreferences();
     }
 
-//Notofication
+    //Updating SharedPreferences Once file is changed
+    private void updatePreferences() {
+        preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("Cursor_Pos", songCursor.getPosition());
+        editor.putBoolean("Shuffle_Status", randomize);
+        editor.putBoolean("Loop_Status", looping);
+        editor.apply();
+    }
+
+    //Notofication
     public void startNotification(){
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -291,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (mediaPlayer.isPlaying()) {
                         mediaPlayer.pause();
                         playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                        userStopped = true;
                     } else {
                         mediaPlayer.start();
                         if (mediaPlayer.isPlaying()) {
@@ -353,17 +372,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        preferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("Cursor_Pos", songCursor.getPosition());
-        editor.putBoolean("Shuffle_Status", randomize);
-        editor.putBoolean("Loop_Status", looping);
-        editor.apply();
-    }
-
-    @Override
     protected void onDestroy() {
         if (mediaPlayer != null) {
             mediaPlayer.reset();
@@ -382,11 +390,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //permissionHandler
     public void setupPermissions() {
         if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-            checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED){
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
                 getSongs();
             }else {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 1);
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             }
         }else {
             getSongs();
@@ -402,6 +409,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     getSongs();
                 } else {
                     Toast.makeText(this, "One or more permission is denied !!", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             }
         }

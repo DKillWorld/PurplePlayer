@@ -2,7 +2,6 @@ package com.dv.apps.purpleplayer;
 
 import android.content.ContentUris;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Virtualizer;
@@ -22,6 +21,7 @@ import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.mediaPlayer;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
 import static com.dv.apps.purpleplayer.MainActivity.songCursor;
+import static com.dv.apps.purpleplayer.MainActivity.userStopped;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
@@ -138,7 +138,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     startActivity(new Intent("com.geecko.QuickLyric.getLyrics")
                             .putExtra("TAGS", new String[]{ArtName, SongName}));
                 }else {
-                    Toast.makeText(detailActivity, "Lyrics are supported by QuickLyric App", Toast.LENGTH_SHORT).show();
                     installQL();
                 }
                 break;
@@ -147,6 +146,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if (mediaPlayer != null) {
                     if (mediaPlayer.isPlaying()) {
                         mediaPlayer.pause();
+                        userStopped = true;
                         playPause.setImageResource(R.mipmap.ic_launcher);
                     } else {
                         mediaPlayer.start();
@@ -220,14 +220,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    @Override
-    protected void onStop() {
-        SharedPreferences preferences = MainActivity.getInstance().getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("Cursor_Pos", songCursor.getPosition());
-        editor.apply();
-        super.onStop();
-    }
 
     public void addBassTest(View view){
         BassBoost bassBoost = new BassBoost(0, mediaPlayer.getAudioSessionId());

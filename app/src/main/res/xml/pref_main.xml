@@ -6,8 +6,8 @@
         app:defaultValue="true"
         android:key="Theme_Key"
         android:title="Theme"
-        android:summaryOff="Purple"
-        android:summaryOn="Blue">
+        android:summaryOff="Blue"
+        android:summaryOn="Purple">
 
     </CheckBoxPreference>
 </PreferenceScreen>
