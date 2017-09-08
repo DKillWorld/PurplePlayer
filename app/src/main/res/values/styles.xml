@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="backgroundColor">@drawable/background_purple</item>
+        <item name="backgroundColorControl">#773300FF</item>
 
     </style>
     <style name="BackgroundPurpleTheme" parent="AppTheme">
@@ -32,6 +33,7 @@
         <item name="colorPrimaryDark">@android:color/holo_blue_dark</item>
         <item name="colorAccent">@color/purple</item>
         <item name="backgroundColor">@android:color/holo_blue_light</item>
+        <item name="backgroundColorControl">#7700AAEE</item>
     </style>
 
     <style name="MyBlackTheme" parent="Theme.AppCompat.Light.DarkActionBar">

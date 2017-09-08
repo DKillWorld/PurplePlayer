@@ -4,12 +4,14 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Virtualizer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.View;
@@ -92,7 +94,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             playPause.setImageResource(R.mipmap.ic_pause);
         }
 
-
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
+        getWindow().getDecorView().setBackgroundResource(R.mipmap.background_list);
     }
 
     public void updateViews(){
