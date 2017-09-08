@@ -2,6 +2,7 @@ package com.dv.apps.purpleplayer;
 
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Virtualizer;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,11 +19,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static com.dv.apps.purpleplayer.MainActivity.bassBoost;
 import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.mediaPlayer;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
 import static com.dv.apps.purpleplayer.MainActivity.songCursor;
 import static com.dv.apps.purpleplayer.MainActivity.userStopped;
+import static com.dv.apps.purpleplayer.MainActivity.virtualizer;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
@@ -34,6 +38,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean("Theme_Key", false)){
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
@@ -83,6 +91,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         if (mediaPlayer.isPlaying()){
             playPause.setImageResource(R.mipmap.ic_pause);
         }
+
+
     }
 
     public void updateViews(){
@@ -222,14 +232,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
 
     public void addBassTest(View view){
-        BassBoost bassBoost = new BassBoost(0, mediaPlayer.getAudioSessionId());
+        bassBoost = new BassBoost(0, mediaPlayer.getAudioSessionId());
         bassBoost.setStrength((short) 1000);
         bassBoost.setEnabled(true);
         mediaPlayer.setAuxEffectSendLevel(1.0f);
     }
 
     public void addVirtualizerTest(View view){
-        Virtualizer virtualizer = new Virtualizer(0, mediaPlayer.getAudioSessionId());
+        virtualizer = new Virtualizer(0, mediaPlayer.getAudioSessionId());
         virtualizer.setStrength((short) 1000);
         virtualizer.setEnabled(true);
         mediaPlayer.setAuxEffectSendLevel(1.0f);

@@ -14,6 +14,8 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
+import android.media.audiofx.BassBoost;
+import android.media.audiofx.Virtualizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,6 +36,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.MobileAds;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -43,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     static MediaPlayer mediaPlayer;
     static Cursor songCursor;
+    static BassBoost bassBoost;
+    static Virtualizer virtualizer;
     Uri uri, songUri;
     ContentResolver contentResolver;
     ArrayList<Songs> songList;
@@ -71,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         songList = new ArrayList<Songs>();
         setupPermissions();
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
         preferences = getPreferences(MODE_PRIVATE);
         if ((preferences != null) && (songCursor != null)){
@@ -227,6 +234,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (DetailActivity.getInstance() != null) {
             DetailActivity.getInstance().updateViews();
+            if (mediaPlayer.isPlaying()){
+                DetailActivity.getInstance().playPause.setImageResource(R.mipmap.ic_pause);
+            }
         }
 
         /**

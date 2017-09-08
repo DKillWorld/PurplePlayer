@@ -7,7 +7,5 @@
 
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="ad_unit_id">ca-app-pub-9589539002030859/7903238812</string>
 </resources>

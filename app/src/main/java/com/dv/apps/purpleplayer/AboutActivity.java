@@ -8,11 +8,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 public class AboutActivity extends AppCompatActivity {
 
     ImageButton imageButton;
     TextView textView;
+    AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,16 @@ public class AboutActivity extends AppCompatActivity {
                 }
             }
         });
+
+        adView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("DD0CDAB405F30F550CD856F507E39725")
+                .build();
+        adView.loadAd(adRequest);
+        boolean isTestDevice = adRequest.isTestDevice(this);
+        if (isTestDevice){
+            Toast.makeText(this, "Loaded on Test Device", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
