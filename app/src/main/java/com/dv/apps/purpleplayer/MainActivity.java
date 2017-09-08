@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
             mediaPlayer.setDataSource(getApplicationContext(), songUri);
-            mediaPlayer.prepareAsync();
+            mediaPlayer.prepare();
             mediaPlayer.setOnPreparedListener(this);
         } catch (IOException e) {
             e.printStackTrace();
