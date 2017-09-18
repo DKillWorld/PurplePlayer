@@ -143,7 +143,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateViews(){
-        if (musicService != null) { tvMain.setText(musicService.getSong().getTitle()); }
+        if (musicService != null) {
+            tvMain.setText(musicService.getSong().getTitle());
+            if (musicService.isPlaying()){
+                playPause.setImageResource(R.drawable.ic_pause_white_24dp);
+            }else {
+                playPause.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            }
+        }
     }
 
     @Override
