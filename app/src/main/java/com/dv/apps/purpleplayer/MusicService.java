@@ -3,9 +3,11 @@ package com.dv.apps.purpleplayer;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -35,6 +37,7 @@ public class MusicService extends Service implements
 
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener;
+    BroadcastReceiver becomingNoisyReceiver;
 
     private static final int NOTIFY_ID = 1;
     private String songTitle;
@@ -67,6 +70,14 @@ public class MusicService extends Service implements
         mediaPlayer = new MediaPlayer();
         initMusicPlayer();
         getAudioFocus();
+
+        becomingNoisyReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //pause audio on ACTION_AUDIO_BECOMING_NOISY
+                pausePlayer();
+            }
+        };
     }
 
     public int getAudioFocus(){
@@ -196,9 +207,14 @@ public class MusicService extends Service implements
         }
     }
 
+    private void registerBecomingNoisyReceiver() {
+        //register after getting audio focus
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        registerReceiver(becomingNoisyReceiver, intentFilter);
+    }
+
     @Override
     public void onCompletion(MediaPlayer mp) {
-
     }
 
     @Override
@@ -208,7 +224,12 @@ public class MusicService extends Service implements
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        mediaPlayer.start();
+        if (getAudioFocus() == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            registerBecomingNoisyReceiver();
+            mediaPlayer.start();
+
+            MainActivity.getInstance().updateViews();
+        }
 
         if (DetailActivity.getInstance() != null) {
             DetailActivity.getInstance().updateViews();

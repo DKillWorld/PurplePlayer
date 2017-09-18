@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         playPauseMain.setOnClickListener(this);
 
         tvMain = (TextView) findViewById(R.id.tvMain);
-        tvMain.setText("Test");
         tvMain.setSelected(true);
         tvMain.setOnClickListener(this);
 
@@ -141,6 +140,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setController();
 
+    }
+
+    public void updateViews(){
+        if (musicService != null) { tvMain.setText(musicService.getSong().getTitle()); }
     }
 
     @Override
@@ -238,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Songs tempSong = adapter.getItem(position);
+                int pos2 = songList.indexOf(tempSong);
                 musicService.setSong(songList.indexOf(tempSong));
                 musicService.playSong();
                 controller.show();
