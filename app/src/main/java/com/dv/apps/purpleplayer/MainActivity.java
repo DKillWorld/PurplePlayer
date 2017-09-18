@@ -1,13 +1,12 @@
 package com.dv.apps.purpleplayer;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,11 +18,11 @@ import android.media.audiofx.Virtualizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -32,26 +31,26 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnPreparedListener
-        , MediaPlayer.OnCompletionListener{
+        , MediaPlayer.OnCompletionListener, MediaController.MediaPlayerControl{
 
-    static MediaPlayer mediaPlayer;
+//    static MediaPlayer mediaPlayer;
     static Cursor songCursor;
     static BassBoost bassBoost;
     static Virtualizer virtualizer;
     Uri uri, songUri;
     ContentResolver contentResolver;
-    ArrayList<Songs> songList;
+    static ArrayList<Songs> songList;
     SongAdapter adapter;
     ImageButton playPause, loop, next, prev, shuffle, playPauseMain;
     TextView tvMain;
@@ -66,6 +65,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     static MainActivity mainActivity;
 
+    //TEST THINGS
+    public static MusicService musicService;
+    private Intent playIntent;
+    private boolean musicBound = false;
+    private ServiceConnection musicConnection;
+
+    MusicController controller;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,84 +86,107 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
-        preferences = getPreferences(MODE_PRIVATE);
-        if ((preferences != null) && (songCursor != null)){
-            songCursor.moveToPosition(preferences.getInt("Cursor_Pos", 0));
-            if (songCursor.getPosition() == songList.size()){
-                songCursor.moveToPosition(0);
-            }
-            String _id = songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media._ID));
-            songUri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, _id);
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-                mediaPlayer.setDataSource(getApplicationContext(), songUri);
-                mediaPlayer.prepare();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mediaPlayer.setOnCompletionListener(this);
-
-            tvMain = (TextView) findViewById(R.id.tvMain);
-            tvMain.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-            tvMain.setSelected(true);
-            tvMain.setOnClickListener(this);
-
-            randomize = preferences.getBoolean("Shuffle_Status", false);
-            looping = preferences.getBoolean("Loop_Status", false);
-
-        }
+//        preferences = getPreferences(MODE_PRIVATE);
+//        if ((preferences != null) && (songCursor != null)){
+//            songCursor.moveToPosition(preferences.getInt("Cursor_Pos", 0));
+//            if (songCursor.getPosition() == songList.size()){
+//                songCursor.moveToPosition(0);
+//            }
+//            String _id = songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media._ID));
+//            songUri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, _id);
+//            musicService.mediaPlayer = new MediaPlayer();
+//            musicService.mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//            try {
+//                musicService.mediaPlayer.setDataSource(getApplicationContext(), songUri);
+//                musicService.mediaPlayer.prepare();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            musicService.mediaPlayer.setOnCompletionListener(this);
+//
+//            tvMain = (TextView) findViewById(R.id.tvMain);
+//            tvMain.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+//            tvMain.setSelected(true);
+//            tvMain.setOnClickListener(this);
+//
+//            randomize = preferences.getBoolean("Shuffle_Status", false);
+//            looping = preferences.getBoolean("Loop_Status", false);
+//
+//        }
 
         mainActivity = this;
 
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         playPauseMain.setOnClickListener(this);
 
-//AudioManager Code
-        AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        tvMain = (TextView) findViewById(R.id.tvMain);
+        tvMain.setText("Test");
+        tvMain.setSelected(true);
+        tvMain.setOnClickListener(this);
+
+        musicConnection = new ServiceConnection() {
             @Override
-            public void onAudioFocusChange(int focusChange) {
-                audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+                musicService = binder.getService();
+                musicService.setList(songList);
+                musicBound = true;
+            }
 
-                switch (focusChange) {
-
-                    case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK):
-                        mediaPlayer.setVolume(0.2f, 0.2f);
-                        break;
-
-                    case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
-                        mediaPlayer.pause();
-                        userStopped = false;
-                        break;
-
-                    case (AudioManager.AUDIOFOCUS_LOSS):
-                        mediaPlayer.pause();
-                        userStopped = false;
-                        break;
-
-                    case (AudioManager.AUDIOFOCUS_GAIN):
-                        if ((mediaPlayer != null) && (!userStopped)) {
-                            mediaPlayer.setVolume(1f, 1f);
-                            mediaPlayer.start();
-                        }
-                        break;
-
-                }
-
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                musicBound = false;
             }
         };
 
+        setController();
 
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        focusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener , AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (playIntent == null){
+            playIntent = new Intent(this, MusicService.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+
+        }
+    }
+
+    public void setController(){
+        controller = new MusicController(this);
+        controller.setPrevNextListeners(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playNext();
+            }
+        }, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playPrev();
+            }
+        });
+        controller.setMediaPlayer(this);
+        controller.setAnchorView(findViewById(R.id.root_main));
+        controller.setEnabled(true);
+    }
+
+    private void playNext(){
+        musicService.playNext();
+        controller.show();
+    }
+
+    private void playPrev(){
+        musicService.playPrev();
+        controller.show();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
+        if (musicService != null) {
+            if (musicService.isPlaying()) {
                 playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
             } else {
                 playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
@@ -194,7 +224,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 songList.add(new Songs(currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
             } while (songCursor.moveToNext());
+            songCursor.close();
         }
+
 
         //ListView creation
         ListView listView = (ListView) findViewById(R.id.lv);
@@ -206,37 +238,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Songs tempSong = adapter.getItem(position);
-                play(songList.indexOf(tempSong));
+                musicService.setSong(songList.indexOf(tempSong));
+                musicService.playSong();
+                controller.show();
+//                play(songList.indexOf(tempSong));
             }
         });
     }
 
     //Play Method
     public void play(int pos) {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-        songCursor.moveToPosition(pos);
-        if (songCursor.getPosition() == songList.size()) {
-            songCursor.moveToPosition(0);
-        }
-        String _id = songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media._ID));
-        songUri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, _id);
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mediaPlayer.setDataSource(getApplicationContext(), songUri);
-            mediaPlayer.prepare();
-            mediaPlayer.setOnPreparedListener(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        musicService.songPosn = pos;
+        musicService.playSong();
         if (DetailActivity.getInstance() != null) {
             DetailActivity.getInstance().updateViews();
-            if (mediaPlayer.isPlaying()){
-                DetailActivity.getInstance().playPause.setImageResource(R.mipmap.ic_pause);
-            }
         }
 
         /**
@@ -247,14 +262,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          */
 
 
-        tvMain = (TextView) findViewById(R.id.tvMain);
-        tvMain.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-        tvMain.setSelected(true);
-        playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-        startNotification();
 
-        tvMain.setOnClickListener(this);
-        mediaPlayer.setOnCompletionListener(this);
+        playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+
+        musicService.mediaPlayer.setOnCompletionListener(this);
         updatePreferences();
     }
 
@@ -268,45 +279,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.apply();
     }
 
-    //Notofication
-    public void startNotification(){
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)) + "")
-                .setContentText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)) + "")
-                .setContentIntent(contentIntent)
-                .build();
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notification);
-    }
-
-
     @Override
     public void onClick(View v) {
         switch (v.getId()){
 
             case R.id.next:
                 if (randomize){
-                    play(getRandom());
+                    musicService.songPosn = getRandom();
+                    musicService.playSong();
                 }else {
-                    if (songCursor.getPosition() == (songList.size() - 1)) {
-                        songCursor.moveToFirst();
-                    }
-                    songCursor.moveToPosition(songCursor.getPosition() + 1);
-                    play(songCursor.getPosition());
+                    playNext();
                 }
                 break;
 
             case R.id.prev:
-                if (songCursor.getPosition() == 0 ) {
-                    songCursor.moveToPosition(songList.size());
-                }
-                songCursor.moveToPosition(songCursor.getPosition() - 1);
-                play(songCursor.getPosition());
+                playPrev();
                 break;
 
             case R.id.tvMain:
@@ -315,14 +302,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.playPauseMain:
-                if (mediaPlayer != null) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
+                if (musicService != null) {
+                    if (musicService.isPlaying()) {
+                        musicService.pausePlayer();
                         playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                         userStopped = true;
                     } else {
-                        mediaPlayer.start();
-                        if (mediaPlayer.isPlaying()) {
+                        musicService.startPlayer();
+                        if (musicService.isPlaying()) {
                             playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
                         }
                     }
@@ -383,11 +370,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
-        if (mediaPlayer != null) {
-            mediaPlayer.reset();
-            mediaPlayer.release();
-        }
-        mediaPlayer = null;
+        stopService(playIntent);
+        musicService = null;
 
         super.onDestroy();
     }
@@ -428,7 +412,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPrepared(MediaPlayer mp) {
         if (focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            mediaPlayer.start();
+        }
+
+        if (DetailActivity.getInstance() != null){
+            DetailActivity.getInstance().playPause.setImageResource(R.mipmap.ic_pause);
         }
     }
 
@@ -440,6 +427,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             songCursor.moveToPosition(songCursor.getPosition() + 1);
             play(songCursor.getPosition());
         }
+
+    }
+
+    @Override
+    public void start() {
+        musicService.startPlayer();
+    }
+
+    @Override
+    public void pause() {
+        musicService.pausePlayer();
+    }
+
+    @Override
+    public int getDuration() {
+        if (musicService != null && musicBound){
+            return musicService.getDur();
+        }
+        else return 0;
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        if (musicService != null && musicBound && musicService.isPlaying()){
+                return musicService.getPosn();
+        }
+        else return 0;
+    }
+
+    @Override
+    public void seekTo(int pos) {
+        musicService.seekTo(pos);
+    }
+
+    @Override
+    public boolean isPlaying() {
+        if (musicService != null && musicBound){
+            return musicService.isPlaying();
+        }
+        else return false;
+    }
+
+    @Override
+    public int getBufferPercentage() {
+        return 0;
+    }
+
+    @Override
+    public boolean canPause() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekBackward() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekForward() {
+        return true;
+    }
+
+    @Override
+    public int getAudioSessionId() {
+        return 0;
     }
 }
 

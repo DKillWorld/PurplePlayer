@@ -1,6 +1,5 @@
 package com.dv.apps.purpleplayer;
 
-import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -23,7 +22,7 @@ import android.widget.Toast;
 
 import static com.dv.apps.purpleplayer.MainActivity.bassBoost;
 import static com.dv.apps.purpleplayer.MainActivity.looping;
-import static com.dv.apps.purpleplayer.MainActivity.mediaPlayer;
+import static com.dv.apps.purpleplayer.MainActivity.musicService;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
 import static com.dv.apps.purpleplayer.MainActivity.songCursor;
 import static com.dv.apps.purpleplayer.MainActivity.userStopped;
@@ -90,7 +89,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         if (randomize){
             shuffle.setBackgroundResource(R.drawable.background_button_selected);
         }
-        if (mediaPlayer.isPlaying()){
+        if (musicService.isPlaying()){
             playPause.setImageResource(R.mipmap.ic_pause);
         }
 
@@ -100,16 +99,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     public void updateViews(){
         //Setting up Title
-        textView1.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+        textView1.setText(musicService.getSong().getTitle());
 
         //Setting up Artist
-        textView2.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+        textView2.setText(musicService.getSong().getArtist());
 
         //Setting up AlmubArt
-        Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-        Long songId = songCursor.getLong(songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-        Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, songId);
-        imageView.setImageURI(albumArtUri);
+        imageView.setImageURI(musicService.getSong().getImage());
         if (imageView.getDrawable() == null){
             imageView.setImageResource(R.mipmap.ic_launcher_web);
         }
@@ -127,9 +123,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mediaPlayer != null) {
-                    seekBar.setMax(mediaPlayer.getDuration());
-                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                if (musicService != null) {
+                    seekBar.setMax(musicService.getDur());
+                    seekBar.setProgress(musicService.getPosn());
                     seekHandler.postDelayed(this, 1000);
                 }
             }
@@ -156,14 +152,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.playPause:
-                if (mediaPlayer != null) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
+                if (musicService != null) {
+                    if (musicService.isPlaying()) {
+                        musicService.pausePlayer();
                         userStopped = true;
                         playPause.setImageResource(R.mipmap.ic_launcher);
                     } else {
-                        mediaPlayer.start();
-                        if (mediaPlayer.isPlaying()) {
+                        musicService.startPlayer();
+                        if (musicService.isPlaying()) {
                             playPause.setImageResource(R.mipmap.ic_pause);
                         }
                     }
@@ -172,12 +168,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
             case R.id.loop:
                 if (!looping){
-                    mediaPlayer.setLooping(true);
+                    musicService.setLooping(true);
                     loop.setBackgroundResource(R.drawable.background_button_selected);
                     Toast.makeText(getApplicationContext(), "Repeat ON!!", Toast.LENGTH_SHORT).show();
                     looping = true;
                 }else{
-                    mediaPlayer.setLooping(false);
+                    musicService.setLooping(false);
                     loop.setBackgroundResource(R.drawable.background_buttons);
                     Toast.makeText(getApplicationContext(), "Repeat OFF!!", Toast.LENGTH_SHORT).show();
                     looping = false;
@@ -217,8 +213,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser){
-            if (mediaPlayer != null){
-                mediaPlayer.seekTo(progress);
+            if (musicService != null){
+                musicService.seekTo(progress);
             }
         }
     }
@@ -235,16 +231,16 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
 
     public void addBassTest(View view){
-        bassBoost = new BassBoost(0, mediaPlayer.getAudioSessionId());
+        bassBoost = new BassBoost(0, musicService.mediaPlayer.getAudioSessionId());
         bassBoost.setStrength((short) 1000);
         bassBoost.setEnabled(true);
-        mediaPlayer.setAuxEffectSendLevel(1.0f);
+        musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
     }
 
     public void addVirtualizerTest(View view){
-        virtualizer = new Virtualizer(0, mediaPlayer.getAudioSessionId());
+        virtualizer = new Virtualizer(0, musicService.mediaPlayer.getAudioSessionId());
         virtualizer.setStrength((short) 1000);
         virtualizer.setEnabled(true);
-        mediaPlayer.setAuxEffectSendLevel(1.0f);
+        musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
     }
 }
