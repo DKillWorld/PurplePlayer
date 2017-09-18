@@ -10,8 +10,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Virtualizer;
@@ -41,8 +39,7 @@ import com.google.android.gms.ads.MobileAds;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnPreparedListener
-        , MediaPlayer.OnCompletionListener, MediaController.MediaPlayerControl{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaController.MediaPlayerControl{
 
 //    static MediaPlayer mediaPlayer;
     static Cursor songCursor;
@@ -59,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static boolean userStopped = true;
     SeekBar seekBar;
     SearchView searchView;
-    AudioManager audioManager;
-    int focusResult;
     SharedPreferences preferences;
 
     static MainActivity mainActivity;
@@ -86,33 +81,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
-//        preferences = getPreferences(MODE_PRIVATE);
-//        if ((preferences != null) && (songCursor != null)){
-//            songCursor.moveToPosition(preferences.getInt("Cursor_Pos", 0));
-//            if (songCursor.getPosition() == songList.size()){
-//                songCursor.moveToPosition(0);
-//            }
-//            String _id = songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media._ID));
-//            songUri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, _id);
-//            musicService.mediaPlayer = new MediaPlayer();
-//            musicService.mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//            try {
-//                musicService.mediaPlayer.setDataSource(getApplicationContext(), songUri);
-//                musicService.mediaPlayer.prepare();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            musicService.mediaPlayer.setOnCompletionListener(this);
-//
-//            tvMain = (TextView) findViewById(R.id.tvMain);
-//            tvMain.setText(songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-//            tvMain.setSelected(true);
-//            tvMain.setOnClickListener(this);
-//
-//            randomize = preferences.getBoolean("Shuffle_Status", false);
-//            looping = preferences.getBoolean("Loop_Status", false);
-//
-//        }
+        preferences = getPreferences(MODE_PRIVATE);
+        if (preferences != null){
+            randomize = preferences.getBoolean("Shuffle_Status", false);
+            looping = preferences.getBoolean("Loop_Status", false);
+
+        }
 
         mainActivity = this;
 
@@ -129,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
                 musicService = binder.getService();
                 musicService.setList(songList);
+                musicService.setSong(preferences.getInt("songPosn", 0));
+                updateViews();
                 musicBound = true;
             }
 
@@ -137,8 +113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 musicBound = false;
             }
         };
-
-        setController();
 
     }
 
@@ -153,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -160,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
-
         }
     }
 
@@ -184,24 +159,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void playNext(){
         musicService.playNext();
-        controller.show();
     }
 
     private void playPrev(){
         musicService.playPrev();
-        controller.show();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (musicService != null) {
-            if (musicService.isPlaying()) {
-                playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-            } else {
-                playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-            }
-        }
     }
 
     public static MainActivity getInstance(){
@@ -248,43 +209,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Songs tempSong = adapter.getItem(position);
-                int pos2 = songList.indexOf(tempSong);
                 musicService.setSong(songList.indexOf(tempSong));
                 musicService.playSong();
-                controller.show();
-//                play(songList.indexOf(tempSong));
             }
         });
     }
 
-    //Play Method
-    public void play(int pos) {
-        musicService.songPosn = pos;
-        musicService.playSong();
-        if (DetailActivity.getInstance() != null) {
-            DetailActivity.getInstance().updateViews();
-        }
-
-        /**
-         * Old code to Play Song, Stored for reference
-         * mediaPlayer = MediaPlayer.create(getApplicationContext(), songUri);   //Old Code to play song
-         * mediaPlayer.start();   //Old Code to play song
-         *
-         */
-
-
-
-        playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-
-        musicService.mediaPlayer.setOnCompletionListener(this);
-        updatePreferences();
-    }
-
     //Updating SharedPreferences Once file is changed
-    private void updatePreferences() {
+    public void updatePreferences() {
         preferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("Cursor_Pos", songCursor.getPosition());
+        editor.putInt("songPosn", songList.indexOf(musicService.getSong()));
         editor.putBoolean("Shuffle_Status", randomize);
         editor.putBoolean("Loop_Status", looping);
         editor.apply();
@@ -313,16 +248,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.playPauseMain:
-                if (musicService != null) {
+                if (musicService.isPlaying()) {
+                    musicService.pausePlayer();
+                    playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                    userStopped = true;
+                } else {
+                    musicService.startPlayer();
                     if (musicService.isPlaying()) {
-                        musicService.pausePlayer();
-                        playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                        userStopped = true;
-                    } else {
-                        musicService.startPlayer();
-                        if (musicService.isPlaying()) {
-                            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-                        }
+                        playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
                     }
                 }
                 break;
@@ -421,24 +354,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onPrepared(MediaPlayer mp) {
-        if (focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-        }
-
-        if (DetailActivity.getInstance() != null){
-            DetailActivity.getInstance().playPause.setImageResource(R.mipmap.ic_pause);
-        }
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        if (randomize){
-            play(getRandom());
-        } else {
-            songCursor.moveToPosition(songCursor.getPosition() + 1);
-            play(songCursor.getPosition());
-        }
-
+    protected void onResume() {
+        super.onResume();
+        updateViews();
     }
 
     @Override

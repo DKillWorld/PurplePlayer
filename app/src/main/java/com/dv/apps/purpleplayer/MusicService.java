@@ -41,6 +41,7 @@ public class MusicService extends Service implements
 
     private static final int NOTIFY_ID = 1;
     private String songTitle;
+    private String songArtist;
 
     private final IBinder binder = new MusicBinder();
 
@@ -148,6 +149,7 @@ public class MusicService extends Service implements
         mediaPlayer.reset();
         Songs sampleSong = songList.get(songPosn);
         songTitle = sampleSong.getTitle();
+        songArtist = sampleSong.getArtist();
         long currentSong = sampleSong.getId();
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currentSong);
 
@@ -215,6 +217,7 @@ public class MusicService extends Service implements
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        playNext();
     }
 
     @Override
@@ -231,8 +234,14 @@ public class MusicService extends Service implements
             MainActivity.getInstance().updateViews();
         }
 
+        if (MainActivity.getInstance() != null){
+            MainActivity.getInstance().updateViews();
+            MainActivity.getInstance().updatePreferences();
+        }
+
         if (DetailActivity.getInstance() != null) {
             DetailActivity.getInstance().updateViews();
+            DetailActivity.getInstance().updateSeekbar();
         }
 
         Intent notIntent = new Intent(this, MainActivity.class);
@@ -245,8 +254,8 @@ public class MusicService extends Service implements
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setTicker(songTitle)
                 .setOngoing(true)
-                .setContentTitle("Playing")
-                .setContentText(songTitle);
+                .setContentTitle(songTitle)
+                .setContentText(songArtist);
 
         Notification notification = builder.build();
         startForeground(NOTIFY_ID, notification);

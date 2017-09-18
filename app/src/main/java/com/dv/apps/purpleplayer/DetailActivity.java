@@ -123,7 +123,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (musicService != null) {
+                if (musicService.isPlaying()) {
                     seekBar.setMax(musicService.getDur());
                     seekBar.setProgress(musicService.getPosn());
                     seekHandler.postDelayed(this, 1000);
