@@ -9,8 +9,9 @@ import android.media.audiofx.Virtualizer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.View;
@@ -24,7 +25,6 @@ import static com.dv.apps.purpleplayer.MainActivity.bassBoost;
 import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.musicService;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
-import static com.dv.apps.purpleplayer.MainActivity.songCursor;
 import static com.dv.apps.purpleplayer.MainActivity.userStopped;
 import static com.dv.apps.purpleplayer.MainActivity.virtualizer;
 
@@ -95,7 +95,23 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
         getWindow().getDecorView().setBackgroundResource(R.mipmap.background_list);
+
     }
+
+    public void buildTransportControls(){
+        playPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pbState = MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getState();
+                if (pbState == PlaybackStateCompat.STATE_PLAYING){
+                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().pause();
+                }else {
+                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().play();
+                }
+            }
+        });
+    }
+
 
     public void updateViews(){
         //Setting up Title
@@ -139,10 +155,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
             case R.id.showLyrics:
                 boolean qLInstalled = isQLInstalled();
-                String ArtName = songCursor.getString
-                        (songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String SongName = songCursor.getString
-                        (songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String ArtName = musicService.getSong().getArtist();
+                String SongName = musicService.getSong().getTitle();
                 if (qLInstalled){
                     startActivity(new Intent("com.geecko.QuickLyric.getLyrics")
                             .putExtra("TAGS", new String[]{ArtName, SongName}));
@@ -228,7 +242,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
-
 
     public void addBassTest(View view){
         bassBoost = new BassBoost(0, musicService.mediaPlayer.getAudioSessionId());

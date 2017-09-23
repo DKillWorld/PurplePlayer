@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.MediaController;
 
 /**
- * Created by Dhaval on 18-09-2017.
+ * Created by Dhaval on 23-09-2017.
  */
 
 public class MusicController extends MediaController {
@@ -12,3 +12,4 @@ public class MusicController extends MediaController {
         super(context);
     }
 }
+

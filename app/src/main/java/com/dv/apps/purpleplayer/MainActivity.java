@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
@@ -41,8 +42,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaController.MediaPlayerControl{
 
-//    static MediaPlayer mediaPlayer;
-    static Cursor songCursor;
+    Cursor songCursor;
     static BassBoost bassBoost;
     static Virtualizer virtualizer;
     Uri uri, songUri;
@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ServiceConnection musicConnection;
 
     MusicController controller;
+
 
 
     @Override
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 musicBound = false;
             }
         };
+        setController();
 
     }
 
@@ -141,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setController(){
         controller = new MusicController(this);
+        controller.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
         controller.setPrevNextListeners(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,15 +156,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         controller.setMediaPlayer(this);
-        controller.setAnchorView(findViewById(R.id.root_main));
+        controller.setAnchorView(findViewById(R.id.lv));
         controller.setEnabled(true);
     }
 
-    private void playNext(){
-        musicService.playNext();
+    public void playNext(){
+        if (randomize){
+            musicService.songPosn = getRandom();
+            musicService.playSong();
+        }else {
+            musicService.playNext();
+        };
     }
 
-    private void playPrev(){
+    public void playPrev(){
         musicService.playPrev();
     }
 
@@ -253,8 +261,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                     userStopped = true;
                 } else {
-                    musicService.startPlayer();
-                    if (musicService.isPlaying()) {
+                    musicService.getDur();
+                    if (musicService.getDur() == 0) {
+                        musicService.playSong();
+                        playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+                    }else {
+                        musicService.startPlayer();
                         playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
                     }
                 }
@@ -379,8 +391,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public int getCurrentPosition() {
-        if (musicService != null && musicBound && musicService.isPlaying()){
-                return musicService.getPosn();
+        if (musicService != null && musicBound) {
+            return musicService.getPosn();
         }
         else return 0;
     }
@@ -420,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public int getAudioSessionId() {
-        return 0;
+        return musicService.mediaPlayer.getAudioSessionId();
     }
 }
 

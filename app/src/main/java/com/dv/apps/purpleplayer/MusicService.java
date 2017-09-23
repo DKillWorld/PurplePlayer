@@ -2,7 +2,6 @@ package com.dv.apps.purpleplayer;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -12,14 +11,25 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaBrowserServiceCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.app.NotificationCompat;
+import android.view.KeyEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.dv.apps.purpleplayer.MainActivity.userStopped;
 
@@ -27,7 +37,7 @@ import static com.dv.apps.purpleplayer.MainActivity.userStopped;
  * Created by Dhaval on 18-09-2017.
  */
 
-public class MusicService extends Service implements
+public class MusicService extends MediaBrowserServiceCompat implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener{
 
@@ -39,6 +49,9 @@ public class MusicService extends Service implements
     AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener;
     BroadcastReceiver becomingNoisyReceiver;
 
+    MediaSessionCompat mediaSessionCompat;
+    PlaybackStateCompat playbackStateCompat;
+
     private static final int NOTIFY_ID = 1;
     private String songTitle;
     private String songArtist;
@@ -49,6 +62,17 @@ public class MusicService extends Service implements
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
+    }
+
+    @Nullable
+    @Override
+    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
+        return null;
+    }
+
+    @Override
+    public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
+
     }
 
     @Override
@@ -70,7 +94,10 @@ public class MusicService extends Service implements
         songPosn = 0;
         mediaPlayer = new MediaPlayer();
         initMusicPlayer();
+        initMediaSession();
         getAudioFocus();
+        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
+
 
         becomingNoisyReceiver = new BroadcastReceiver() {
             @Override
@@ -79,6 +106,72 @@ public class MusicService extends Service implements
                 pausePlayer();
             }
         };
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
+        if (startId >= 2) {
+            switch (keyEvent.getKeyCode()){
+
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
+                    startPlayer();
+                    break;
+
+                case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                    pausePlayer();
+                    break;
+
+                case KeyEvent.KEYCODE_MEDIA_NEXT:
+                    MainActivity.getInstance().playNext();
+                    break;
+
+                case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                    MainActivity.getInstance().playPrev();
+                    break;
+
+                case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                    if ((mediaPlayer.getCurrentPosition() + 15000) < mediaPlayer.getDuration()){
+                        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 15000);
+                    }
+                    break;
+
+                case KeyEvent.KEYCODE_MEDIA_REWIND:
+                    if ((mediaPlayer.getCurrentPosition() - 15000) > 0){
+                        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 15000);
+                    }
+                    break;
+            }
+        }
+        return START_STICKY;
+    }
+
+
+
+    public void setupMetadata(){
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, getSong().getTitle());
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, getSong().getArtist());
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, getSong().getImage().toString());
+        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, getSong().getDuration());
+        mediaSessionCompat.setMetadata(builder.build());
+
+    }
+
+    public void setMediaPlaybackState(int state){
+        PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
+        builder.setActions(PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_FAST_FORWARD |
+                PlaybackStateCompat.ACTION_REWIND);
+
+        if (state == PlaybackStateCompat.STATE_PLAYING){
+            builder.setActions(PlaybackStateCompat.ACTION_PAUSE);
+        }else {
+            builder.setActions(PlaybackStateCompat.ACTION_PLAY);
+        }
+        builder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1);
+        playbackStateCompat = builder.build();
+        mediaSessionCompat.setPlaybackState(playbackStateCompat);
     }
 
     public int getAudioFocus(){
@@ -133,6 +226,18 @@ public class MusicService extends Service implements
 
     }
 
+    public void initMediaSession(){
+        mediaSessionCompat = new MediaSessionCompat(getApplicationContext(), "TAG");
+        mediaSessionCompat.setCallback(new MediaSessionCompat.Callback(){});
+        mediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
+
+        Intent mediaButoonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        mediaButoonIntent.setClass(this, MediaButtonReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButoonIntent, 0);
+        mediaSessionCompat.setMediaButtonReceiver(pendingIntent);
+
+    }
+
     public void setList(ArrayList<Songs> songList){
         this.songList = songList;
     }
@@ -175,6 +280,10 @@ public class MusicService extends Service implements
 
     public void pausePlayer(){
         mediaPlayer.pause();
+        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
+        stopForeground(false);
+        updatNotification();
+
     }
 
     public void seekTo(int posn){
@@ -183,6 +292,8 @@ public class MusicService extends Service implements
 
     public void startPlayer(){
         mediaPlayer.start();
+        setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+        startForeground(NOTIFY_ID, setupNotification());
     }
 
     public void playPrev(){
@@ -230,6 +341,9 @@ public class MusicService extends Service implements
         if (getAudioFocus() == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             registerBecomingNoisyReceiver();
             mediaPlayer.start();
+            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+
+            MainActivity.getInstance().controller.show(0);
 
             MainActivity.getInstance().updateViews();
         }
@@ -244,27 +358,70 @@ public class MusicService extends Service implements
             DetailActivity.getInstance().updateSeekbar();
         }
 
+        mediaSessionCompat.setActive(true);
+        setupMetadata();
+        setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+        startForeground(NOTIFY_ID, setupNotification());
+        updatNotification();
+
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+//
+//        builder.setContentIntent(pendingIntent)
+//                .setSmallIcon(R.mipmap.ic_launcher)
+//                .setTicker(songTitle)
+//                .setOngoing(true)
+//                .setContentTitle(songTitle)
+//                .setContentText(songArtist);
+//
+//        Notification notification = builder.build();
+//        startForeground(NOTIFY_ID, notification);
+
+
+    }
+
+    public Notification setupNotification(){
         Intent notIntent = new Intent(this, MainActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        NotificationCompat.Builder builder = MediaStyleHelper.from(getApplicationContext(), mediaSessionCompat);
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+                .setColor(ContextCompat.getColor(this, android.R.color.holo_orange_light));
+        builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Prev", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)));
+        builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_rew, "FastReve", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_REWIND)));
+        if (playbackStateCompat.getState() == PlaybackStateCompat.STATE_PLAYING){
+            builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_pause, "Pause", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_PAUSE)));
+        }else {
+            builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_play, "Play", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_PLAY)));
+        }
+        builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_ff, "FastForw", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_FAST_FORWARD)));
+        builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)));
 
-        builder.setContentIntent(pendingIntent)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setTicker(songTitle)
-                .setOngoing(true)
-                .setContentTitle(songTitle)
-                .setContentText(songArtist);
 
-        Notification notification = builder.build();
-        startForeground(NOTIFY_ID, notification);
+        builder.setShowWhen(false);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        builder.setStyle(new NotificationCompat.MediaStyle()
+                .setShowActionsInCompactView(2)
+                .setMediaSession(mediaSessionCompat.getSessionToken()));
+        return builder.build();
 
+    }
+
+    public void updatNotification(){
+        if (playbackStateCompat.getState() == PlaybackStateCompat.ACTION_PAUSE) {
+            startForeground(NOTIFY_ID, setupNotification());
+            stopForeground(false);
+        }else if(playbackStateCompat.getState() == PlaybackStateCompat.ACTION_PLAY){
+            startForeground(NOTIFY_ID, setupNotification());
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mediaSessionCompat.setActive(false);
+        mediaSessionCompat.release();
         audioManager.abandonAudioFocus(onAudioFocusChangeListener);
         stopForeground(true);
     }
