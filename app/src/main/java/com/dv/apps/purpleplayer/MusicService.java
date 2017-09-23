@@ -282,7 +282,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         mediaPlayer.pause();
         setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
         stopForeground(false);
-        updatNotification();
+        updateNotification();
 
     }
 
@@ -343,7 +343,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
             mediaPlayer.start();
             setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
 
-            MainActivity.getInstance().controller.show(0);
+            MainActivity.getInstance().controller.show(5000);
 
             MainActivity.getInstance().updateViews();
         }
@@ -362,7 +362,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         setupMetadata();
         setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
         startForeground(NOTIFY_ID, setupNotification());
-        updatNotification();
+        updateNotification();
 
 //        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 //
@@ -408,7 +408,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     }
 
-    public void updatNotification(){
+    public void updateNotification(){
         if (playbackStateCompat.getState() == PlaybackStateCompat.ACTION_PAUSE) {
             startForeground(NOTIFY_ID, setupNotification());
             stopForeground(false);
