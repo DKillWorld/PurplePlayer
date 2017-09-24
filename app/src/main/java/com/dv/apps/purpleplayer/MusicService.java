@@ -25,7 +25,6 @@ import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
-import android.view.KeyEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -110,39 +109,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
-        if (startId >= 2) {
-            switch (keyEvent.getKeyCode()){
-
-                case KeyEvent.KEYCODE_MEDIA_PLAY:
-                    startPlayer();
-                    break;
-
-                case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                    pausePlayer();
-                    break;
-
-                case KeyEvent.KEYCODE_MEDIA_NEXT:
-                    MainActivity.getInstance().playNext();
-                    break;
-
-                case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                    MainActivity.getInstance().playPrev();
-                    break;
-
-                case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                    if ((mediaPlayer.getCurrentPosition() + 15000) < mediaPlayer.getDuration()){
-                        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 15000);
-                    }
-                    break;
-
-                case KeyEvent.KEYCODE_MEDIA_REWIND:
-                    if ((mediaPlayer.getCurrentPosition() - 15000) > 0){
-                        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 15000);
-                    }
-                    break;
-            }
-        }
+        MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
         return START_STICKY;
     }
 
@@ -152,7 +119,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
         builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, getSong().getTitle());
         builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, getSong().getArtist());
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, getSong().getImage().toString());
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getSong().getImageBitmap());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, getSong().getDuration());
         mediaSessionCompat.setMetadata(builder.build());
 
@@ -160,18 +127,20 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public void setMediaPlaybackState(int state){
         PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
-        builder.setActions(PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_FAST_FORWARD |
-                PlaybackStateCompat.ACTION_REWIND);
 
         if (state == PlaybackStateCompat.STATE_PLAYING){
-            builder.setActions(PlaybackStateCompat.ACTION_PAUSE);
+            builder.setActions(PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
+                    PlaybackStateCompat.ACTION_REWIND);
         }else {
-            builder.setActions(PlaybackStateCompat.ACTION_PLAY);
+            builder.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
+                    PlaybackStateCompat.ACTION_REWIND);
         }
         builder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1);
         playbackStateCompat = builder.build();
         mediaSessionCompat.setPlaybackState(playbackStateCompat);
+
     }
 
     public int getAudioFocus(){
@@ -228,7 +197,48 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public void initMediaSession(){
         mediaSessionCompat = new MediaSessionCompat(getApplicationContext(), "TAG");
-        mediaSessionCompat.setCallback(new MediaSessionCompat.Callback(){});
+        mediaSessionCompat.setCallback(new MediaSessionCompat.Callback(){
+            @Override
+            public void onSkipToNext() {
+                MainActivity.getInstance().playNext();
+                super.onSkipToNext();
+
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                MainActivity.getInstance().playPrev();
+                super.onSkipToPrevious();
+            }
+
+            @Override
+            public void onPause() {
+                pausePlayer();
+                super.onPause();
+            }
+
+            @Override
+            public void onPlay() {
+                startPlayer();
+                super.onPlay();
+            }
+
+            @Override
+            public void onFastForward() {
+                if ((mediaPlayer.getCurrentPosition() + 15000) < mediaPlayer.getDuration()){
+                    mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 15000);
+                }
+                super.onFastForward();
+            }
+
+            @Override
+            public void onRewind() {
+                if ((mediaPlayer.getCurrentPosition() - 15000) > 0){
+                    mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 15000);
+                }
+                super.onRewind();
+            }
+        });
         mediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
 
         Intent mediaButoonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
@@ -387,7 +397,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
         NotificationCompat.Builder builder = MediaStyleHelper.from(getApplicationContext(), mediaSessionCompat);
         builder.setContentIntent(pendingIntent);
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setColor(ContextCompat.getColor(this, android.R.color.holo_orange_light));
+                .setLargeIcon(getSong().getImageBitmap())
+                .setColor(ContextCompat.getColor(this, android.R.color.holo_purple));
         builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Prev", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)));
         builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_rew, "FastReve", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_REWIND)));
         if (playbackStateCompat.getState() == PlaybackStateCompat.STATE_PLAYING){

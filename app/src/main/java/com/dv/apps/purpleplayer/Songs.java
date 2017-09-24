@@ -1,6 +1,10 @@
 package com.dv.apps.purpleplayer;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
+
+import java.io.IOException;
 
 /**
  * Created by Dhaval on 01-07-2017.
@@ -42,6 +46,14 @@ public class Songs {
         return image;
     }
 
-
+    public Bitmap getImageBitmap(){
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(MainActivity.getInstance().contentResolver, image);
+            return bitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 
