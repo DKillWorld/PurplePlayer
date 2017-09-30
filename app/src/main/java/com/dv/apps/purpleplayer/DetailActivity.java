@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.View;
@@ -25,7 +23,6 @@ import static com.dv.apps.purpleplayer.MainActivity.bassBoost;
 import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.musicService;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
-import static com.dv.apps.purpleplayer.MainActivity.userStopped;
 import static com.dv.apps.purpleplayer.MainActivity.virtualizer;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
@@ -34,6 +31,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     ImageView imageView;
     ImageButton playPause, loop, next, prev, shuffle, showLyrics;
     SeekBar seekBar;
+
+    boolean BASS_BOOST_ATTACHED = false;
+    boolean VIRTUALIZER_ATTACHED = false;
+
 
     static DetailActivity detailActivity;
 
@@ -52,11 +53,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         textView1 = (TextView) findViewById(R.id.titleDetail);
         textView2 = (TextView) findViewById(R.id.artistDetail);
         imageView = (ImageView) findViewById(R.id.albumArt);
-        updateViews();
 
         //Play Pause Button
         playPause = (ImageButton) findViewById(R.id.playPause);
         playPause.setOnClickListener(this);
+        updateViews();
 
         //Loop Button
         loop = (ImageButton) findViewById(R.id.loop);
@@ -98,20 +99,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public void buildTransportControls(){
-        playPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int pbState = MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getState();
-                if (pbState == PlaybackStateCompat.STATE_PLAYING){
-                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().pause();
-                }else {
-                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().play();
-                }
-            }
-        });
-    }
-
 
     public void updateViews(){
         //Setting up Title
@@ -124,6 +111,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         imageView.setImageURI(musicService.getSong().getImage());
         if (imageView.getDrawable() == null){
             imageView.setImageResource(R.mipmap.ic_launcher_web);
+        }
+
+        if (musicService.isPlaying()){
+            playPause.setImageResource(R.mipmap.ic_pause);
+        }
+        if (!musicService.isPlaying()){
+            playPause.setImageResource(R.mipmap.ic_launcher);
         }
 
     }
@@ -166,16 +160,17 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.playPause:
-                if (musicService != null) {
-                    if (musicService.isPlaying()) {
-                        musicService.pausePlayer();
-                        userStopped = true;
-                        playPause.setImageResource(R.mipmap.ic_launcher);
-                    } else {
+                if (musicService.isPlaying()) {
+                    musicService.pausePlayer();
+                    playPause.setImageResource(R.mipmap.ic_launcher);
+                } else {
+                    musicService.getDur();
+                    if (musicService.getDur() == 0) {
+                        musicService.playSong();
+                        playPause.setImageResource(R.mipmap.ic_pause);
+                    }else {
                         musicService.startPlayer();
-                        if (musicService.isPlaying()) {
-                            playPause.setImageResource(R.mipmap.ic_pause);
-                        }
+                        playPause.setImageResource(R.mipmap.ic_pause);
                     }
                 }
                 break;
@@ -244,16 +239,26 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void addBassTest(View view){
-        bassBoost = new BassBoost(0, musicService.mediaPlayer.getAudioSessionId());
-        bassBoost.setStrength((short) 1000);
-        bassBoost.setEnabled(true);
-        musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
+        if (!BASS_BOOST_ATTACHED) {
+            bassBoost = new BassBoost(0, musicService.mediaPlayer.getAudioSessionId());
+            bassBoost.setStrength((short) 1000);
+            bassBoost.setEnabled(true);
+            musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
+            BASS_BOOST_ATTACHED = true;
+        }else {
+            bassBoost.setEnabled(false);
+        }
     }
 
     public void addVirtualizerTest(View view){
-        virtualizer = new Virtualizer(0, musicService.mediaPlayer.getAudioSessionId());
-        virtualizer.setStrength((short) 1000);
-        virtualizer.setEnabled(true);
-        musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
+        if (!VIRTUALIZER_ATTACHED) {
+            virtualizer = new Virtualizer(0, musicService.mediaPlayer.getAudioSessionId());
+            virtualizer.setStrength((short) 1000);
+            virtualizer.setEnabled(true);
+            musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
+            VIRTUALIZER_ATTACHED = true;
+        }else {
+            virtualizer.setEnabled(false);
+        }
     }
 }

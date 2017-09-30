@@ -20,7 +20,6 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
@@ -38,6 +37,7 @@ import android.widget.Toast;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaController.MediaPlayerControl{
@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView tvMain;
     static boolean randomize = false;
     static boolean looping = false;
-    static boolean userStopped = true;
     SeekBar seekBar;
     SearchView searchView;
     SharedPreferences preferences;
@@ -66,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean musicBound = false;
     private ServiceConnection musicConnection;
 
-    MusicController controller;
 
 
 
@@ -114,8 +112,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 musicBound = false;
             }
         };
-        setController();
-
     }
 
     public void updateViews(){
@@ -123,7 +119,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tvMain.setText(musicService.getSong().getTitle());
             if (musicService.isPlaying()){
                 playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-            }else {
+            }
+            if (!musicService.isPlaying()){
                 playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
             }
         }
@@ -139,25 +136,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
         }
-    }
-
-    public void setController(){
-        controller = new MusicController(this);
-        controller.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
-        controller.setPrevNextListeners(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playNext();
-            }
-        }, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playPrev();
-            }
-        });
-        controller.setMediaPlayer(this);
-        controller.setAnchorView(findViewById(R.id.lv));
-        controller.setEnabled(true);
     }
 
     public void playNext(){
@@ -259,7 +237,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (musicService.isPlaying()) {
                     musicService.pausePlayer();
                     playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                    userStopped = true;
                 } else {
                     musicService.getDur();
                     if (musicService.getDur() == 0) {
@@ -276,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //get random song when randomize/shuffle ON
     public int getRandom(){
-        return (int) (Math.random() * songList.size());
+        return new Random().nextInt(songList.size());
     }
 
     @Override

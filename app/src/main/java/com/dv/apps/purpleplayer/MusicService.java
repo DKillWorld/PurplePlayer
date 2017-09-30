@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dv.apps.purpleplayer.MainActivity.userStopped;
-
 /**
  * Created by Dhaval on 18-09-2017.
  */
@@ -43,6 +41,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
     MediaPlayer mediaPlayer;
     ArrayList<Songs> songList;
     int songPosn;
+    boolean systemStopped = false;
 
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener;
@@ -160,17 +159,20 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
                         case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
                             mediaPlayer.pause();
-                            userStopped = false;
+                            systemStopped = true;
                             break;
 
                         case (AudioManager.AUDIOFOCUS_LOSS):
                             mediaPlayer.pause();
-                            userStopped = false;
+                            systemStopped = false;
                             break;
 
                         case (AudioManager.AUDIOFOCUS_GAIN):
                             mediaPlayer.setVolume(1f, 1f);
-                            startPlayer();
+                            if (systemStopped) {
+                                startPlayer();
+                                systemStopped = false; //resetting variable to default
+                            }
                             break;
 
                     }
@@ -293,6 +295,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
         stopForeground(false);
         updateNotification();
+        updateActivityViews();
 
     }
 
@@ -304,6 +307,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
         mediaPlayer.start();
         setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
         startForeground(NOTIFY_ID, setupNotification());
+        updateActivityViews();
+        if (DetailActivity.getInstance() != null){
+            DetailActivity.getInstance().updateSeekbar();
+        }
     }
 
     public void playPrev(){
@@ -352,19 +359,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
             registerBecomingNoisyReceiver();
             mediaPlayer.start();
             setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
-
-            MainActivity.getInstance().controller.show(5000);
-
-            MainActivity.getInstance().updateViews();
         }
 
-        if (MainActivity.getInstance() != null){
-            MainActivity.getInstance().updateViews();
-            MainActivity.getInstance().updatePreferences();
-        }
-
-        if (DetailActivity.getInstance() != null) {
-            DetailActivity.getInstance().updateViews();
+        updateActivityViews();
+        if (DetailActivity.getInstance() != null){
             DetailActivity.getInstance().updateSeekbar();
         }
 
@@ -413,7 +411,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         builder.setShowWhen(false);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         builder.setStyle(new NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(2)
+                .setShowActionsInCompactView(2, 4)
                 .setMediaSession(mediaSessionCompat.getSessionToken()));
         return builder.build();
 
@@ -425,6 +423,17 @@ public class MusicService extends MediaBrowserServiceCompat implements
             stopForeground(false);
         }else if(playbackStateCompat.getState() == PlaybackStateCompat.ACTION_PLAY){
             startForeground(NOTIFY_ID, setupNotification());
+        }
+    }
+
+    public void updateActivityViews(){
+        if (MainActivity.getInstance() != null){
+            MainActivity.getInstance().updateViews();
+            MainActivity.getInstance().updatePreferences();
+        }
+
+        if (DetailActivity.getInstance() != null) {
+            DetailActivity.getInstance().updateViews();
         }
     }
 
