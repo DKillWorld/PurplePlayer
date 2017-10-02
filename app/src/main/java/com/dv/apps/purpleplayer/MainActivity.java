@@ -10,7 +10,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.audiofx.AudioEffect;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Virtualizer;
 import android.net.Uri;
@@ -81,11 +80,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
         preferences = getPreferences(MODE_PRIVATE);
-        if (preferences != null){
-            randomize = preferences.getBoolean("Shuffle_Status", false);
-            looping = preferences.getBoolean("Loop_Status", false);
-
-        }
 
         mainActivity = this;
 
@@ -103,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 musicService = binder.getService();
                 musicService.setList(songList);
                 musicService.setSong(preferences.getInt("songPosn", 0));
-                updateViews();
                 musicBound = true;
             }
 
@@ -199,16 +192,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 musicService.playSong();
             }
         });
+
+        getPreferences();
+        updateViews();
     }
 
     //Updating SharedPreferences Once file is changed
     public void updatePreferences() {
-        preferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("songPosn", songList.indexOf(musicService.getSong()));
         editor.putBoolean("Shuffle_Status", randomize);
         editor.putBoolean("Loop_Status", looping);
         editor.apply();
+    }
+
+    public void getPreferences(){
+
+        if (preferences != null){
+            randomize = preferences.getBoolean("Shuffle_Status", false);
+            looping = preferences.getBoolean("Loop_Status", false);
+
+        }
     }
 
     @Override
@@ -282,21 +286,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.setting_menu:
-                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(sIntent);
-                Toast.makeText(this, "Under Construction!", Toast.LENGTH_SHORT).show();
+//                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
+//                startActivity(sIntent);
+                Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.about_menu:
                 Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(aIntent);
                 break;
             case R.id.equilizer:
-                Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                if (bIntent.resolveActivity(getPackageManager()) != null){
-                    startActivity(bIntent);
-                }else {
-                    Toast.makeText(this, "No Equilizer Found !!", Toast.LENGTH_SHORT).show();
-                }
+//                Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+//                if (bIntent.resolveActivity(getPackageManager()) != null){
+//                    startActivity(bIntent);
+//                }else {
+                    Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
+//                }
         }
         return true;
     }

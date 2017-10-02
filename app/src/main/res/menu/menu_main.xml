@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/setting_menu" android:title="Settings"/>
-    <item android:id="@+id/about_menu" android:title="About"/>
+    <item android:id="@+id/setting_menu" android:title="Settings"
+        android:orderInCategory="300"/>
+    <item android:id="@+id/about_menu" android:title="About"
+        android:orderInCategory="400"/>
     <item android:id="@+id/search"
         android:title="Search"
         app:showAsAction="always"
         app:actionViewClass="android.support.v7.widget.SearchView"
+        android:orderInCategory="100"
         android:icon="@android:drawable/ic_menu_search"
         >
 
     </item>
     <item android:id="@+id/equilizer"
-        android:title="Equilizer"/>
+        android:title="Equilizer"
+        android:orderInCategory="200"/>
 </menu>

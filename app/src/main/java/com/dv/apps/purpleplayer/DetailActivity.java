@@ -247,6 +247,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             BASS_BOOST_ATTACHED = true;
         }else {
             bassBoost.setEnabled(false);
+            BASS_BOOST_ATTACHED = false;
         }
     }
 
@@ -259,6 +260,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             VIRTUALIZER_ATTACHED = true;
         }else {
             virtualizer.setEnabled(false);
+            VIRTUALIZER_ATTACHED = false;
         }
     }
 }

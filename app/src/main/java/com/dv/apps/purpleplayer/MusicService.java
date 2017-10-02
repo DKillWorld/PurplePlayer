@@ -126,17 +126,19 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public void setMediaPlaybackState(int state){
         PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
+        long currentPos = PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
 
         if (state == PlaybackStateCompat.STATE_PLAYING){
             builder.setActions(PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                     PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
-                    PlaybackStateCompat.ACTION_REWIND);
+                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO);
         }else {
             builder.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                     PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
-                    PlaybackStateCompat.ACTION_REWIND);
+                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO);
         }
-        builder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1);
+        if (isPlaying()) { currentPos = getPosn(); }
+        builder.setState(state, currentPos  , 1);
         playbackStateCompat = builder.build();
         mediaSessionCompat.setPlaybackState(playbackStateCompat);
 
@@ -240,6 +242,12 @@ public class MusicService extends MediaBrowserServiceCompat implements
                 }
                 super.onRewind();
             }
+
+            @Override
+            public void onSeekTo(long pos) {
+                setMediaPlaybackState(PlaybackStateCompat.STATE_FAST_FORWARDING);
+                super.onSeekTo(pos);
+            }
         });
         mediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
 
@@ -299,8 +307,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     }
 
-    public void seekTo(int posn){
+    public void seekTo(int posn) {
         mediaPlayer.seekTo(posn);
+        mediaSessionCompat.getController().getTransportControls().seekTo(getPosn());
     }
 
     public void startPlayer(){
