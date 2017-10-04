@@ -65,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ServiceConnection musicConnection;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateViews(){
-        if (musicService != null) {
+        if (musicService != null && songList.size() != 0) {
             tvMain.setText(musicService.getSong().getTitle());
             if (musicService.isPlaying()){
                 playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
@@ -233,24 +231,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.tvMain:
-                Intent intent = new Intent(this, DetailActivity.class);
-                startActivity(intent);
+                if (songList.size() != 0) {
+                    Intent intent = new Intent(this, DetailActivity.class);
+                    startActivity(intent);
+                }else Toast.makeText(this, "No Songs Found !!", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.playPauseMain:
-                if (musicService.isPlaying()) {
-                    musicService.pausePlayer();
-                    playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                } else {
-                    musicService.getDur();
-                    if (musicService.getDur() == 0) {
-                        musicService.playSong();
-                        playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-                    }else {
-                        musicService.startPlayer();
-                        playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+                if (songList.size() != 0) {
+                    if (musicService.isPlaying()) {
+                        musicService.pausePlayer();
+                        playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                    } else {
+                        musicService.getDur();
+                        if (musicService.getDur() == 0) {
+                            musicService.playSong();
+                            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+                        } else {
+                            musicService.startPlayer();
+                            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+                        }
                     }
-                }
+                }else Toast.makeText(this, "No Songs Found !!", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

@@ -12,6 +12,10 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.ArrayList;
 
 /**
@@ -23,11 +27,13 @@ public class SongAdapter extends ArrayAdapter<Songs> {
     private String songTime;
     private ArrayList<Songs> songList, backupList;
     private Songs song;
+    private Context context;
 
     public SongAdapter(@NonNull Context context, ArrayList<Songs> songList) {
         super(context,0, songList);
         this.songList = songList;
         this.backupList = songList;
+        this.context = context;
     }
 
     class Myholder{
@@ -74,7 +80,11 @@ public class SongAdapter extends ArrayAdapter<Songs> {
         myholder.textView2.setText(song.getArtist() + "");
         myholder.textView3.setText(songTime + "");
 //        myholder.imageView.setImageURI(song.getImage());
-
+        Glide.with(context)
+                .load(song.getImage())
+                .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher))
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(myholder.imageView);
 
         return view;
     }

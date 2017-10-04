@@ -19,10 +19,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+
 import static com.dv.apps.purpleplayer.MainActivity.bassBoost;
 import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.musicService;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
+import static com.dv.apps.purpleplayer.MainActivity.songList;
 import static com.dv.apps.purpleplayer.MainActivity.virtualizer;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
@@ -101,23 +106,35 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
 
     public void updateViews(){
-        //Setting up Title
-        textView1.setText(musicService.getSong().getTitle());
+        if (songList.size() != 0) {
 
-        //Setting up Artist
-        textView2.setText(musicService.getSong().getArtist());
+            //Setting up Title
+            textView1.setText(musicService.getSong().getTitle());
 
-        //Setting up AlmubArt
-        imageView.setImageURI(musicService.getSong().getImage());
-        if (imageView.getDrawable() == null){
-            imageView.setImageResource(R.mipmap.ic_launcher_web);
-        }
+            //Setting up Artist
+            textView2.setText(musicService.getSong().getArtist());
 
-        if (musicService.isPlaying()){
-            playPause.setImageResource(R.mipmap.ic_pause);
-        }
-        if (!musicService.isPlaying()){
-            playPause.setImageResource(R.mipmap.ic_launcher);
+            //Setting up AlmubArt
+
+            //Old code for ImageLoading
+//            imageView.setImageURI(musicService.getSong().getImage());
+//            if (imageView.getDrawable() == null) {
+//                imageView.setImageResource(R.mipmap.ic_launcher_web);
+//            }
+            Glide.with(this)
+                    .load(musicService.getSong().getImage())
+                    .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(imageView);
+
+
+
+            if (musicService.isPlaying()) {
+                playPause.setImageResource(R.mipmap.ic_pause);
+            }
+            if (!musicService.isPlaying()) {
+                playPause.setImageResource(R.mipmap.ic_launcher);
+            }
         }
 
     }

@@ -65,12 +65,12 @@ public class MusicService extends MediaBrowserServiceCompat implements
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-        return null;
+        return new BrowserRoot(getString(R.string.app_name), null);
     }
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-
+        result.sendResult(null);
     }
 
     @Override
@@ -95,6 +95,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         initMediaSession();
         getAudioFocus();
         setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
+        setSessionToken(mediaSessionCompat.getSessionToken());
 
 
         becomingNoisyReceiver = new BroadcastReceiver() {
@@ -131,11 +132,13 @@ public class MusicService extends MediaBrowserServiceCompat implements
         if (state == PlaybackStateCompat.STATE_PLAYING){
             builder.setActions(PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                     PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
-                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO);
+                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO |
+                    PlaybackStateCompat.ACTION_STOP);
         }else {
             builder.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                     PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
-                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO);
+                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO |
+                    PlaybackStateCompat.ACTION_STOP);
         }
         if (isPlaying()) { currentPos = getPosn(); }
         builder.setState(state, currentPos  , 1);
@@ -247,6 +250,12 @@ public class MusicService extends MediaBrowserServiceCompat implements
             public void onSeekTo(long pos) {
                 setMediaPlaybackState(PlaybackStateCompat.STATE_FAST_FORWARDING);
                 super.onSeekTo(pos);
+            }
+
+            @Override
+            public void onStop() {
+                mediaPlayer.stop();
+                super.onStop();
             }
         });
         mediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
@@ -421,6 +430,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         builder.setStyle(new NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(2, 4)
+                .setShowCancelButton(true)
+                .setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_STOP))
                 .setMediaSession(mediaSessionCompat.getSessionToken()));
         return builder.build();
 
