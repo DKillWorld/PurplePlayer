@@ -4,14 +4,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
-import android.media.audiofx.BassBoost;
-import android.media.audiofx.Virtualizer;
+import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,12 +24,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
-import static com.dv.apps.purpleplayer.MainActivity.bassBoost;
 import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.musicService;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
 import static com.dv.apps.purpleplayer.MainActivity.songList;
-import static com.dv.apps.purpleplayer.MainActivity.virtualizer;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
@@ -121,7 +120,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //            if (imageView.getDrawable() == null) {
 //                imageView.setImageResource(R.mipmap.ic_launcher_web);
 //            }
-            Glide.with(this)
+            Glide.with(getApplicationContext())
                     .load(musicService.getSong().getImage())
                     .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -255,29 +254,36 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public void addBassTest(View view){
-        if (!BASS_BOOST_ATTACHED) {
-            bassBoost = new BassBoost(0, musicService.mediaPlayer.getAudioSessionId());
-            bassBoost.setStrength((short) 1000);
-            bassBoost.setEnabled(true);
-            musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
-            BASS_BOOST_ATTACHED = true;
-        }else {
-            bassBoost.setEnabled(false);
-            BASS_BOOST_ATTACHED = false;
-        }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_detail_activity, menu);
+        return true;
     }
 
-    public void addVirtualizerTest(View view){
-        if (!VIRTUALIZER_ATTACHED) {
-            virtualizer = new Virtualizer(0, musicService.mediaPlayer.getAudioSessionId());
-            virtualizer.setStrength((short) 1000);
-            virtualizer.setEnabled(true);
-            musicService.mediaPlayer.setAuxEffectSendLevel(1.0f);
-            VIRTUALIZER_ATTACHED = true;
-        }else {
-            virtualizer.setEnabled(false);
-            VIRTUALIZER_ATTACHED = false;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.settingsDetail:
+//                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
+//                startActivity(sIntent);
+                Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.equilizerDetail:
+                Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                bIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
+                bIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, musicService.mediaPlayer.getAudioSessionId());
+                if (bIntent.resolveActivity(getPackageManager()) != null){
+                    startActivityForResult(bIntent, 100);
+                }else {
+                    Toast.makeText(this, "No Equalizer Found !!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case android.R.id.home:
+                this.finish();
+                break;
         }
+
+        return true;
     }
 }

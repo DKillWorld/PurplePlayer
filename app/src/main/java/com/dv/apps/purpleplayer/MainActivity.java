@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.audiofx.AudioEffect;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Virtualizer;
 import android.net.Uri;
@@ -297,12 +298,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(aIntent);
                 break;
             case R.id.equilizer:
-//                Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-//                if (bIntent.resolveActivity(getPackageManager()) != null){
-//                    startActivity(bIntent);
-//                }else {
-                    Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
-//                }
+                Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                bIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
+                bIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, musicService.mediaPlayer.getAudioSessionId());
+                if (bIntent.resolveActivity(getPackageManager()) != null){
+                    startActivityForResult(bIntent, 100);
+                }else {
+                    Toast.makeText(this, "No Equalizer Found !!", Toast.LENGTH_SHORT).show();
+                }
         }
         return true;
     }

@@ -42,6 +42,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Bluegrey" parent="MyTheme">
+        <item name="colorPrimary">@color/primary_bluegrey</item>
+        <item name="colorPrimaryDark">@color/primary_dark_bluegrey</item>
+        <item name="colorAccent">@color/accent_bluegrey</item>
+
+    </style>
+
 
 
 </resources>

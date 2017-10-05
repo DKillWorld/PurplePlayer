@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
@@ -128,18 +129,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
     public void setMediaPlaybackState(int state){
         PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
         long currentPos = PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
-
-        if (state == PlaybackStateCompat.STATE_PLAYING){
-            builder.setActions(PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
-                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
-                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO |
-                    PlaybackStateCompat.ACTION_STOP);
-        }else {
-            builder.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
-                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_FAST_FORWARD |
-                    PlaybackStateCompat.ACTION_REWIND | PlaybackStateCompat.ACTION_SEEK_TO |
-                    PlaybackStateCompat.ACTION_STOP);
-        }
+        builder.setActions(PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY |
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                PlaybackStateCompat.ACTION_FAST_FORWARD | PlaybackStateCompat.ACTION_REWIND |
+                PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_STOP);
         if (isPlaying()) { currentPos = getPosn(); }
         builder.setState(state, currentPos  , 1);
         playbackStateCompat = builder.build();
@@ -199,6 +192,11 @@ public class MusicService extends MediaBrowserServiceCompat implements
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnErrorListener(this);
         mediaPlayer.setOnCompletionListener(this);
+        Intent audioFx = new Intent();
+        audioFx.setAction(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
+        audioFx.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
+        audioFx.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.getAudioSessionId());
+        sendBroadcast(audioFx);
 
     }
 
