@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "408385930936",
+    "firebase_url": "https://purple-player.firebaseio.com",
+    "project_id": "purple-player",
+    "storage_bucket": "purple-player.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:408385930936:android:f39c03b6d5170bf9",
+        "android_client_info": {
+          "package_name": "com.dv.apps.purpleplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "408385930936-vpl10mv7s31td2iahinq37au2rplh53t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcCnzJcMP3tX0PN8-_yAbisj-Pw1liiZQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
