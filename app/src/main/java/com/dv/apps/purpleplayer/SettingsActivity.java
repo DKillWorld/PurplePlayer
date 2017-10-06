@@ -9,26 +9,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.Theme;
-import com.afollestad.materialdialogs.color.ColorChooserDialog;
 
-public class SettingsActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback{
+public class SettingsActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-    }
-
-    @Override
-    public void onColorSelection(@NonNull ColorChooserDialog colorChooserDialog, @ColorInt int i) {
-        Toast.makeText(this, "Color Picked", Toast.LENGTH_SHORT).show();
-        getWindow().getDecorView().setBackground(new ColorDrawable(i));
-
-    }
-
-    @Override
-    public void onColorChooserDismissed(@NonNull ColorChooserDialog colorChooserDialog) {
-
     }
 }
