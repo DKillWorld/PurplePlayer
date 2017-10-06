@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -68,10 +69,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.getBoolean("Theme_Key", false)){
-            setTheme(R.style.AppTheme);
-        }
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        if (sharedPreferences.getBoolean("Theme_Key", false)){
+//            setTheme(R.style.AppTheme);
+//        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         songList = new ArrayList<Songs>();
@@ -289,8 +290,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.setting_menu:
-//                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
-//                startActivity(sIntent);
+                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(sIntent);
                 Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.about_menu:

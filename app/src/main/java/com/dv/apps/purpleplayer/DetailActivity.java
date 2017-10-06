@@ -44,10 +44,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.getBoolean("Theme_Key", false)){
-            setTheme(R.style.AppTheme);
-        }
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        if (sharedPreferences.getBoolean("Theme_Key", false)){
+//            setTheme(R.style.AppTheme);
+//        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
@@ -265,8 +265,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         switch (item.getItemId()){
             case R.id.settingsDetail:
-//                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
-//                startActivity(sIntent);
+                Intent sIntent = new Intent(this, SettingsActivity.class);
+                startActivity(sIntent);
                 Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.equilizerDetail:

@@ -10,4 +10,9 @@
         android:summaryOn="Purple">
 
     </CheckBoxPreference>
+
+    <Preference
+        android:title="Color Picker Test"
+        android:key="color">
+    </Preference>
 </PreferenceScreen>
