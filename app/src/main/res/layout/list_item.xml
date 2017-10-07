@@ -24,6 +24,7 @@
         android:layout_marginTop="0dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center_vertical"
+        android:textStyle="bold"
         android:maxLines="1"
         android:textColor="@android:color/black"
         app:layout_constraintLeft_toRightOf="@+id/image_view"

@@ -15,8 +15,7 @@
         android:key="sort"
         android:title="Sort by..."
         android:entries="@array/sort_by"
-        android:entryValues="@array/sort_by_values"
-        >
+        android:entryValues="@array/sort_by_values">
 
     </ListPreference>
 

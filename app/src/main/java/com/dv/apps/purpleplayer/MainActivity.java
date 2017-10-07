@@ -9,22 +9,27 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.MediaController;
@@ -52,7 +57,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SeekBar seekBar;
     SearchView searchView;
     SharedPreferences preferences;
+
     DrawerLayout drawerlayout;
+    ListView drawerList;
+    ActionBarDrawerToggle actionBarToggle;
 
     static MainActivity mainActivity;
 
@@ -75,7 +83,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
-        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //Method to setup Drawer Layout
+        setupDrawerLayout();
 
         preferences = getPreferences(MODE_PRIVATE);
 
@@ -285,11 +294,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (actionBarToggle.onOptionsItemSelected(item)){
+            return true;
+        }
         switch (item.getItemId()) {
             case R.id.setting_menu:
-                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(sIntent);
-                Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
+//                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
+//                startActivity(sIntent);
+                Toast.makeText(this, "Under Development !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.about_menu:
                 Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
@@ -432,6 +444,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
             }
         }
+    }
+
+    public void setupDrawerLayout(){
+        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerList = (ListView) findViewById(R.id.drawer_list);
+        final String s[] = {"Songs", "Albums", "Artists"};
+        drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "Clicked " + s[position], Toast.LENGTH_SHORT).show();
+            }
+        });
+        actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                Toast.makeText(getApplicationContext(), "Under Development !!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+        drawerlayout.setDrawerListener(actionBarToggle);;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        actionBarToggle.syncState();
+    }
+
+    @Override
+    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onPostCreate(savedInstanceState, persistentState);
+        actionBarToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        actionBarToggle.onConfigurationChanged(newConfig);
     }
 }
 
