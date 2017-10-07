@@ -29,16 +29,26 @@ public class AboutActivity extends AppCompatActivity {
         textView.setText("v " + BuildConfig.VERSION_NAME);
 
         imageButton = (ImageButton) findViewById(R.id.contact_icon);
+//        imageButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                try {
+//                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://profile/100002257422329"));
+//                    startActivity(fbIntent);
+//                }catch (Exception e){
+//                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/dkillworld"));
+//                    startActivity(fbIntent);
+//                }
+//
+//            }
+//        });
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://profile/100002257422329"));
-                    startActivity(fbIntent);
-                }catch (Exception e){
-                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/dkillworld"));
-                    startActivity(fbIntent);
-                }
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                emailIntent.setData(Uri.parse("mailto: dkillworld@gmail.com"));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback about Purple Player");
+                startActivity(Intent.createChooser(emailIntent, "Send feedback"));
             }
         });
 

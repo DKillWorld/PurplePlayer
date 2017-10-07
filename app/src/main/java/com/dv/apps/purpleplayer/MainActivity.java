@@ -11,8 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.audiofx.AudioEffect;
-import android.media.audiofx.BassBoost;
-import android.media.audiofx.Virtualizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,8 +18,8 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,16 +34,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaController.MediaPlayerControl{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaController.MediaPlayerControl, SharedPreferences.OnSharedPreferenceChangeListener{
 
     Cursor songCursor;
-    static BassBoost bassBoost;
-    static Virtualizer virtualizer;
     Uri uri, songUri;
     ContentResolver contentResolver;
     static ArrayList<Songs> songList;
@@ -57,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SeekBar seekBar;
     SearchView searchView;
     SharedPreferences preferences;
+    DrawerLayout drawerlayout;
 
     static MainActivity mainActivity;
 
@@ -78,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         songList = new ArrayList<Songs>();
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+
+        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         preferences = getPreferences(MODE_PRIVATE);
 
@@ -176,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } while (songCursor.moveToNext());
             songCursor.close();
         }
-
 
         //ListView creation
         ListView listView = (ListView) findViewById(R.id.lv);
@@ -420,6 +417,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public int getAudioSessionId() {
         return musicService.mediaPlayer.getAudioSessionId();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Toast.makeText(mainActivity, "changed", Toast.LENGTH_SHORT).show();
+        if (key.equals("sort")){
+            switch (sharedPreferences.getString(key, "Titles")){
+                case "Titles":
+                    break;
+                case "Artists":
+                    break;
+                case "Albums":
+                    break;
+            }
+        }
     }
 }
 

@@ -1,7 +1,6 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +21,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.musicService;
@@ -122,10 +122,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //            }
             Glide.with(getApplicationContext())
                     .load(musicService.getSong().getImage())
+                    .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(30, 0)))
                     .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
-
 
 
             if (musicService.isPlaying()) {
@@ -238,7 +238,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser){
-            if (musicService != null){
+            if (musicService != null && musicService.isPlaying()){
                 musicService.seekTo(progress);
             }
         }
@@ -265,8 +265,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         switch (item.getItemId()){
             case R.id.settingsDetail:
-                Intent sIntent = new Intent(this, SettingsActivity.class);
-                startActivity(sIntent);
+//                Intent sIntent = new Intent(this, SettingsActivity.class);
+//                startActivity(sIntent);
                 Toast.makeText(this, "Under Construction !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.equilizerDetail:
