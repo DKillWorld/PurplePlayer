@@ -98,7 +98,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
         setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
         setSessionToken(mediaSessionCompat.getSessionToken());
 
-
         becomingNoisyReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

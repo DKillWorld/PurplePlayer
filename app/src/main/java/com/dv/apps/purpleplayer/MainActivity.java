@@ -40,6 +40,8 @@ import android.widget.Toast;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 
@@ -455,6 +457,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(MainActivity.this, "Clicked " + s[position], Toast.LENGTH_SHORT).show();
+                switch (position){
+                    case 0:
+                        Collections.sort(songList, new Comparator<Songs>() {
+                            @Override
+                            public int compare(Songs o1, Songs o2) {
+                                return o1.getTitle().compareTo(o2.getTitle());
+                            }
+                        });
+
+                    case 2:
+                        Collections.sort(songList, new Comparator<Songs>() {
+                            @Override
+                            public int compare(Songs o1, Songs o2) {
+                                return o1.getArtist().compareTo(o2.getArtist());
+                            }
+                        });
+                }
             }
         });
         actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
