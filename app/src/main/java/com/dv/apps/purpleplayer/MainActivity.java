@@ -37,12 +37,16 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Random;
+
+import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaController.MediaPlayerControl, SharedPreferences.OnSharedPreferenceChangeListener{
@@ -72,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean musicBound = false;
     private ServiceConnection musicConnection;
 
+    InterstitialAd interstitialAd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         songList = new ArrayList<Songs>();
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+        setupInterstitialAd();
 
         //Method to setup Drawer Layout
         setupDrawerLayout();
@@ -158,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //songList Code
-    public void getSongs() {
+    public ArrayList<Songs> getSongs() {
         contentResolver = getContentResolver();
         uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
@@ -203,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getPreferences();
         updateViews();
+
+        return songList;
     }
 
     //Updating SharedPreferences Once file is changed
@@ -222,6 +231,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
+    public void setupInterstitialAd(){
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-9589539002030859/7346365267");
+        interstitialAd.loadAd(getInterstitialAdrequest());
+        interstitialAd.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                interstitialAd.loadAd(getInterstitialAdrequest());
+            }
+        });
+    }
+
+    public AdRequest getInterstitialAdrequest(){
+        return new AdRequest.Builder()
+                .addTestDevice("DD0CDAB405F30F550CD856F507E39725")
+                .build();
+    }
+
+    public void setupDrawerLayout(){
+        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerList = (ListView) findViewById(R.id.drawer_list);
+        final String s[] = {"Songs", "Albums", "Artists"};
+        drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "Clicked " + s[position], Toast.LENGTH_SHORT).show();
+//                if (interstitialAd.isLoaded()){
+//                    interstitialAd.show();
+//                }
+//                switch (position){
+//                    case 0:
+//                        Collections.sort(songList, new Comparator<Songs>() {
+//                            @Override
+//                            public int compare(Songs o1, Songs o2) {
+//                                return o1.getTitle().compareTo(o2.getTitle());
+//                            }
+//                        });
+//
+//                    case 2:
+//                        Collections.sort(songList, new Comparator<Songs>() {
+//                            @Override
+//                            public int compare(Songs o1, Songs o2) {
+//                                return o1.getArtist().compareTo(o2.getArtist());
+//                            }
+//                        });
+//                }
+            }
+        });
+        actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                Toast.makeText(getApplicationContext(), "Under Development !!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+        drawerlayout.setDrawerListener(actionBarToggle);;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        actionBarToggle.syncState();
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -252,6 +330,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (musicService.isPlaying()) {
                         musicService.pausePlayer();
                         playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                        userStopped = true;
                     } else {
                         musicService.getDur();
                         if (musicService.getDur() == 0) {
@@ -261,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             musicService.startPlayer();
                             playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
                         }
+                        userStopped = false;
                     }
                 }else Toast.makeText(this, "No Songs Found !!", Toast.LENGTH_SHORT).show();
                 break;
@@ -446,52 +526,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
             }
         }
-    }
-
-    public void setupDrawerLayout(){
-        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.drawer_list);
-        final String s[] = {"Songs", "Albums", "Artists"};
-        drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
-        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "Clicked " + s[position], Toast.LENGTH_SHORT).show();
-                switch (position){
-                    case 0:
-                        Collections.sort(songList, new Comparator<Songs>() {
-                            @Override
-                            public int compare(Songs o1, Songs o2) {
-                                return o1.getTitle().compareTo(o2.getTitle());
-                            }
-                        });
-
-                    case 2:
-                        Collections.sort(songList, new Comparator<Songs>() {
-                            @Override
-                            public int compare(Songs o1, Songs o2) {
-                                return o1.getArtist().compareTo(o2.getArtist());
-                            }
-                        });
-                }
-            }
-        });
-        actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                Toast.makeText(getApplicationContext(), "Under Development !!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-        };
-        drawerlayout.setDrawerListener(actionBarToggle);;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        actionBarToggle.syncState();
     }
 
     @Override

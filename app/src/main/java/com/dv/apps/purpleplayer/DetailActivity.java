@@ -28,6 +28,7 @@ import static com.dv.apps.purpleplayer.MainActivity.looping;
 import static com.dv.apps.purpleplayer.MainActivity.musicService;
 import static com.dv.apps.purpleplayer.MainActivity.randomize;
 import static com.dv.apps.purpleplayer.MainActivity.songList;
+import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
@@ -179,6 +180,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if (musicService.isPlaying()) {
                     musicService.pausePlayer();
                     playPause.setImageResource(R.mipmap.ic_launcher);
+                    userStopped = true;
                 } else {
                     musicService.getDur();
                     if (musicService.getDur() == 0) {
@@ -188,6 +190,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         musicService.startPlayer();
                         playPause.setImageResource(R.mipmap.ic_pause);
                     }
+                    userStopped = false;
                 }
                 break;
 

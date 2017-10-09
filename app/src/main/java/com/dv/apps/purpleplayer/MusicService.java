@@ -42,7 +42,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
     MediaPlayer mediaPlayer;
     ArrayList<Songs> songList;
     int songPosn;
-    boolean systemStopped = false;
+    static boolean systemStopped = false;
+    static boolean userStopped = false;
 
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener;
@@ -151,7 +152,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
                     switch (focusChange) {
 
                         case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK):
-                            mediaPlayer.setVolume(0.2f, 0.2f);
+                            if (mediaPlayer.isPlaying()) {
+                                mediaPlayer.setVolume(0.2f, 0.2f);
+                            }
                             break;
 
                         case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
@@ -166,7 +169,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
                         case (AudioManager.AUDIOFOCUS_GAIN):
                             mediaPlayer.setVolume(1f, 1f);
-                            if (systemStopped) {
+                            if (systemStopped && !userStopped) {
                                 startPlayer();
                                 systemStopped = false; //resetting variable to default
                             }
@@ -218,12 +221,14 @@ public class MusicService extends MediaBrowserServiceCompat implements
             @Override
             public void onPause() {
                 pausePlayer();
+                userStopped = true;
                 super.onPause();
             }
 
             @Override
             public void onPlay() {
                 startPlayer();
+                userStopped = false;
                 super.onPlay();
             }
 
@@ -251,7 +256,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
             @Override
             public void onStop() {
-                mediaPlayer.stop();
+                mediaPlayer.pause();
+                stopForeground(true);
                 super.onStop();
             }
         });

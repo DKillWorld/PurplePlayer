@@ -1,4 +1,4 @@
-package com.dv.apps.purpleplayer;
+package com.dv.apps.purpleplayer.ListAdapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.dv.apps.purpleplayer.R;
+import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
 
