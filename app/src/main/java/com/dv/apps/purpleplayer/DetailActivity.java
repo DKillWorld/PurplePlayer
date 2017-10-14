@@ -33,8 +33,8 @@ import com.bumptech.glide.request.RequestOptions;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
-import static com.dv.apps.purpleplayer.MainActivity.looping;
-import static com.dv.apps.purpleplayer.MainActivity.randomize;
+import static com.dv.apps.purpleplayer.MusicService.looping;
+import static com.dv.apps.purpleplayer.MusicService.randomize;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
@@ -72,6 +72,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     | state.getState() == PlaybackStateCompat.STATE_STOPPED){
                 playPause.setImageResource(R.mipmap.ic_launcher);
             }
+            updateSeekbar();
         }
 
         @Override
@@ -97,7 +98,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
-
         }
     };
 
@@ -111,10 +111,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.detail_activity);
 
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
-
-        if (randomize){
-            shuffle.setBackgroundResource(R.drawable.background_button_selected);
-        }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
         getWindow().getDecorView().setBackgroundResource(R.mipmap.background_list);
@@ -153,15 +149,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         //Loop Button
         loop = (ImageButton) findViewById(R.id.loop);
-        if (MediaControllerCompat.getMediaController(this).getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ALL ||
-                MediaControllerCompat.getMediaController(this).getRepeatMode() == PlaybackStateCompat.REPEAT_MODE_ONE){
+        if (looping){
             loop.setBackgroundResource(R.drawable.background_button_selected);
         }
         loop.setOnClickListener(this);
 
         //shuffle Button
         shuffle = (ImageButton) findViewById(R.id.shuffle);
-        if (MediaControllerCompat.getMediaController(this).isShuffleModeEnabled()){
+        if (randomize){
             shuffle.setBackgroundResource(R.drawable.background_button_selected);
         }
         shuffle.setOnClickListener(this);
@@ -187,7 +182,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     //Seekbar Mechanism
     public void updateSeekbar() {
-        seekBar.setProgress(0);
+        seekBar.setProgress((int) MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPosition());
         seekBar.setMax((int) MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
         if (seekHandler == null){
             seekHandler = new Handler();
@@ -202,6 +197,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         long timeDelta = SystemClock.elapsedRealtime() - MediaControllerCompat.getMediaController(DetailActivity.this)
                                 .getPlaybackState().getLastPositionUpdateTime();
                         current += timeDelta * MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPlaybackSpeed();
+                        if (current > MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION)) {
+
+                        }
                         seekBar.setProgress(current);
                         seekHandler.postDelayed(this, 1000);
                     }
@@ -242,23 +240,23 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.loop:
                 if (!looping){
                     loop.setBackgroundResource(R.drawable.background_button_selected);
+                    MediaControllerCompat.getMediaController(this).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ONE);
                     Toast.makeText(getApplicationContext(), "Repeat ON!!", Toast.LENGTH_SHORT).show();
-                    looping = true;
                 }else{
                     loop.setBackgroundResource(R.drawable.background_buttons);
+                    MediaControllerCompat.getMediaController(this).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
                     Toast.makeText(getApplicationContext(), "Repeat OFF!!", Toast.LENGTH_SHORT).show();
-                    looping = false;
                 }
                 break;
 
             case R.id.shuffle:
                 if (!randomize){
-                    randomize = true;
                     shuffle.setBackgroundResource(R.drawable.background_button_selected);
+                    MediaControllerCompat.getMediaController(this).getTransportControls().setShuffleModeEnabled(true);
                     Toast.makeText(getApplicationContext(), "Shuffle ON!!", Toast.LENGTH_SHORT).show();
                 }else{
-                    randomize = false;
                     shuffle.setBackgroundResource(R.drawable.background_buttons);
+                    MediaControllerCompat.getMediaController(this).getTransportControls().setShuffleModeEnabled(false);
                     Toast.makeText(getApplicationContext(), "Shuffle OFF!!", Toast.LENGTH_SHORT).show();
                 }
                 break;

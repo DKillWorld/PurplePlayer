@@ -6,7 +6,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -47,6 +46,7 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
@@ -62,10 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SongAdapter adapter;
     ImageButton playPauseMain;
     TextView tvMain;
-    static boolean randomize = false;
-    static boolean looping = false;
     SearchView searchView;
-    SharedPreferences preferences;
 
     DrawerLayout drawerlayout;
     ListView drawerList;
@@ -131,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Method to setup Drawer Layout
         setupDrawerLayout();
 
-        preferences = getPreferences(MODE_PRIVATE);
     }
 
     public void buildTransportControls(){
@@ -202,27 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .playFromUri(playUri, bundle);
             }
         });
-
-        getPreferences();
         return songList;
-    }
-
-    //Updating SharedPreferences Once file is changed
-//    public void updatePreferences() {
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putInt("songPosn", songList.indexOf(musicService.getSong()));
-//        editor.putBoolean("Shuffle_Status", randomize);
-//        editor.putBoolean("Loop_Status", looping);
-//        editor.apply();
-//    }
-
-    public void getPreferences(){
-
-        if (preferences != null){
-            randomize = preferences.getBoolean("Shuffle_Status", false);
-            looping = preferences.getBoolean("Loop_Status", false);
-
-        }
     }
 
     public void setupInterstitialAd(){
@@ -247,32 +223,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setupDrawerLayout(){
         drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.drawer_list);
-        final String s[] = {"Songs", "Albums", "Artists"};
+        final String s[] = {"Shuffle All"};
         drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(MainActivity.this, "Clicked " + s[position], Toast.LENGTH_SHORT).show();
-//                if (interstitialAd.isLoaded()){
-//                    interstitialAd.show();
-//                }
-//                switch (position){
-//                    case 0:
-//                        Collections.sort(songList, new Comparator<Songs>() {
-//                            @Override
-//                            public int compare(Songs o1, Songs o2) {
-//                                return o1.getTitle().compareTo(o2.getTitle());
-//                            }
-//                        });
-//
-//                    case 2:
-//                        Collections.sort(songList, new Comparator<Songs>() {
-//                            @Override
-//                            public int compare(Songs o1, Songs o2) {
-//                                return o1.getArtist().compareTo(o2.getArtist());
-//                            }
-//                        });
-//                }
+                if (interstitialAd.isLoaded()){
+                    interstitialAd.show();
+                }
+                switch (position){
+                    case 0:
+                        Collections.shuffle(songList, new Random());
+                        adapter.notifyDataSetChanged();
+                        drawerlayout.closeDrawers();
+                }
             }
         });
         actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
@@ -318,11 +283,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
         }
-    }
-
-    //get random song when randomize/shuffle ON
-    public int getRandom(){
-        return new Random().nextInt(songList.size());
     }
 
     @Override

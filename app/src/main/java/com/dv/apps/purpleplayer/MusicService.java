@@ -31,9 +31,7 @@ import com.dv.apps.purpleplayer.Utils.MediaStyleHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.dv.apps.purpleplayer.MainActivity.looping;
-import static com.dv.apps.purpleplayer.MainActivity.randomize;
+import java.util.Random;
 
 /**
  * Created by Dhaval on 18-09-2017.
@@ -41,13 +39,15 @@ import static com.dv.apps.purpleplayer.MainActivity.randomize;
 
 public class MusicService extends MediaBrowserServiceCompat implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener{
+        MediaPlayer.OnCompletionListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     MediaPlayer mediaPlayer;
     ArrayList<Songs> songList;
     int songPosn;
     static boolean systemStopped = false;
     public static boolean userStopped = false;
+    static boolean randomize = false;
+    static boolean looping = false;
 
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener;
@@ -85,6 +85,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
         };
 
         preferences = getSharedPreferences(MUSICSERVICE_PREFERENCES, Context.MODE_PRIVATE);
+        preferences.registerOnSharedPreferenceChangeListener(this);
+        getPreferences();
 
     }
 
@@ -164,7 +166,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
                 .setActions(PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY |
                 PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                 PlaybackStateCompat.ACTION_FAST_FORWARD | PlaybackStateCompat.ACTION_REWIND |
-                PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_STOP);
+                PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_STOP |
+                PlaybackStateCompat.ACTION_SET_REPEAT_MODE | PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE_ENABLED);
         metadataBuilder = new MediaMetadataCompat.Builder();
         mediaSessionCompat.setPlaybackState(playbackStateBuilder.build());
         mediaSessionCompat.setMetadata(metadataBuilder.build());
@@ -193,6 +196,14 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public Songs getSong(){
         return songList.get(songPosn);
+    }
+
+    public void getPreferences(){
+        if (preferences != null){
+            randomize = preferences.getBoolean(SHUFFLE_STATUS, false);
+            looping = preferences.getBoolean(REPEAT_STATUS, false);
+            songPosn = preferences.getInt(SONG_POSITION, 0);
+        }
     }
 
     public void playSong(){
@@ -238,6 +249,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
             startForeground(NOTIFY_ID, setupNotification());
         }
 
+        //Updating Preferences
+        updatePreferences(preferences.edit());
         updateNotification();
     }
 
@@ -250,7 +263,11 @@ public class MusicService extends MediaBrowserServiceCompat implements
     }
 
     public void playNext(){
-        songPosn++;
+        if (randomize){
+            songPosn = getRandom();
+        }else {
+            songPosn++;
+        }
         if (songPosn == songList.size()){
             songPosn = 0;
         }
@@ -265,6 +282,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT,
+                mediaPlayer.getCurrentPosition(),1.0f).build());
         playNext();
     }
 
@@ -276,7 +295,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
     @Override
     public void onPrepared(MediaPlayer mp) {
         startPlayer();
-        updatePreferences(preferences.edit());
     }
 
     public Notification setupNotification(){
@@ -322,13 +340,20 @@ public class MusicService extends MediaBrowserServiceCompat implements
         }
     }
 
+    //get random song when randomize/shuffle ON
+    public int getRandom(){
+        return new Random().nextInt(songList.size());
+    }
+
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mediaSessionCompat.setActive(false);
         mediaSessionCompat.release();
         audioManager.abandonAudioFocus(onAudioFocusChangeListener);
         stopForeground(true);
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+
+        super.onDestroy();
     }
 
     @Nullable
@@ -340,6 +365,11 @@ public class MusicService extends MediaBrowserServiceCompat implements
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
         result.sendResult(null);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        updatePreferences(preferences.edit());
     }
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback{
@@ -372,6 +402,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
             stopSelf();
             mediaPlayer.pause();
             stopForeground(true);
+
         }
 
         @Override
@@ -412,6 +443,32 @@ public class MusicService extends MediaBrowserServiceCompat implements
             mediaPlayer.seekTo((int) pos);
             mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_FAST_FORWARDING,
                     mediaPlayer.getCurrentPosition(), 1.0f).build());
+        }
+
+        @Override
+        public void onSetShuffleModeEnabled(boolean enabled) {
+            super.onSetShuffleModeEnabled(enabled);
+            mediaSessionCompat.setShuffleModeEnabled(enabled);
+            if (enabled){
+                randomize = true;
+            }else {
+                randomize = false;
+            }
+        }
+
+        @Override
+        public void onSetRepeatMode(int repeatMode) {
+            super.onSetRepeatMode(repeatMode);
+            mediaSessionCompat.setRepeatMode(repeatMode);
+            if (repeatMode == PlaybackStateCompat.REPEAT_MODE_ONE) {
+                looping = true;
+                mediaPlayer.setLooping(true);
+
+            }else {
+                mediaPlayer.setLooping(false);
+                looping = false;
+            };
+
         }
 
         @Override
