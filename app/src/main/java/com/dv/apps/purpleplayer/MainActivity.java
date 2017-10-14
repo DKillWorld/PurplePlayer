@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Utils.SplashScreenActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -155,6 +156,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //songList Code
     public ArrayList<Songs> getSongs() {
+        Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+        startActivity(intent);
         contentResolver = getContentResolver();
         uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";

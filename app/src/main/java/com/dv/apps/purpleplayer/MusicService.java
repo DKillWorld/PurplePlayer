@@ -25,7 +25,6 @@ import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
-import android.widget.Toast;
 
 import com.dv.apps.purpleplayer.Utils.MediaStyleHelper;
 
@@ -419,7 +418,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
         public void onPlayFromUri(Uri uri, Bundle extras) {
             super.onPlayFromUri(uri, extras);
             songPosn = extras.getInt("Pos");
-            Toast.makeText(MusicService.this, "Playing from Uri", Toast.LENGTH_SHORT).show();
             mediaPlayer.reset();
             try {
                 mediaPlayer.setDataSource(getApplicationContext(), uri);
