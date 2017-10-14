@@ -6,7 +6,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -15,12 +14,17 @@ import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.PersistableBundle;
+import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -32,8 +36,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.MediaController;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,18 +51,18 @@ import java.util.Random;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaController.MediaPlayerControl, SharedPreferences.OnSharedPreferenceChangeListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    Context context;
     Cursor songCursor;
-    Uri uri, songUri;
+    Uri uri;
     ContentResolver contentResolver;
     static ArrayList<Songs> songList;
     SongAdapter adapter;
-    ImageButton playPause, loop, next, prev, shuffle, playPauseMain;
+    ImageButton playPauseMain;
     TextView tvMain;
     static boolean randomize = false;
     static boolean looping = false;
-    SeekBar seekBar;
     SearchView searchView;
     SharedPreferences preferences;
 
@@ -68,15 +70,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ListView drawerList;
     ActionBarDrawerToggle actionBarToggle;
 
-    static MainActivity mainActivity;
+    InterstitialAd interstitialAd;
 
     //TEST THINGS
-    public static MusicService musicService;
-    private Intent playIntent;
-    private boolean musicBound = false;
-    private ServiceConnection musicConnection;
+    private MediaBrowserCompat mediaBrowserCompat;
+    private MediaBrowserCompat.ConnectionCallback connectionCallback = new MediaBrowserCompat.ConnectionCallback(){
+        @Override
+        public void onConnected() {
+            super.onConnected();
+            MediaSessionCompat.Token token = mediaBrowserCompat.getSessionToken();
+            MediaControllerCompat mediaControllerCompat = null;
+            try {
+                mediaControllerCompat = new MediaControllerCompat(MainActivity.this, token);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            MediaControllerCompat.setMediaController(MainActivity.this, mediaControllerCompat);
+            buildTransportControls();
+        }
+    };
+    private MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
+        @Override
+        public void onPlaybackStateChanged(PlaybackStateCompat state) {
+            super.onPlaybackStateChanged(state);
+            if (state.getState() == PlaybackStateCompat.STATE_PLAYING){
+                playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+            }else if (state.getState() == PlaybackStateCompat.STATE_PAUSED
+                    | state.getState() == PlaybackStateCompat.STATE_STOPPED){
+                playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            }
+        }
 
-    InterstitialAd interstitialAd;
+        @Override
+        public void onMetadataChanged(MediaMetadataCompat metadata) {
+            super.onMetadataChanged(metadata);
+            tvMain.setText(metadata.getDescription().getTitle());
+
+        }
+    };
 
 
     @Override
@@ -87,7 +118,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
         songList = new ArrayList<Songs>();
+
+        context = this;
+
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         setupInterstitialAd();
@@ -96,8 +131,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupDrawerLayout();
 
         preferences = getPreferences(MODE_PRIVATE);
+    }
 
-        mainActivity = this;
+    public void buildTransportControls(){
+        final MediaControllerCompat mediaControllerCompat = MediaControllerCompat.getMediaController(MainActivity.this);
+        MediaMetadataCompat mediaMetadataCompat = mediaControllerCompat.getMetadata();
+        PlaybackStateCompat playbackStateCompat = mediaControllerCompat.getPlaybackState();
+        mediaControllerCompat.registerCallback(mediaControllerCallback);
 
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         playPauseMain.setOnClickListener(this);
@@ -105,63 +145,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvMain = (TextView) findViewById(R.id.tvMain);
         tvMain.setSelected(true);
         tvMain.setOnClickListener(this);
-
-        musicConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
-                musicService = binder.getService();
-                musicService.setList(songList);
-                musicService.setSong(preferences.getInt("songPosn", 0));
-                musicBound = true;
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                musicBound = false;
-            }
-        };
     }
-
-    public void updateViews(){
-        if (musicService != null && songList.size() != 0) {
-            tvMain.setText(musicService.getSong().getTitle());
-            if (musicService.isPlaying()){
-                playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-            }
-            if (!musicService.isPlaying()){
-                playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-            }
-        }
-    }
-
-
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (playIntent == null){
-            playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-        }
-    }
-
-    public void playNext(){
-        if (randomize){
-            musicService.songPosn = getRandom();
-            musicService.playSong();
-        }else {
-            musicService.playNext();
-        };
-    }
-
-    public void playPrev(){
-        musicService.playPrev();
-    }
-
-    public static MainActivity getInstance(){
-        return mainActivity;
+        mediaBrowserCompat.connect();
     }
 
     //songList Code
@@ -188,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                 Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
 
-                songList.add(new Songs(currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+                songList.add(new Songs(context, currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
             } while (songCursor.moveToNext());
             songCursor.close();
         }
@@ -203,25 +192,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Songs tempSong = adapter.getItem(position);
-                musicService.setSong(songList.indexOf(tempSong));
-                musicService.playSong();
+                Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
+                Bundle bundle = new Bundle();
+                bundle.putInt("Pos", songList.indexOf(tempSong));
+                MediaControllerCompat.getMediaController(MainActivity.this).getTransportControls()
+                        .playFromUri(playUri, bundle);
             }
         });
 
         getPreferences();
-        updateViews();
-
         return songList;
     }
 
     //Updating SharedPreferences Once file is changed
-    public void updatePreferences() {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("songPosn", songList.indexOf(musicService.getSong()));
-        editor.putBoolean("Shuffle_Status", randomize);
-        editor.putBoolean("Loop_Status", looping);
-        editor.apply();
-    }
+//    public void updatePreferences() {
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.putInt("songPosn", songList.indexOf(musicService.getSong()));
+//        editor.putBoolean("Shuffle_Status", randomize);
+//        editor.putBoolean("Loop_Status", looping);
+//        editor.apply();
+//    }
 
     public void getPreferences(){
 
@@ -305,19 +295,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
 
-            case R.id.next:
-                if (randomize){
-                    musicService.songPosn = getRandom();
-                    musicService.playSong();
-                }else {
-                    playNext();
-                }
-                break;
-
-            case R.id.prev:
-                playPrev();
-                break;
-
             case R.id.tvMain:
                 if (songList.size() != 0) {
                     Intent intent = new Intent(this, DetailActivity.class);
@@ -326,24 +303,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.playPauseMain:
-                if (songList.size() != 0) {
-                    if (musicService.isPlaying()) {
-                        musicService.pausePlayer();
-                        playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                        userStopped = true;
-                    } else {
-                        musicService.getDur();
-                        if (musicService.getDur() == 0) {
-                            musicService.playSong();
-                            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-                        } else {
-                            musicService.startPlayer();
-                            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
-                        }
-                        userStopped = false;
-                    }
-                }else Toast.makeText(this, "No Songs Found !!", Toast.LENGTH_SHORT).show();
+                if (MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED ||
+                        MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED ||
+                        MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE){
+                    MediaControllerCompat.getMediaController(this).getTransportControls().play();
+                    userStopped = false;
+                } else {
+                    MediaControllerCompat.getMediaController(this).getTransportControls().pause();
+                    userStopped = true;
+                }
                 break;
+
         }
     }
 
@@ -388,11 +358,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.about_menu:
                 Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(aIntent);
+                if (interstitialAd.isLoaded()){
+                    interstitialAd.show();
+                }
                 break;
             case R.id.equilizer:
                 Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 bIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
-                bIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, musicService.mediaPlayer.getAudioSessionId());
+                bIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION,
+                        MediaControllerCompat.getMediaController(this).getExtras().getInt("AudioSessionId"));
                 if (bIntent.resolveActivity(getPackageManager()) != null){
                     startActivityForResult(bIntent, 100);
                 }else {
@@ -403,11 +377,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onDestroy() {
-        stopService(playIntent);
-        musicService = null;
-
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+        mediaBrowserCompat.disconnect();
     }
 
     @Override
@@ -439,91 +411,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "One or more permission is denied !!", Toast.LENGTH_SHORT).show();
                     finish();
                 }
-            }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateViews();
-    }
-
-    @Override
-    public void start() {
-        musicService.startPlayer();
-    }
-
-    @Override
-    public void pause() {
-        musicService.pausePlayer();
-    }
-
-    @Override
-    public int getDuration() {
-        if (musicService != null && musicBound){
-            return musicService.getDur();
-        }
-        else return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        if (musicService != null && musicBound) {
-            return musicService.getPosn();
-        }
-        else return 0;
-    }
-
-    @Override
-    public void seekTo(int pos) {
-        musicService.seekTo(pos);
-    }
-
-    @Override
-    public boolean isPlaying() {
-        if (musicService != null && musicBound){
-            return musicService.isPlaying();
-        }
-        else return false;
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public boolean canPause() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return true;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return musicService.mediaPlayer.getAudioSessionId();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Toast.makeText(mainActivity, "changed", Toast.LENGTH_SHORT).show();
-        if (key.equals("sort")){
-            switch (sharedPreferences.getString(key, "Titles")){
-                case "Titles":
-                    break;
-                case "Artists":
-                    break;
-                case "Albums":
-                    break;
             }
         }
     }

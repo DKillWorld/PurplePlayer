@@ -1,5 +1,6 @@
 package com.dv.apps.purpleplayer;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -16,14 +17,15 @@ public class Songs {
     private Uri image;
     private long id;
     private int duration;
+    private Context context;
 
-    public Songs(String title, long id, int duration, String artist, Uri uri) {
+    public Songs(Context context, String title, long id, int duration, String artist, Uri uri) {
         this.title = title;
         this.id = id;
         this.duration = duration;
         this.artist = artist;
         this.image = uri;
-
+        this.context = context;
     }
 
     public String getTitle(){
@@ -48,7 +50,7 @@ public class Songs {
 
     public Bitmap getImageBitmap(){
         try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(MainActivity.getInstance().contentResolver, image);
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), image);
             return bitmap;
         } catch (IOException e) {
             e.printStackTrace();

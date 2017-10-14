@@ -1,4 +1,4 @@
-package com.dv.apps.purpleplayer;
+package com.dv.apps.purpleplayer.Utils;
 
 import android.content.Context;
 import android.support.v4.media.MediaDescriptionCompat;
