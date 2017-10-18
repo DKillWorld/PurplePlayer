@@ -103,10 +103,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        if (sharedPreferences.getBoolean("Theme_Key", false)){
-//            setTheme(R.style.AppTheme);
-//        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 

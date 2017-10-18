@@ -34,7 +34,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/backgroundColor"
+                android:background="@android:color/holo_blue_light"
                 android:orientation="horizontal">
 
                 <TextView
@@ -60,9 +60,9 @@
                 <ImageButton
                     android:id="@+id/playPauseMain"
                     android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:layout_marginRight="8dp"
+                    android:paddingRight="8dp"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_play_arrow_white_24dp" />
             </LinearLayout>

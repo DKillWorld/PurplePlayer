@@ -6,9 +6,11 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Build;
@@ -27,6 +29,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,8 +41,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
-import com.dv.apps.purpleplayer.Utils.SplashScreenActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -52,7 +55,7 @@ import java.util.Random;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     Context context;
     Cursor songCursor;
@@ -69,6 +72,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ActionBarDrawerToggle actionBarToggle;
 
     InterstitialAd interstitialAd;
+
+    SharedPreferences preferences;
+
+    public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -5194043;
+    public static final int PRIMARY_COLOR_DEFAULT = -11243910;
 
     //TEST THINGS
     private MediaBrowserCompat mediaBrowserCompat;
@@ -110,10 +118,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        if (sharedPreferences.getBoolean("Theme_Key", false)){
-//            setTheme(R.style.AppTheme);
-//        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
@@ -124,6 +128,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         setupInterstitialAd();
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        preferences.registerOnSharedPreferenceChangeListener(this);
 
         //Method to setup Drawer Layout
         setupDrawerLayout();
@@ -142,6 +149,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvMain = (TextView) findViewById(R.id.tvMain);
         tvMain.setSelected(true);
         tvMain.setOnClickListener(this);
+        tvMain.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+        playPauseMain.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(CircleView.shiftColorDown(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+        }
+        getWindow().getDecorView().setBackground(new ColorDrawable(preferences.getInt("list_background", LISTVIEW_BACKGROUND_COLOR_DEFAULT)));
     }
 
     @Override
@@ -152,8 +168,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //songList Code
     public ArrayList<Songs> getSongs() {
-        Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-        startActivity(intent);
         contentResolver = getContentResolver();
         uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
@@ -256,6 +270,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         actionBarToggle.syncState();
+
+        //Themeing
+        drawerList.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
     }
 
 
@@ -314,8 +331,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         switch (item.getItemId()) {
             case R.id.setting_menu:
-//                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
-//                startActivity(sIntent);
+                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(sIntent);
                 Toast.makeText(this, "Under Development !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.about_menu:
@@ -388,6 +405,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         actionBarToggle.onConfigurationChanged(newConfig);
+    }
+
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch (key){
+            case "list_background":
+                getWindow().getDecorView().setBackground(new ColorDrawable(sharedPreferences.getInt("list_background", LISTVIEW_BACKGROUND_COLOR_DEFAULT)));
+                break;
+            case "primary_color":
+                tvMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+                playPauseMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+                drawerList.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    getWindow().setStatusBarColor(CircleView.shiftColorDown(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+                }
+        }
     }
 }
 
