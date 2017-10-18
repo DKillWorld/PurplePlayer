@@ -313,8 +313,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         switch (item.getItemId()){
             case R.id.settingsDetail:
-//                Intent sIntent = new Intent(this, SettingsActivity.class);
-//                startActivity(sIntent);
+                Intent sIntent = new Intent(this, SettingsActivity.class);
+                startActivity(sIntent);
                 Toast.makeText(this, "Under Development !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.equilizerDetail:
