@@ -20,12 +20,16 @@ import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +47,11 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.ListFragments.AlbumListFragment;
+import com.dv.apps.purpleplayer.ListFragments.ArtistListFragment;
+import com.dv.apps.purpleplayer.ListFragments.GenreListFragment;
+import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
+import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -68,12 +77,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SearchView searchView;
 
     DrawerLayout drawerlayout;
+    TabLayout tabLayout;
     ListView drawerList;
     ActionBarDrawerToggle actionBarToggle;
 
     InterstitialAd interstitialAd;
 
     SharedPreferences preferences;
+    FragmentManager fragmentManager;
 
     public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -5194043;
     public static final int PRIMARY_COLOR_DEFAULT = -11243910;
@@ -132,9 +143,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         preferences.registerOnSharedPreferenceChangeListener(this);
 
+        fragmentManager = getSupportFragmentManager();
+
         //Method to setup Drawer Layout
         setupDrawerLayout();
-
+        setupTabLayout();
     }
 
     public void buildTransportControls(){
@@ -237,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setupDrawerLayout(){
         drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.drawer_list);
-        final String s[] = {"Shuffle All"};
+        final String s[] = {"Shuffle All", "Songs", "Albums", "Artists", "Genres", "Playlists"};
         drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -251,6 +264,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Collections.shuffle(songList, new Random());
                         adapter.notifyDataSetChanged();
                         drawerlayout.closeDrawers();
+                        break;
+
+                    case 1:
+                        SongListFragment songListFragment = new SongListFragment();
+                        if (!songListFragment.isAdded()) {
+                            fragmentManager.beginTransaction().add(R.id.fragment_detail, songListFragment).commit();
+                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, songListFragment).commit();
+                        break;
+
+                    case 2:
+                        AlbumListFragment albumListFragment = new AlbumListFragment();
+                        if (!albumListFragment.isAdded()) {
+                            fragmentManager.beginTransaction().add(R.id.fragment_detail, albumListFragment).commit();
+                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, albumListFragment).commit();
+                        break;
+
+                    case 3:
+                        ArtistListFragment artistListFragment = new ArtistListFragment();
+                        if (!artistListFragment.isAdded()) {
+                            fragmentManager.beginTransaction().add(R.id.fragment_detail, artistListFragment).commit();
+                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, artistListFragment).commit();
+                        break;
+
+                    case 4:
+                        GenreListFragment genreListFragment = new GenreListFragment();
+                        if (!genreListFragment.isAdded()) {
+                            fragmentManager.beginTransaction().add(R.id.fragment_detail, genreListFragment).commit();
+                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, genreListFragment).commit();
+                        break;
+
+                    case 5:
+                        PlaylistListFragment playlistListFragment = new PlaylistListFragment();
+                        if (!playlistListFragment.isAdded()) {
+                            fragmentManager.beginTransaction().add(R.id.fragment_detail, playlistListFragment).commit();
+                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, playlistListFragment).commit();
+                        break;
                 }
             }
         });
@@ -273,6 +322,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Themeing
         drawerList.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+    }
+
+    public void setupTabLayout(){
+        tabLayout = findViewById(R.id.tab_layout);
+        ViewPager viewPager = findViewById(R.id.viewpager);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
 
