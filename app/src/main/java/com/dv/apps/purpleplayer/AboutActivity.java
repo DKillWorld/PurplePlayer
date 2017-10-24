@@ -30,6 +30,10 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("About");
+        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

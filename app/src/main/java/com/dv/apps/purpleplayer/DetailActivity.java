@@ -106,6 +106,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Now Playing");
+        }
+
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));

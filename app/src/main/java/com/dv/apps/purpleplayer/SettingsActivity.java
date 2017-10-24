@@ -22,6 +22,10 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Settings");
+        }
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (getSupportActionBar() != null) {
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));

@@ -2,28 +2,24 @@ package com.dv.apps.purpleplayer;
 
 import android.Manifest;
 import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -58,19 +54,15 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 
+import static android.R.attr.tag;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     Context context;
-    Cursor songCursor;
-    Uri uri;
-    ContentResolver contentResolver;
-    static ArrayList<Songs> songList;
+    ArrayList<Songs> songList;
     SongAdapter adapter;
     ImageButton playPauseMain;
     TextView tvMain;
@@ -132,9 +124,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
-        songList = new ArrayList<Songs>();
+//        songList = new ArrayList<Songs>();
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Library");
+        }
 
         context = this;
+        adapter = new SongAdapter(getApplicationContext(), songList);
 
         setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
@@ -179,54 +176,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mediaBrowserCompat.connect();
     }
 
-    //songList Code
-    public ArrayList<Songs> getSongs() {
-        contentResolver = getContentResolver();
-        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-        songCursor = contentResolver.query(uri, null, selection, null,MediaStore.Audio.Media.TITLE);
-
-        if (songCursor != null && songCursor.moveToFirst()) {
-            int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
-            int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int songAlbumId = songCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
-
-            do {
-                String currentTitle = songCursor.getString(songTitle);
-                long currentId = songCursor.getLong(songId);
-                int currentDuration = songCursor.getInt(songDuration);
-                String currentArtist = songCursor.getString(songArtist);
-                long currentAlbumId = songCursor.getLong(songAlbumId);
-
-                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
-
-                songList.add(new Songs(context, currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
-            } while (songCursor.moveToNext());
-            songCursor.close();
-        }
-
-        //ListView creation
-        ListView listView = (ListView) findViewById(R.id.lv);
-        listView.setFastScrollEnabled(true);
-        adapter = new SongAdapter(getApplicationContext(), songList);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Songs tempSong = adapter.getItem(position);
-                Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
-                Bundle bundle = new Bundle();
-                bundle.putInt("Pos", songList.indexOf(tempSong));
-                MediaControllerCompat.getMediaController(MainActivity.this).getTransportControls()
-                        .playFromUri(playUri, bundle);
-            }
-        });
-        return songList;
-    }
+//    //songList Code
+//    public ArrayList<Songs> getSongs() {
+//        contentResolver = getContentResolver();
+//        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+//        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+//        songCursor = contentResolver.query(uri, null, selection, null,MediaStore.Audio.Media.TITLE);
+//
+//        if (songCursor != null && songCursor.moveToFirst()) {
+//            int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
+//            int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+//            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+//            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+//            int songAlbumId = songCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
+//
+//            do {
+//                String currentTitle = songCursor.getString(songTitle);
+//                long currentId = songCursor.getLong(songId);
+//                int currentDuration = songCursor.getInt(songDuration);
+//                String currentArtist = songCursor.getString(songArtist);
+//                long currentAlbumId = songCursor.getLong(songAlbumId);
+//
+//                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+//                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
+//
+//                songList.add(new Songs(context, currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+//            } while (songCursor.moveToNext());
+//            songCursor.close();
+//        }
+//
+//        //ListView creation
+//        ListView listView = (ListView) findViewById(R.id.lv);
+//        listView.setFastScrollEnabled(true);
+//        adapter = new SongAdapter(getApplicationContext(), songList);
+//        listView.setAdapter(adapter);
+//
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Songs tempSong = adapter.getItem(position);
+//                Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
+//                Bundle bundle = new Bundle();
+//                bundle.putInt("Pos", songList.indexOf(tempSong));
+//                MediaControllerCompat.getMediaController(MainActivity.this).getTransportControls()
+//                        .playFromUri(playUri, bundle);
+//            }
+//        });
+//        return songList;
+//    }
 
     public void setupInterstitialAd(){
         interstitialAd = new InterstitialAd(this);
@@ -250,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setupDrawerLayout(){
         drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.drawer_list);
-        final String s[] = {"Shuffle All", "Songs", "Albums", "Artists", "Genres", "Playlists"};
+        final String s[] = {"Shuffle All"};
         drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -259,46 +256,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (interstitialAd.isLoaded()){
                     interstitialAd.show();
                 }
-                switch (position){
+                switch (position) {
                     case 0:
-                        Collections.shuffle(songList, new Random());
-                        adapter.notifyDataSetChanged();
+//                        Collections.shuffle(songList, new Random());
+//                        adapter.notifyDataSetChanged();
                         drawerlayout.closeDrawers();
-                        break;
-
-                    case 1:
-                        SongListFragment songListFragment = new SongListFragment();
-                        if (!songListFragment.isAdded()) {
-                            fragmentManager.beginTransaction().add(R.id.fragment_detail, songListFragment).commit();
-                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, songListFragment).commit();
-                        break;
-
-                    case 2:
-                        AlbumListFragment albumListFragment = new AlbumListFragment();
-                        if (!albumListFragment.isAdded()) {
-                            fragmentManager.beginTransaction().add(R.id.fragment_detail, albumListFragment).commit();
-                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, albumListFragment).commit();
-                        break;
-
-                    case 3:
-                        ArtistListFragment artistListFragment = new ArtistListFragment();
-                        if (!artistListFragment.isAdded()) {
-                            fragmentManager.beginTransaction().add(R.id.fragment_detail, artistListFragment).commit();
-                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, artistListFragment).commit();
-                        break;
-
-                    case 4:
-                        GenreListFragment genreListFragment = new GenreListFragment();
-                        if (!genreListFragment.isAdded()) {
-                            fragmentManager.beginTransaction().add(R.id.fragment_detail, genreListFragment).commit();
-                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, genreListFragment).commit();
-                        break;
-
-                    case 5:
-                        PlaylistListFragment playlistListFragment = new PlaylistListFragment();
-                        if (!playlistListFragment.isAdded()) {
-                            fragmentManager.beginTransaction().add(R.id.fragment_detail, playlistListFragment).commit();
-                        }else fragmentManager.beginTransaction().replace(R.id.fragment_detail, playlistListFragment).commit();
                         break;
                 }
             }
@@ -326,8 +288,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setupTabLayout(){
         tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         ViewPager viewPager = findViewById(R.id.viewpager);
+        FragmentPagerAdapter fragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
+            @Override
+            public Fragment getItem(int i) {
+                Fragment fragment;
+                switch (i) {
+                    case 0:
+                        fragment = new SongListFragment();
+                        break;
+                    case 1:
+                        fragment = new AlbumListFragment();
+                        break;
+                    case 2:
+                        fragment = new ArtistListFragment();
+                        break;
+                    case 3:
+                        fragment = new GenreListFragment();
+                        break;
+                    case 4:
+                        fragment = new PlaylistListFragment();
+                        break;
+                    default:
+                        fragment = new SongListFragment();
+                }
+                return fragment;
+            }
+
+            @Override
+            public int getCount() {
+                return 5;
+            }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+                switch (position){
+                    case 0:
+                        return "Songs";
+                    case 1:
+                        return "Albums";
+                    case 2:
+                        return "Artists";
+                    case 3:
+                        return "Genres";
+                    case 4:
+                        return "Playlists";
+                    default:
+                        return null;
+                }
+            }
+        };
+        viewPager.setAdapter(fragmentPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
     }
 
 
@@ -336,10 +350,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
 
             case R.id.tvMain:
-                if (songList.size() != 0) {
-                    Intent intent = new Intent(this, DetailActivity.class);
-                    startActivity(intent);
-                }else Toast.makeText(this, "No Songs Found !!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, DetailActivity.class);
+                startActivity(intent);
                 break;
 
             case R.id.playPauseMain:
@@ -355,28 +367,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        //SearchView Code
-        MenuItem item = menu.findItem(R.id.search);
-        searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return true;
-            }
-        });
-        return true;
     }
 
     @Override
@@ -426,12 +416,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setupPermissions() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                getSongs();
+//                getSongs();
             }else {
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             }
         }else {
-            getSongs();
+//            getSongs();
         }
     }
 
@@ -441,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case 1: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Welcome!!", Toast.LENGTH_SHORT).show();
-                    getSongs();
+//                    getSongs();
                 } else {
                     Toast.makeText(this, "One or more permission is denied !!", Toast.LENGTH_SHORT).show();
                     finish();
@@ -473,6 +463,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
                 playPauseMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
                 drawerList.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+                tabLayout.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setBackgroundDrawable(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
                 }

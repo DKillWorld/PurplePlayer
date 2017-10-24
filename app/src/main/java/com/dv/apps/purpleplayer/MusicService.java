@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
@@ -42,7 +43,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         MediaPlayer.OnCompletionListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     MediaPlayer mediaPlayer;
-    ArrayList<Songs> songList;
+    public static ArrayList<Songs> songList;
     int songPosn;
     static boolean systemStopped = false;
     public static boolean userStopped = false;
@@ -74,7 +75,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         initMusicPlayer();
         initMediaSession();
         getAudioFocus();
-        this.songList = MainActivity.songList;
+        songList = getSongs();
 
         becomingNoisyReceiver = new BroadcastReceiver() {
             @Override
@@ -115,12 +116,12 @@ public class MusicService extends MediaBrowserServiceCompat implements
                             break;
 
                         case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
-                            mediaPlayer.pause();
+                            pausePlayer();
                             systemStopped = true;
                             break;
 
                         case (AudioManager.AUDIOFOCUS_LOSS):
-                            mediaPlayer.pause();
+                            pausePlayer();
                             systemStopped = false;
                             break;
 
@@ -222,6 +223,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public void pausePlayer(){
         mediaPlayer.pause();
+        mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                mediaPlayer.getCurrentPosition(), 1.0f).build());
         updateNotification();
     }
 
@@ -343,6 +346,39 @@ public class MusicService extends MediaBrowserServiceCompat implements
     //get random song when randomize/shuffle ON
     public int getRandom(){
         return new Random().nextInt(songList.size());
+    }
+
+    private ArrayList<Songs> getSongs() {
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+        ArrayList<Songs> tempSongList = new ArrayList<>();
+        Cursor songCursor = getApplicationContext().getContentResolver().query(uri, null, selection, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        if (songCursor != null && songCursor.moveToFirst()) {
+            int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
+            int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int songAlbumId = songCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
+            int songData = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+            int songYear = songCursor.getColumnIndex(MediaStore.Audio.Media.YEAR);
+
+            do {
+                String currentTitle = songCursor.getString(songTitle);
+                long currentId = songCursor.getLong(songId);
+                int currentDuration = songCursor.getInt(songDuration);
+                String currentArtist = songCursor.getString(songArtist);
+                long currentAlbumId = songCursor.getLong(songAlbumId);
+                String currentData = songCursor.getString(songData);
+                long currentYear = songCursor.getLong(songYear);
+
+                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
+
+                tempSongList.add(new Songs(getApplicationContext(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+            } while (songCursor.moveToNext());
+            songCursor.close();
+        }
+        return tempSongList;
     }
 
     @Override
