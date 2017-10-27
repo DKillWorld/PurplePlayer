@@ -508,6 +508,25 @@ public class MusicService extends MediaBrowserServiceCompat implements
         }
 
         @Override
+        public void onPlayFromSearch(String query, Bundle extras) {
+            super.onPlayFromSearch(query, extras);
+            boolean found = false;
+            int pos = 0;
+            for (int i = 0; i < songList.size(); i++) {
+                if (songList.get(i).getTitle().equals(query)) {
+                    pos = i;
+                    found = true;
+                    break;
+                }
+            }
+            mediaPlayer.reset();
+            Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songList.get(pos).getId());
+            Bundle bundle = new Bundle();
+            bundle.putInt("Pos", pos);
+            onPlayFromUri(playUri, bundle);
+        }
+
+        @Override
         public void onPlayFromUri(Uri uri, Bundle extras) {
             super.onPlayFromUri(uri, extras);
             songPosn = extras.getInt("Pos");
@@ -520,6 +539,14 @@ public class MusicService extends MediaBrowserServiceCompat implements
             mediaPlayer.prepareAsync();
             mediaSessionCompat.setPlaybackState((playbackStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,
                     1.0f)).build());
+
+//            MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
+//            metadataRetriever.setDataSource(getApplicationContext(), uri);
+//            String name = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+//            String artist = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+//            String album = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+//            String genre = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
+
         }
     }
 }

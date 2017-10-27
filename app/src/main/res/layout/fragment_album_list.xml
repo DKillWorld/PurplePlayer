@@ -1,13 +1,23 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.dv.apps.purpleplayer.ListFragments.AlbumListFragment">
 
+    <ImageView
+        android:id="@+id/fragment_album_image"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:src="@color/purple"
+        android:visibility="gone"/>
     <ListView
         android:id="@+id/fragment_album_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:fastScrollEnabled="true"
+        android:layout_weight="1"
         />
 
-</FrameLayout>
+
+</LinearLayout>

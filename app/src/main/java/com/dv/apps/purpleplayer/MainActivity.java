@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaMetadataRetriever;
 import android.media.audiofx.AudioEffect;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -31,7 +31,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,9 +52,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
+import java.io.File;
 import java.util.ArrayList;
 
-import static android.R.attr.tag;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
@@ -76,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     InterstitialAd interstitialAd;
 
     SharedPreferences preferences;
-    FragmentManager fragmentManager;
 
     public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -5194043;
     public static final int PRIMARY_COLOR_DEFAULT = -11243910;
@@ -96,6 +94,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             MediaControllerCompat.setMediaController(MainActivity.this, mediaControllerCompat);
             buildTransportControls();
+
+            //GetIntent to play From File managers
+            if (Intent.ACTION_VIEW.equals(getIntent().getAction()))
+            {
+                MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+                mediaMetadataRetriever.setDataSource(getApplicationContext(), getIntent().getData());
+                String songName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                if (songName == null) {
+                    File file = new File(getIntent().getData().getPath());
+                    String temp = file.getName();
+                    songName = temp.substring(0, temp.lastIndexOf("."));
+                }
+                MediaControllerCompat.getMediaController(MainActivity.this).getTransportControls().playFromSearch(songName, null);
+            }
         }
     };
     private MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
@@ -140,11 +152,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         preferences.registerOnSharedPreferenceChangeListener(this);
 
-        fragmentManager = getSupportFragmentManager();
-
         //Method to setup Drawer Layout
         setupDrawerLayout();
         setupTabLayout();
+
     }
 
     public void buildTransportControls(){
@@ -155,10 +166,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         playPauseMain.setOnClickListener(this);
+        if (mediaControllerCompat.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING){
+            playPauseMain.setImageResource(R.drawable.ic_pause_white_24dp);
+        }else if (mediaControllerCompat.getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED
+                | mediaControllerCompat.getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED){
+            playPauseMain.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+        }
 
         tvMain = (TextView) findViewById(R.id.tvMain);
         tvMain.setSelected(true);
         tvMain.setOnClickListener(this);
+        if (mediaControllerCompat.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
+            tvMain.setText(mediaControllerCompat.getMetadata().getDescription().getTitle());
+        }else {
+            tvMain.setText("Select a Song");
+        }
+
         tvMain.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         playPauseMain.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         if (getSupportActionBar() != null) {
@@ -397,6 +420,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }else {
                     Toast.makeText(this, "No Equalizer Found !!", Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case R.id.close:
+                return false;
         }
         return true;
     }
@@ -405,11 +431,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStop() {
         super.onStop();
         mediaBrowserCompat.disconnect();
-    }
-
-    @Override
-    public void onBackPressed() {
-        moveTaskToBack(true);
     }
 
     //permissionHandler

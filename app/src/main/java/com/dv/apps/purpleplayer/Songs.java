@@ -3,6 +3,7 @@ package com.dv.apps.purpleplayer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import java.io.IOException;
