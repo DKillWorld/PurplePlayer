@@ -18,6 +18,13 @@
         android:fastScrollEnabled="true"
         android:layout_weight="1"
         />
+    <TextView
+        android:id="@+id/empty_view_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restart App"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
 
 </LinearLayout>

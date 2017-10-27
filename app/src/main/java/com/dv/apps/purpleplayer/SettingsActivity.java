@@ -38,6 +38,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
 
     @Override
     public void onColorSelection(@NonNull ColorChooserDialog colorChooserDialog, @ColorInt int i) {
+        int j = i;
         if (colorChooserDialog.isAccentMode()){
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor editor = preferences.edit();

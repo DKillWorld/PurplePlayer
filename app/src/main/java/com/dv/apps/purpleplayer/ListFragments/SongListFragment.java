@@ -2,14 +2,17 @@ package com.dv.apps.purpleplayer.ListFragments;
 
 
 import android.content.ContentUris;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,9 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.MusicService;
@@ -27,6 +29,8 @@ import com.dv.apps.purpleplayer.R;
 import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
+
+import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 
 
 /**
@@ -62,6 +66,8 @@ public class SongListFragment extends Fragment{
         adapter = new SongAdapter(getActivity(), songList);
         listView.setAdapter(adapter);
         setHasOptionsMenu(true);
+
+        listView.setEmptyView(getActivity().findViewById(R.id.empty_view_button));
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

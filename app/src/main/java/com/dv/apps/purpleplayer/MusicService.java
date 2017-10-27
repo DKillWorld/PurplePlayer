@@ -8,16 +8,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserServiceCompat;
@@ -65,6 +68,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
     public static final String SONG_POSITION = "Song_Pos";
     public static final String SHUFFLE_STATUS = "Shuffle_Status";
     public static final String REPEAT_STATUS = "Repeat_Status";
+    public static boolean PERMISSION_GRANTED = false;
 
 
     @Override
@@ -75,7 +79,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
         initMusicPlayer();
         initMediaSession();
         getAudioFocus();
-        songList = getSongs();
+        songList = new ArrayList<Songs>();
+        setSongList();
 
         becomingNoisyReceiver = new BroadcastReceiver() {
             @Override
@@ -95,6 +100,12 @@ public class MusicService extends MediaBrowserServiceCompat implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
         return START_STICKY;
+    }
+
+    public void setSongList(){
+        if (PERMISSION_GRANTED) {
+            songList = getSongs();
+        }
     }
 
 

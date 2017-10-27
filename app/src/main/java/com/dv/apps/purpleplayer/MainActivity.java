@@ -1,6 +1,5 @@
 package com.dv.apps.purpleplayer;
 
-import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -55,6 +54,7 @@ import com.google.android.gms.ads.MobileAds;
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     SharedPreferences preferences;
 
-    public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -5194043;
-    public static final int PRIMARY_COLOR_DEFAULT = -11243910;
+    public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -1;
+    public static final int PRIMARY_COLOR_DEFAULT = -14575885;
 
     //TEST THINGS
     private MediaBrowserCompat mediaBrowserCompat;
@@ -135,7 +135,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
+        setupPermissions();
+        mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(getApplicationContext(), MusicService.class),connectionCallback, null);
 //        songList = new ArrayList<Songs>();
 
         if (getSupportActionBar() != null) {
@@ -145,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         context = this;
         adapter = new SongAdapter(getApplicationContext(), songList);
 
-        setupPermissions();
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         setupInterstitialAd();
 
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setupDrawerLayout(){
         drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.drawer_list);
-        final String s[] = {"Shuffle All"};
+        final String s[] = {"Sample Item"};
         drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -433,34 +433,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mediaBrowserCompat.disconnect();
     }
 
-    //permissionHandler
-    public void setupPermissions() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-//                getSongs();
-            }else {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-            }
-        }else {
-//            getSongs();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Welcome!!", Toast.LENGTH_SHORT).show();
-//                    getSongs();
-                } else {
-                    Toast.makeText(this, "One or more permission is denied !!", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
-        }
-    }
-
     @Override
     public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onPostCreate(savedInstanceState, persistentState);
@@ -493,5 +465,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         }
     }
+
+    //permissionHandler
+    public void setupPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                PERMISSION_GRANTED = true;
+            }else {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            }
+        }else {
+            PERMISSION_GRANTED = true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Welcome!!", Toast.LENGTH_SHORT).show();
+                    PERMISSION_GRANTED = true;
+                    recreate();
+                } else {
+                    Toast.makeText(this, "One or more permission is denied !!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        }
+    }
+
 }
 
