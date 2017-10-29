@@ -40,28 +40,23 @@
 
                         <android.support.design.widget.TabItem
                             android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Songs" />
+                            android:layout_height="40dp"/>
 
                         <android.support.design.widget.TabItem
                             android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Albums" />
+                            android:layout_height="40dp"/>
 
                         <android.support.design.widget.TabItem
                             android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Artists" />
+                            android:layout_height="40dp"/>
 
                         <android.support.design.widget.TabItem
                             android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Genres" />
+                            android:layout_height="40dp"/>
 
                         <android.support.design.widget.TabItem
                             android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Playlists" />
+                            android:layout_height="40dp"/>
 
                     </android.support.design.widget.TabLayout>
 

@@ -17,7 +17,9 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +47,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     SeekBar seekBar;
 
     Handler seekHandler;
+
+    ShareActionProvider shareActionProvider;
 
     private MediaBrowserCompat mediaBrowserCompat;
     private MediaBrowserCompat.ConnectionCallback connectionCallback = new MediaBrowserCompat.ConnectionCallback(){
@@ -215,8 +219,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
             case R.id.showLyrics:
                 boolean qLInstalled = isQLInstalled(getApplicationContext());
-                String ArtName = MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getSubtitle().toString();
-                String SongName = MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getTitle().toString();
+                String ArtName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getSubtitle();
+                String SongName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getTitle();
+                if ((ArtName == null) || (SongName == null)){
+                    Toast.makeText(this, "Nothing is playing !!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
                 if (qLInstalled){
                     startActivity(new Intent("com.geecko.QuickLyric.getLyrics")
                             .putExtra("TAGS", new String[]{ArtName, SongName}));
@@ -309,6 +317,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_detail_activity, menu);
+
+//        MenuItem item = menu.findItem(R.id.share_action_provider);
+//        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+//        if (shareActionProvider != null){
+//            shareActionProvider.setShareIntent(new Intent(Intent.ACTION_SEND).setType("audio/*").putExtra(Intent.EXTRA_STREAM, "Test"));
+//        }
+
         return true;
     }
 

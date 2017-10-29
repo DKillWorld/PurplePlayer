@@ -22,7 +22,7 @@ import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
 
 public class AboutActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    ImageButton imageButton;
+    ImageButton emailButton, fBPageButton;
     TextView textView;
     AdView adView;
 
@@ -47,21 +47,23 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
         textView = (TextView) findViewById(R.id.version_about);
         textView.setText("v " + BuildConfig.VERSION_NAME);
 
-        imageButton = (ImageButton) findViewById(R.id.contact_icon);
-//        imageButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try {
-//                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://profile/100002257422329"));
-//                    startActivity(fbIntent);
-//                }catch (Exception e){
-//                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/dkillworld"));
-//                    startActivity(fbIntent);
-//                }
-//
-//            }
-//        });
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        fBPageButton = (ImageButton) findViewById(R.id.fb_message_icon);
+        fBPageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/840546956122931"));
+                    startActivity(fbIntent);
+                }catch (Exception e){
+                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/thepurpleplayer"));
+                    startActivity(fbIntent);
+                }
+
+            }
+        });
+
+        emailButton = (ImageButton) findViewById(R.id.contact_icon);
+        emailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);

@@ -10,5 +10,9 @@
         android:key="list_background"
         android:title="List background color"
         android:summary="Use light colors"/>
+    <!--<Preference-->
+        <!--android:key="playback_speed"-->
+        <!--android:title="Playback Speed"-->
+        <!--android:summary="Change speed of player"/>-->
 
 </PreferenceScreen>

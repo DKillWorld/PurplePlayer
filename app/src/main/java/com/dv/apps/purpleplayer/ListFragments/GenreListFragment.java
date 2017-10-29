@@ -61,12 +61,13 @@ public class GenreListFragment extends Fragment {
         listView = view.findViewById(R.id.fragment_genre_list);
         Uri uri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
         final ArrayList<String> arrayList = new ArrayList<>();
-        final Cursor genreCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Genres.DEFAULT_SORT_ORDER);
-        genreCursor.moveToPosition(0);
-        do {
-            String albumName = genreCursor.getString(genreCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
-            arrayList.add(albumName);
-        }while (genreCursor.moveToNext());
+        final Cursor genreCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Genres.NAME);
+        if (genreCursor != null && genreCursor.moveToFirst()) {
+            do {
+                String albumName = genreCursor.getString(genreCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
+                arrayList.add(albumName);
+            } while (genreCursor.moveToNext());
+        }
         genreAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item,R.id.songName, arrayList);
         listView.setAdapter(genreAdapter);
 

@@ -2,12 +2,10 @@ package com.dv.apps.purpleplayer.ListFragments;
 
 
 import android.content.ContentUris;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -22,7 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -31,8 +28,6 @@ import com.dv.apps.purpleplayer.R;
 import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
-
-import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 
 
 /**
@@ -72,74 +67,74 @@ public class AlbumListFragment extends Fragment {
         imageView = view.findViewById(R.id.fragment_album_image);
         Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
         final ArrayList<String> arrayList = new ArrayList<>();
-        listView.setEmptyView(getActivity().findViewById(R.id.empty_view_button));
-        if (PERMISSION_GRANTED) {
-            final Cursor albumCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
-            albumCursor.moveToPosition(0);
+        listView.setEmptyView(getActivity().findViewById(R.id.empty_view));
+        final Cursor albumCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
+        if (albumCursor != null && albumCursor.moveToFirst()) {
             do {
                 String albumName = albumCursor.getString(albumCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM));
                 arrayList.add(albumName);
             } while (albumCursor.moveToNext());
-            albumAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item, R.id.songName, arrayList);
-            listView.setAdapter(albumAdapter);
-
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (!in_detail_view) {
-                        String s = albumAdapter.getItem(position);
-                        albumCursor.moveToPosition(arrayList.indexOf(s));
-
-                        Uri uri1 = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                        String selection = MediaStore.Audio.Albums.ALBUM + " = ?";
-                        String selectrionArgs[] = {albumCursor.getString(albumCursor.getColumnIndex((MediaStore.Audio.Albums.ALBUM)))};
-
-                        tempSongList = new ArrayList<Songs>();
-                        Cursor songCursor = getActivity().getContentResolver().query(uri1, null, selection, selectrionArgs, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-                        if (songCursor != null && songCursor.moveToFirst()) {
-                            int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
-                            int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-                            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-                            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-                            int songAlbumId = songCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
-
-                            do {
-                                String currentTitle = songCursor.getString(songTitle);
-                                long currentId = songCursor.getLong(songId);
-                                int currentDuration = songCursor.getInt(songDuration);
-                                String currentArtist = songCursor.getString(songArtist);
-                                long currentAlbumId = songCursor.getLong(songAlbumId);
-
-                                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-                                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
-
-                                tempSongList.add(new Songs(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
-                            } while (songCursor.moveToNext());
-                            songCursor.close();
-                            songAdapter = new SongAdapter(getActivity(), tempSongList);
-                        }
-                        imageView.setVisibility(View.VISIBLE);
-                        listView.setAdapter(songAdapter);
-                        in_detail_view = true;
-                        getActivity().invalidateOptionsMenu();
-                    } else {
-
-                        Songs tempSong = songAdapter.getItem(position);
-                        MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
-                                .playFromSearch(tempSong.getTitle(), null);
-                    }
-                    Glide.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
-                            albumCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID)))
-                            .apply(new RequestOptions().centerCrop())
-                            .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher_web)).
-                            into(imageView);
-
-
-                }
-            });
         }
+        albumAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item, R.id.songName, arrayList);
+        listView.setAdapter(albumAdapter);
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (!in_detail_view) {
+                    String s = albumAdapter.getItem(position);
+                    albumCursor.moveToPosition(arrayList.indexOf(s));
+
+                    Uri uri1 = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                    String selection = MediaStore.Audio.Albums.ALBUM + " = ?";
+                    String selectrionArgs[] = {albumCursor.getString(albumCursor.getColumnIndex((MediaStore.Audio.Albums.ALBUM)))};
+
+                    tempSongList = new ArrayList<Songs>();
+                    Cursor songCursor = getActivity().getContentResolver().query(uri1, null, selection, selectrionArgs, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                    if (songCursor != null && songCursor.moveToFirst()) {
+                        int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
+                        int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+                        int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+                        int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+                        int songAlbumId = songCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
+
+                        do {
+                            String currentTitle = songCursor.getString(songTitle);
+                            long currentId = songCursor.getLong(songId);
+                            int currentDuration = songCursor.getInt(songDuration);
+                            String currentArtist = songCursor.getString(songArtist);
+                            long currentAlbumId = songCursor.getLong(songAlbumId);
+
+                            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+                            Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
+
+                            tempSongList.add(new Songs(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+                        } while (songCursor.moveToNext());
+                        songCursor.close();
+                        songAdapter = new SongAdapter(getActivity(), tempSongList);
+                    }
+                    imageView.setVisibility(View.VISIBLE);
+                    listView.setAdapter(songAdapter);
+                    in_detail_view = true;
+                    getActivity().invalidateOptionsMenu();
+                } else {
+
+                    Songs tempSong = songAdapter.getItem(position);
+                    MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                            .playFromSearch(tempSong.getTitle(), null);
+                }
+                Glide.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
+                        albumCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID)))
+                        .apply(new RequestOptions().centerCrop())
+                        .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher_web)).
+                        into(imageView);
+
+
+            }
+        });
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

@@ -145,7 +145,11 @@ public class SongAdapter extends ArrayAdapter<Songs> {
 
     @Override
     public int getCount() {
-        return songList.size();
+        if (songList != null) {
+            return songList.size();
+        }else {
+            return 0;
+        }
     }
 }
 

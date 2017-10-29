@@ -61,11 +61,12 @@ public class PlaylistListFragment extends Fragment {
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         final ArrayList<String> arrayList = new ArrayList<>();
         final Cursor playlistCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
-        playlistCursor.moveToPosition(0);
-        do {
-            String albumName = playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
-            arrayList.add(albumName);
-        }while (playlistCursor.moveToNext());
+        if (playlistCursor != null && playlistCursor.moveToFirst()) {
+            do {
+                String albumName = playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
+                arrayList.add(albumName);
+            } while (playlistCursor.moveToNext());
+        }
         playlistAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item,R.id.songName, arrayList);
         listView.setAdapter(playlistAdapter);
 

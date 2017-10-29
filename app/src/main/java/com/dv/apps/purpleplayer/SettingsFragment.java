@@ -3,11 +3,11 @@ package com.dv.apps.purpleplayer;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.text.InputType;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 
 /**
@@ -51,5 +51,22 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
+//        Preference playbackSpeed = findPreference("playback_speed");
+//        playbackSpeed.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//                new MaterialDialog.Builder(getActivity())
+//                        .title("Set Playback Speed")
+//                        .content("Set Speed")
+//                        .inputType(InputType.TYPE_CLASS_NUMBER)
+//                        .input("Speed in float", "1.0", new MaterialDialog.InputCallback() {
+//                            @Override
+//                            public void onInput(MaterialDialog dialog, CharSequence input) {
+//                                float speed = Float.parseFloat(input.toString());
+//                            }
+//                        }).show();
+//                return true;
+//            }
+//        });
     }
 }

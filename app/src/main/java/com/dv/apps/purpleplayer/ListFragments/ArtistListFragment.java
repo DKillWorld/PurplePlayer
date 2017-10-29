@@ -60,11 +60,12 @@ public class ArtistListFragment extends Fragment {
         Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
         final ArrayList<String> arrayList = new ArrayList<>();
         final Cursor artistCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
-        artistCursor.moveToPosition(0);
-        do {
-            String albumName = artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST));
-            arrayList.add(albumName);
-        }while (artistCursor.moveToNext());
+        if (artistCursor != null && artistCursor.moveToFirst()) {
+            do {
+                String albumName = artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST));
+                arrayList.add(albumName);
+            } while (artistCursor.moveToNext());
+        }
         artistAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item,R.id.songName, arrayList);
         listView.setAdapter(artistAdapter);
 

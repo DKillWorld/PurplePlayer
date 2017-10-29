@@ -1,5 +1,6 @@
 package com.dv.apps.purpleplayer;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -14,6 +15,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -79,8 +81,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
         initMusicPlayer();
         initMediaSession();
         getAudioFocus();
-        songList = new ArrayList<Songs>();
-        setSongList();
 
         becomingNoisyReceiver = new BroadcastReceiver() {
             @Override
@@ -100,12 +100,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
         return START_STICKY;
-    }
-
-    public void setSongList(){
-        if (PERMISSION_GRANTED) {
-            songList = getSongs();
-        }
     }
 
 
@@ -359,11 +353,14 @@ public class MusicService extends MediaBrowserServiceCompat implements
         return new Random().nextInt(songList.size());
     }
 
-    private ArrayList<Songs> getSongs() {
+    public static ArrayList<Songs> getSongs(Context context) {
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String projection[] = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Albums.ALBUM_ID,
+                MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.YEAR};
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-        ArrayList<Songs> tempSongList = new ArrayList<>();
-        Cursor songCursor = getApplicationContext().getContentResolver().query(uri, null, selection, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        songList = new ArrayList<>();
+        Cursor songCursor = context.getContentResolver().query(uri, projection, selection, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
         if (songCursor != null && songCursor.moveToFirst()) {
             int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
             int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
@@ -385,11 +382,11 @@ public class MusicService extends MediaBrowserServiceCompat implements
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                 Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
 
-                tempSongList.add(new Songs(getApplicationContext(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+                songList.add(new Songs(context, currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
             } while (songCursor.moveToNext());
             songCursor.close();
         }
-        return tempSongList;
+        return songList;
     }
 
     @Override

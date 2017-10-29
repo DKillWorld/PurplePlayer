@@ -11,4 +11,11 @@
         android:orderInCategory="100"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_equalizer_white_24dp"/>
+
+    <!--<item android:id="@+id/share_action_provider"-->
+        <!--android:title="Share"-->
+        <!--android:orderInCategory="200"-->
+        <!--app:showAsAction="ifRoom"-->
+        <!--app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>-->
+
 </menu>
