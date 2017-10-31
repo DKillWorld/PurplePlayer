@@ -21,8 +21,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Song;
+import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
-import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
 
@@ -38,7 +39,7 @@ public class GenreListFragment extends Fragment {
 
     ArrayAdapter<String> genreAdapter;
     SongAdapter songAdapter;
-    ArrayList<Songs> tempSongList;
+    ArrayList<Song> tempSongList;
 
     public GenreListFragment() {
         // Required empty public constructor
@@ -60,8 +61,9 @@ public class GenreListFragment extends Fragment {
 
         listView = view.findViewById(R.id.fragment_genre_list);
         Uri uri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
+        String projection[] = {MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME};
         final ArrayList<String> arrayList = new ArrayList<>();
-        final Cursor genreCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Genres.NAME);
+        final Cursor genreCursor = getContext().getContentResolver().query(uri, projection, null, null, MediaStore.Audio.Genres.NAME);
         if (genreCursor != null && genreCursor.moveToFirst()) {
             do {
                 String albumName = genreCursor.getString(genreCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
@@ -78,9 +80,9 @@ public class GenreListFragment extends Fragment {
                     String s = genreAdapter.getItem(position);
                     genreCursor.moveToPosition(arrayList.indexOf(s));
 
-                    Uri uri1 = MediaStore.Audio.Genres.Members.getContentUri("external", genreAdapter.getItemId(position));
+                    Uri uri1 = MediaStore.Audio.Genres.Members.getContentUri("external", genreCursor.getLong(0));
 
-                    tempSongList = new ArrayList<Songs>();
+                    tempSongList = new ArrayList<Song>();
                     Cursor songCursor = getActivity().getContentResolver().query(uri1, null, null, null, MediaStore.Audio.Genres.Members.DEFAULT_SORT_ORDER);
                     if (songCursor != null && songCursor.moveToFirst()) {
                         int songId = songCursor.getColumnIndex((MediaStore.Audio.Genres.Members.AUDIO_ID));
@@ -99,7 +101,7 @@ public class GenreListFragment extends Fragment {
                             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                             Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
 
-                            tempSongList.add(new Songs(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+                            tempSongList.add(new Song(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
                         } while (songCursor.moveToNext());
                         songCursor.close();
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
@@ -108,14 +110,22 @@ public class GenreListFragment extends Fragment {
                     in_detail_view = true;
                     getActivity().invalidateOptionsMenu();
                 } else {
-
-                    Songs tempSong = songAdapter.getItem(position);
+                    Song tempSong = songAdapter.getItem(position);
+                    MusicService.setSongList(tempSongList);
                     MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
                             .playFromSearch(tempSong.getTitle(), null);
                 }
             }
         });
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        in_detail_view = false;
+        listView.setAdapter(genreAdapter);
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);

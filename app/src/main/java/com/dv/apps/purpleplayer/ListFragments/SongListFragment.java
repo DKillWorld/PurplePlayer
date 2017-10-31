@@ -19,9 +19,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
-import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
 
@@ -34,7 +34,7 @@ public class SongListFragment extends Fragment{
 
     ListView listView;
     public SongAdapter adapter;
-    ArrayList<Songs> songList;
+    ArrayList<Song> songList;
     SearchView searchView;
 
     public SongListFragment() {
@@ -55,17 +55,16 @@ public class SongListFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         listView = view.findViewById(R.id.fragment_song_list);
         listView.setFastScrollEnabled(true);
-        songList = MusicService.songList;
+        songList = MusicService.globalSongList;
         adapter = new SongAdapter(getActivity(), songList);
         listView.setAdapter(adapter);
         setHasOptionsMenu(true);
 
-        listView.setEmptyView(getActivity().findViewById(R.id.empty_view));
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Songs tempSong = adapter.getItem(position);
+                MusicService.setSongList(songList);
+                Song tempSong = adapter.getItem(position);
                 Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
                 Bundle bundle = new Bundle();
                 bundle.putInt("Pos", songList.indexOf(tempSong));

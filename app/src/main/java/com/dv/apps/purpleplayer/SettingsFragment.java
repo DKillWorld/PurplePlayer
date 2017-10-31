@@ -29,7 +29,7 @@ public class SettingsFragment extends PreferenceFragment {
                         .doneButton(R.string.md_done_label)  // changes label of the done button
                         .cancelButton(R.string.md_cancel_label)  // changes label of the cancel button
                         .backButton(R.string.md_back_label)  // changes label of the back button
-                        .accentMode(true)
+                        .tag("Secondary")
                         .dynamicButtonColor(true)  // defaults to true, false will disable changing action buttons' color to currently selected color
                         .show((FragmentActivity) getActivity());
                 return true;
@@ -45,6 +45,7 @@ public class SettingsFragment extends PreferenceFragment {
                         .doneButton(R.string.md_done_label)  // changes label of the done button
                         .cancelButton(R.string.md_cancel_label)  // changes label of the cancel button
                         .backButton(R.string.md_back_label)  // changes label of the back button
+                        .tag("Primary")
                         .dynamicButtonColor(true)  // defaults to true, false will disable changing action buttons' color to currently selected color
                         .show((FragmentActivity) getActivity());
                 return true;

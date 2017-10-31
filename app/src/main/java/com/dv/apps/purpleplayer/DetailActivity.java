@@ -3,10 +3,15 @@ package com.dv.apps.purpleplayer;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -17,8 +22,8 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,15 +34,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.color.CircleView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
+import static com.dv.apps.purpleplayer.MainActivity.LISTVIEW_BACKGROUND_COLOR_DEFAULT;
+import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
 import static com.dv.apps.purpleplayer.MusicService.looping;
 import static com.dv.apps.purpleplayer.MusicService.randomize;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
+import static com.dv.apps.purpleplayer.R.id.playPauseMain;
+import static com.dv.apps.purpleplayer.R.id.tvMain;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
@@ -118,6 +128,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
         getWindow().getDecorView().setBackgroundResource(R.mipmap.background_list);
+//        getWindow().getDecorView().getBackground().setColorFilter(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)).getColor(), PorterDuff.Mode.ADD);
 
     }
 
@@ -366,4 +377,5 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         super.onStop();
         mediaBrowserCompat.disconnect();
     }
+
 }

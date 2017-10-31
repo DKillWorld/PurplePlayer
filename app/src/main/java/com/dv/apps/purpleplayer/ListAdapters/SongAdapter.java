@@ -15,8 +15,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.R;
-import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
 
@@ -24,14 +24,14 @@ import java.util.ArrayList;
  * Created by Dhaval on 01-07-2017.
  */
 
-public class SongAdapter extends ArrayAdapter<Songs> {
+public class SongAdapter extends ArrayAdapter<Song> {
 
     private String songTime;
-    private ArrayList<Songs> songList, backupList;
-    private Songs song;
+    private ArrayList<Song> songList, backupList;
+    private Song song;
     private Context context;
 
-    public SongAdapter(@NonNull Context context, ArrayList<Songs> songList) {
+    public SongAdapter(@NonNull Context context, ArrayList<Song> songList) {
         super(context,0, songList);
         this.songList = songList;
         this.backupList = songList;
@@ -106,9 +106,9 @@ public class SongAdapter extends ArrayAdapter<Songs> {
                 results.count = backupList.size();
             }
             else if (constraint != null && constraint.toString().length() > 0){
-                ArrayList<Songs> tempList = new ArrayList<Songs>();
+                ArrayList<Song> tempList = new ArrayList<Song>();
                 for (int i = 0, l = backupList.size(); i < l; i++){
-                    Songs tempSong = backupList.get(i);
+                    Song tempSong = backupList.get(i);
                     if (tempSong.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())
                             || tempSong.getArtist().toLowerCase().contains(constraint.toString().toLowerCase())){
                         tempList.add(tempSong);
@@ -128,7 +128,7 @@ public class SongAdapter extends ArrayAdapter<Songs> {
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            songList = (ArrayList<Songs>) results.values;
+            songList = (ArrayList<Song>) results.values;
             if (songList.size() > 0) {
                 notifyDataSetChanged();
             }else{
@@ -139,7 +139,7 @@ public class SongAdapter extends ArrayAdapter<Songs> {
 
     @Nullable
     @Override
-    public Songs getItem(int position) {
+    public Song getItem(int position) {
         return songList.get(position);
     }
 

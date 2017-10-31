@@ -21,8 +21,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Song;
+import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
-import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
 
@@ -37,7 +38,7 @@ public class ArtistListFragment extends Fragment {
 
     ArrayAdapter<String> artistAdapter;
     SongAdapter songAdapter;
-    ArrayList<Songs> tempSongList;
+    ArrayList<Song> tempSongList;
 
     public ArtistListFragment() {
         // Required empty public constructor
@@ -80,7 +81,7 @@ public class ArtistListFragment extends Fragment {
                     String selection = MediaStore.Audio.Albums.ARTIST + " = ?";
                     String selectrionArgs[] = {artistCursor.getString(artistCursor.getColumnIndex((MediaStore.Audio.Albums.ARTIST)))};
 
-                    tempSongList = new ArrayList<Songs>();
+                    tempSongList = new ArrayList<Song>();
                     Cursor songCursor = getActivity().getContentResolver().query(uri1, null, selection, selectrionArgs, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
                     if (songCursor != null && songCursor.moveToFirst()) {
                         int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
@@ -99,7 +100,7 @@ public class ArtistListFragment extends Fragment {
                             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                             Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
 
-                            tempSongList.add(new Songs(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+                            tempSongList.add(new Song(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
                         } while (songCursor.moveToNext());
                         songCursor.close();
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
@@ -109,13 +110,20 @@ public class ArtistListFragment extends Fragment {
                     in_detail_view = true;
                     getActivity().invalidateOptionsMenu();
                 }else {
-
-                    Songs tempSong = songAdapter.getItem(position);
+                    Song tempSong = songAdapter.getItem(position);
+                    MusicService.setSongList(tempSongList);
                     MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
                             .playFromSearch(tempSong.getTitle(), null);
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        in_detail_view = false;
+        listView.setAdapter(artistAdapter);
     }
 
     @Override

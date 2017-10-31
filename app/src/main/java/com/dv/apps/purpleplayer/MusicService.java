@@ -1,6 +1,5 @@
 package com.dv.apps.purpleplayer;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,20 +8,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserServiceCompat;
@@ -32,6 +27,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 
+import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.Utils.MediaStyleHelper;
 
 import java.io.IOException;
@@ -48,7 +44,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
         MediaPlayer.OnCompletionListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     MediaPlayer mediaPlayer;
-    public static ArrayList<Songs> songList;
+    public static ArrayList<Song> songList;
+    public static ArrayList<Song> globalSongList;
     int songPosn;
     static boolean systemStopped = false;
     public static boolean userStopped = false;
@@ -200,7 +197,11 @@ public class MusicService extends MediaBrowserServiceCompat implements
         preference.apply();
     }
 
-    public Songs getSong(){
+    public static void setSongList(ArrayList<Song> tempSongList){
+        songList = tempSongList;
+    }
+
+    public Song getSong(){
         return songList.get(songPosn);
     }
 
@@ -214,7 +215,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public void playSong(){
         mediaPlayer.reset();
-        Songs sampleSong = getSong();
+        Song sampleSong = getSong();
         long currentSong = sampleSong.getId();
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currentSong);
 
@@ -353,7 +354,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         return new Random().nextInt(songList.size());
     }
 
-    public static ArrayList<Songs> getSongs(Context context) {
+    public static ArrayList<Song> getSongs(Context context) {
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Albums.ALBUM_ID,
@@ -382,10 +383,12 @@ public class MusicService extends MediaBrowserServiceCompat implements
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                 Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
 
-                songList.add(new Songs(context, currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+                songList.add(new Song(context, currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
             } while (songCursor.moveToNext());
             songCursor.close();
         }
+        globalSongList = new ArrayList<Song>();
+        globalSongList.addAll(songList);
         return songList;
     }
 
@@ -485,7 +488,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
         public void onSeekTo(long pos) {
             super.onSeekTo(pos);
             mediaPlayer.seekTo((int) pos);
-            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_FAST_FORWARDING,
+            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    mediaPlayer.getCurrentPosition(), 1.0f).build());
+            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mediaPlayer.getCurrentPosition(), 1.0f).build());
         }
 

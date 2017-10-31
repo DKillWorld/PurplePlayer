@@ -1,22 +1,18 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.audiofx.AudioEffect;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -50,6 +46,7 @@ import com.dv.apps.purpleplayer.ListFragments.ArtistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.GenreListFragment;
 import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
+import com.dv.apps.purpleplayer.Models.Song;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -59,13 +56,14 @@ import java.io.File;
 import java.util.ArrayList;
 
 import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
+import static com.dv.apps.purpleplayer.MusicService.songList;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     Context context;
-    ArrayList<Songs> songList;
+    ArrayList<Song> songList;
     SongAdapter adapter;
     ImageButton playPauseMain;
     TextView tvMain;
@@ -141,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(getApplicationContext(), MusicService.class),connectionCallback, null);
-//        songList = new ArrayList<Songs>();
+//        songList = new ArrayList<Song>();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Library");
@@ -250,11 +248,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 Toast.makeText(getApplicationContext(), "Under Development !!", Toast.LENGTH_SHORT).show();
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle("Purple Player");
+                }
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle("Library");
+                }
             }
         };
         drawerlayout.setDrawerListener(actionBarToggle);;
@@ -321,9 +325,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         viewPager.setAdapter(fragmentPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-
     }
-
 
     @Override
     public void onClick(View v) {
@@ -335,14 +337,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.playPauseMain:
-                if (MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED ||
-                        MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED ||
-                        MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE){
-                    MediaControllerCompat.getMediaController(this).getTransportControls().play();
-                    userStopped = false;
-                } else {
-                    MediaControllerCompat.getMediaController(this).getTransportControls().pause();
-                    userStopped = true;
+                if ((MusicService.songList != null) && (MusicService.songList.size() != 0)) {
+                    if (MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED ||
+                            MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED ||
+                            MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE) {
+                        MediaControllerCompat.getMediaController(this).getTransportControls().play();
+                        userStopped = false;
+                    } else {
+                        MediaControllerCompat.getMediaController(this).getTransportControls().pause();
+                        userStopped = true;
+                    }
                 }
                 break;
 

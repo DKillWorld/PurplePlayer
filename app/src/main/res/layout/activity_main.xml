@@ -35,8 +35,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:tabMode="scrollable"
-                        app:tabTextColor="@color/white"
-                        app:tabSelectedTextColor="@color/purple">
+                        app:tabTextColor="#BBFFFFFF"
+                        app:tabSelectedTextColor="@color/white">
 
                         <android.support.design.widget.TabItem
                             android:layout_width="wrap_content"

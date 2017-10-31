@@ -1,9 +1,8 @@
-package com.dv.apps.purpleplayer;
+package com.dv.apps.purpleplayer.Models;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.io.IOException;
  * Created by Dhaval on 01-07-2017.
  */
 
-public class Songs {
+public class Song {
 
     private String title, artist;
     private Uri image;
@@ -20,7 +19,7 @@ public class Songs {
     private int duration;
     private Context context;
 
-    public Songs(Context context, String title, long id, int duration, String artist, Uri uri) {
+    public Song(Context context, String title, long id, int duration, String artist, Uri uri) {
         this.title = title;
         this.id = id;
         this.duration = duration;

@@ -21,8 +21,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Song;
+import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
-import com.dv.apps.purpleplayer.Songs;
 
 import java.util.ArrayList;
 
@@ -38,7 +39,7 @@ public class PlaylistListFragment extends Fragment {
 
     ArrayAdapter<String> playlistAdapter;
     SongAdapter songAdapter;
-    ArrayList<Songs> tempSongList;
+    ArrayList<Song> tempSongList;
 
     public PlaylistListFragment() {
         // Required empty public constructor
@@ -59,8 +60,9 @@ public class PlaylistListFragment extends Fragment {
 
         listView = view.findViewById(R.id.fragment_playlist_list);
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        String projection[] = {MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.NAME};
         final ArrayList<String> arrayList = new ArrayList<>();
-        final Cursor playlistCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
+        final Cursor playlistCursor = getContext().getContentResolver().query(uri, projection, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
         if (playlistCursor != null && playlistCursor.moveToFirst()) {
             do {
                 String albumName = playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
@@ -74,12 +76,12 @@ public class PlaylistListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!in_detail_view) {
-                    long s = playlistAdapter.getItemId(position);
+                    String s = playlistAdapter.getItem(position);
                     playlistCursor.moveToPosition(arrayList.indexOf(s));
 
-                    Uri uri1 = MediaStore.Audio.Playlists.Members.getContentUri("external", position);
+                    Uri uri1 = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistCursor.getLong(0));
 
-                    tempSongList = new ArrayList<Songs>();
+                    tempSongList = new ArrayList<Song>();
                     Cursor songCursor = getActivity().getContentResolver().query(uri1, null, null, null, MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
                     if (songCursor != null && songCursor.moveToFirst()) {
                         int songId = songCursor.getColumnIndex((MediaStore.Audio.Playlists.Members.AUDIO_ID));
@@ -98,7 +100,7 @@ public class PlaylistListFragment extends Fragment {
                             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
                             Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
 
-                            tempSongList.add(new Songs(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+                            tempSongList.add(new Song(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
                         } while (songCursor.moveToNext());
                         songCursor.close();
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
@@ -107,13 +109,20 @@ public class PlaylistListFragment extends Fragment {
                     in_detail_view = true;
                     getActivity().invalidateOptionsMenu();
                 } else {
-
-                    Songs tempSong = songAdapter.getItem(position);
+                    Song tempSong = songAdapter.getItem(position);
+                    MusicService.setSongList(tempSongList);
                     MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
                             .playFromSearch(tempSong.getTitle(), null);
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        in_detail_view = false;
+        listView.setAdapter(playlistAdapter);
     }
 
     @Override

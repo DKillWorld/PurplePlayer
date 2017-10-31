@@ -9,7 +9,7 @@
     <Preference
         android:key="list_background"
         android:title="List background color"
-        android:summary="Use light colors"/>
+        android:summary="Tip: Use lightest version of Primary color"/>
     <!--<Preference-->
         <!--android:key="playback_speed"-->
         <!--android:title="Playback Speed"-->
