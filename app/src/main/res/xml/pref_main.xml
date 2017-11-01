@@ -2,6 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory
+        android:title="UI">
     <Preference
         android:key="primary_color"
         android:title="Primary color"
@@ -15,4 +17,15 @@
         <!--android:title="Playback Speed"-->
         <!--android:summary="Change speed of player"/>-->
 
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Lyrics">
+        <CheckBoxPreference
+            android:title="Use QuickLyric as default"
+            android:key="@string/key_use_quicklyric"
+            android:summaryOff="Purple Player default"
+            android:summaryOn="QuickLyric"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -127,10 +127,10 @@ public class AlbumListFragment extends Fragment {
                 }
                 Glide.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
                         albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums._ID))))
+                        .apply(new RequestOptions().placeholder(R.mipmap.ic_play))
                         .apply(new RequestOptions().centerCrop())
                         .transition(DrawableTransitionOptions.withCrossFade())
-                        .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher_web)).
-                        into(imageView);
+                        .into(imageView);
 
 
             }

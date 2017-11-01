@@ -22,5 +22,7 @@
         <item>"Albums"</item>
     </string-array>
 
+    <string name="key_use_quicklyric" translatable="false">QuickLyric_Key</string>
+
 
 </resources>

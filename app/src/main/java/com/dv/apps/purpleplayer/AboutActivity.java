@@ -20,11 +20,15 @@ import com.google.android.gms.ads.AdView;
 
 import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
 
+
+//Icon credit = psdblast.com
 public class AboutActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     ImageButton emailButton, fBPageButton;
     TextView textView;
     AdView adView;
+
+    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +40,7 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (getSupportActionBar() != null) {
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         }
@@ -103,5 +107,11 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(CircleView.shiftColorDown(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 }

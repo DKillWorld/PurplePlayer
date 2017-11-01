@@ -313,7 +313,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         NotificationCompat.Builder builder = MediaStyleHelper.from(getApplicationContext(), mediaSessionCompat);
         builder.setContentIntent(pendingIntent);
-        builder.setSmallIcon(R.mipmap.ic_launcher)
+        builder.setSmallIcon(R.mipmap.ic_play)
                 .setLargeIcon(mediaSessionCompat.getController().getMetadata().getDescription().getIconBitmap())
                 .setColor(ContextCompat.getColor(this, android.R.color.holo_purple));
         builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Prev", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)));
@@ -470,7 +470,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
             if ((mediaPlayer.getCurrentPosition() + 15000) < mediaPlayer.getDuration()){
                 mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 15000);
             }
-            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_FAST_FORWARDING,
+            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    mediaPlayer.getCurrentPosition(), 1.0f).build());
+            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mediaPlayer.getCurrentPosition(), 1.0f).build());
         }
 
@@ -480,7 +482,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
             if ((mediaPlayer.getCurrentPosition() - 15000) > 0){
                 mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 15000);
             }
-            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_REWINDING,
+            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    mediaPlayer.getCurrentPosition(), 1.0f).build());
+            mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mediaPlayer.getCurrentPosition(), 1.0f).build());
         }
 

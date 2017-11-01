@@ -1,6 +1,7 @@
 package com.dv.apps.purpleplayer;
 
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
@@ -69,5 +70,8 @@ public class SettingsFragment extends PreferenceFragment {
 //                return true;
 //            }
 //        });
+
     }
+
+
 }

@@ -17,6 +17,8 @@ import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
 
 public class SettingsActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback, SharedPreferences.OnSharedPreferenceChangeListener {
 
+    SharedPreferences preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
             getSupportActionBar().setTitle("Settings");
         }
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (getSupportActionBar() != null) {
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         }
@@ -40,11 +42,11 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
     public void onColorSelection(@NonNull ColorChooserDialog colorChooserDialog, @ColorInt int i) {
         String dialogueTag = colorChooserDialog.tag();
         if (dialogueTag.equals("Secondary")){
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor editor = preferences.edit();
             editor.putInt("list_background", i).apply();
         }else {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor editor = preferences.edit();
             editor.putInt("primary_color", i).apply();
         }
@@ -64,5 +66,11 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(CircleView.shiftColorDown(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 }

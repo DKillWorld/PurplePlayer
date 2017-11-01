@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.audiofx.AudioEffect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -56,7 +57,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
-import static com.dv.apps.purpleplayer.MusicService.songList;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setupDrawerLayout(){
         drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.drawer_list);
-        final String s[] = {"Support Development"};
+        final String s[] = {"Support Development", "Rate Us"};
         drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -240,6 +240,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Toast.makeText(context, "Send Feedback with Subject as \"Support Development\"", Toast.LENGTH_SHORT).show();
                         drawerlayout.closeDrawers();
                         break;
+                    case 1:
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
+                        startActivity(intent);
                 }
             }
         });
@@ -461,5 +465,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
 }
 

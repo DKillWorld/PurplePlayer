@@ -5,17 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -34,22 +32,30 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.color.CircleView;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
-import static com.dv.apps.purpleplayer.MainActivity.LISTVIEW_BACKGROUND_COLOR_DEFAULT;
-import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
 import static com.dv.apps.purpleplayer.MusicService.looping;
 import static com.dv.apps.purpleplayer.MusicService.randomize;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
-import static com.dv.apps.purpleplayer.R.id.playPauseMain;
-import static com.dv.apps.purpleplayer.R.id.tvMain;
 
-public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     TextView textView1, textView2;
     ImageView imageView;
@@ -57,6 +63,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     SeekBar seekBar;
 
     Handler seekHandler;
+
+    SharedPreferences preferences;
 
     ShareActionProvider shareActionProvider;
 
@@ -84,7 +92,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 playPause.setImageResource(R.mipmap.ic_pause);
             }else if (state.getState() == PlaybackStateCompat.STATE_PAUSED
                     | state.getState() == PlaybackStateCompat.STATE_STOPPED){
-                playPause.setImageResource(R.mipmap.ic_launcher);
+                playPause.setImageResource(R.mipmap.ic_play);
             }
             updateSeekbar();
         }
@@ -124,6 +132,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             getSupportActionBar().setTitle("Now Playing");
         }
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        preferences.registerOnSharedPreferenceChangeListener(this);
+
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
@@ -158,7 +169,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         if (MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED ||
                 MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE ||
                 MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED){
-            playPause.setImageResource(R.mipmap.ic_launcher);
+            playPause.setImageResource(R.mipmap.ic_play);
         }else playPause.setImageResource(R.mipmap.ic_pause);
         playPause.setOnClickListener(this);
 
@@ -229,19 +240,29 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         switch (v.getId()){
 
             case R.id.showLyrics:
-                boolean qLInstalled = isQLInstalled(getApplicationContext());
+                //boolean to check if use QuickLyric OR https://api.lyrics.ovh/v1/
+                boolean useQuickLyric = preferences.getBoolean(getString(R.string.key_use_quicklyric), false);
+
                 String ArtName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getSubtitle();
                 String SongName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getTitle();
-                if ((ArtName == null) || (SongName == null)){
+                if ((ArtName == null) || (SongName == null)) {
                     Toast.makeText(this, "Nothing is playing !!", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                if (qLInstalled){
-                    startActivity(new Intent("com.geecko.QuickLyric.getLyrics")
-                            .putExtra("TAGS", new String[]{ArtName, SongName}));
-                }else {
-                    installQL();
+                if (useQuickLyric) {
+                    boolean qLInstalled = isQLInstalled(getApplicationContext());
+                    if (qLInstalled) {
+                        startActivity(new Intent("com.geecko.QuickLyric.getLyrics")
+                                .putExtra("TAGS", new String[]{ArtName, SongName}));
+                    } else {
+                        installQL();
+                    }
+                } else {
+                    String artistAndSongName[] = {ArtName, SongName};
+                    FetchLyricsTask fetchLyricsTask = new FetchLyricsTask();
+                    fetchLyricsTask.execute(artistAndSongName);
                 }
+
                 break;
 
             case R.id.playPause:
@@ -378,4 +399,131 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         mediaBrowserCompat.disconnect();
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+    }
+
+    /**
+     * Created by Dhaval on 31-10-2017.
+     * To get lyrics by lyrics.ovh
+     */
+
+    private class FetchLyricsTask extends AsyncTask<String, Void, String> {
+
+        HttpURLConnection urlConnection;
+        MaterialDialog progressDialog, lyricsDialog;
+        String artName, songName;
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new MaterialDialog.Builder(DetailActivity.this)
+                    .title("Checking for Lyrics")
+                    .content("Please Wait")
+                    .progress(true, 0)
+                    .show();
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+
+            StringBuilder result = new StringBuilder();
+
+            artName = args[0]; //Used to fire up Quicklyric
+            songName = args[1]; //Used to fire up QuickLyric
+
+            Uri lyricsBaseUri = Uri.parse("https://api.lyrics.ovh/v1/");
+            Uri lyricsUri = lyricsBaseUri.buildUpon().appendPath(args[0]).appendPath(args[1]).build();
+
+            try {
+                URL url = new URL(lyricsUri.toString());
+                urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+            }catch( Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                urlConnection.disconnect();
+            }
+
+
+            return result.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            progressDialog.dismiss();
+            if (result == null || result.length() == 0){
+                lyricsDialog = new MaterialDialog.Builder(DetailActivity.this)
+                        .title("Oops !!")
+                        .content("No Lyrics Found. \nMake sure you are connected to network and metadata is correct.")
+                        .negativeText("Damn It !!")
+                        .positiveText("QuickLyric")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                boolean qLInstalled = isQLInstalled(getApplicationContext());
+                                if (qLInstalled) {
+                                    startActivity(new Intent("com.geecko.QuickLyric.getLyrics")
+                                            .putExtra("TAGS", new String[]{artName, songName}));
+                                } else {
+                                    installQL();
+                                }
+                            }
+                        })
+                        .show();
+            }else {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (jsonObject.has("lyrics")) {
+                        String s = jsonObject.getString("lyrics");
+                        lyricsDialog = new MaterialDialog.Builder(DetailActivity.this)
+                                .title("Lyrics")
+                                .content(s)
+                                .contentGravity(GravityEnum.CENTER)
+                                .positiveText("QuickLyric")
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                        boolean qLInstalled = isQLInstalled(getApplicationContext());
+                                        if (qLInstalled) {
+                                            startActivity(new Intent("com.geecko.QuickLyric.getLyrics")
+                                                    .putExtra("TAGS", new String[]{artName, songName}));
+                                        } else {
+                                            installQL();
+                                        }
+                                    }
+                                })
+                                .neutralText("Great")
+                                .show();
+                    } else {
+                        Toast.makeText(DetailActivity.this, "No Lyrics Found !!", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
 }
