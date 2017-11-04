@@ -2,8 +2,12 @@ package com.dv.apps.purpleplayer.Models;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
+
+import com.dv.apps.purpleplayer.R;
 
 import java.io.IOException;
 
@@ -49,13 +53,14 @@ public class Song {
     }
 
     public Bitmap getImageBitmap(){
+        Bitmap bitmap;
         try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), image);
-            return bitmap;
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), image);
         } catch (IOException e) {
             e.printStackTrace();
+            bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_web);
         }
-        return null;
+        return bitmap;
     }
 }
 

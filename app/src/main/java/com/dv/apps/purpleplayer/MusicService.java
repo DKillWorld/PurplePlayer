@@ -265,7 +265,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public void playPrev(){
         songPosn--;
-        if (songPosn == 0){
+        if (songPosn == -1){
             songPosn = songList.size() - 1;
         }
         playSong();
@@ -313,7 +313,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         NotificationCompat.Builder builder = MediaStyleHelper.from(getApplicationContext(), mediaSessionCompat);
         builder.setContentIntent(pendingIntent);
-        builder.setSmallIcon(R.mipmap.ic_play)
+        builder.setSmallIcon(R.mipmap.ic_launcher_web)
                 .setLargeIcon(mediaSessionCompat.getController().getMetadata().getDescription().getIconBitmap())
                 .setColor(ContextCompat.getColor(this, android.R.color.holo_purple));
         builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Prev", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)));
