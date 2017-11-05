@@ -313,7 +313,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         NotificationCompat.Builder builder = MediaStyleHelper.from(getApplicationContext(), mediaSessionCompat);
         builder.setContentIntent(pendingIntent);
-        builder.setSmallIcon(R.mipmap.ic_launcher_web)
+        builder.setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(mediaSessionCompat.getController().getMetadata().getDescription().getIconBitmap())
                 .setColor(ContextCompat.getColor(this, android.R.color.holo_purple));
         builder.addAction(new NotificationCompat.Action(android.R.drawable.ic_media_previous, "Prev", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)));
@@ -330,7 +330,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
 
         builder.setShowWhen(false);
-        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         builder.setStyle(new NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(2, 4)
                 .setShowCancelButton(true)
@@ -394,13 +393,22 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     @Override
     public void onDestroy() {
-        mediaSessionCompat.setActive(false);
-        mediaSessionCompat.release();
-        audioManager.abandonAudioFocus(onAudioFocusChangeListener);
-        stopForeground(true);
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        if (mediaPlayer != null) {
+            mediaSessionCompat.setActive(false);
+            mediaSessionCompat.release();
+            audioManager.abandonAudioFocus(onAudioFocusChangeListener);
+            stopForeground(true);
+            stopSelf();
+            preferences.unregisterOnSharedPreferenceChangeListener(this);
+            unregisterReceiver(becomingNoisyReceiver);
+
+            mediaPlayer.pause();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
 
         super.onDestroy();
+
     }
 
     @Nullable
@@ -443,12 +451,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         @Override
         public void onStop() {
-            super.onStop();
-            audioManager.abandonAudioFocus(onAudioFocusChangeListener);
-            unregisterReceiver(becomingNoisyReceiver);
-            stopSelf();
-            mediaPlayer.pause();
-            stopForeground(true);
+            onDestroy();
 
         }
 
