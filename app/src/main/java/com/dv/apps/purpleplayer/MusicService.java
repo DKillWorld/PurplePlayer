@@ -393,18 +393,17 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     @Override
     public void onDestroy() {
-        if (mediaPlayer != null) {
+        if (mediaSessionCompat.isActive()) {
             mediaSessionCompat.setActive(false);
             mediaSessionCompat.release();
             audioManager.abandonAudioFocus(onAudioFocusChangeListener);
             stopForeground(true);
-            stopSelf();
             preferences.unregisterOnSharedPreferenceChangeListener(this);
             unregisterReceiver(becomingNoisyReceiver);
+        }
 
+        if (mediaPlayer != null){
             mediaPlayer.pause();
-            mediaPlayer.release();
-            mediaPlayer = null;
         }
 
         super.onDestroy();
@@ -451,7 +450,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         @Override
         public void onStop() {
-            onDestroy();
+            stopSelf();
 
         }
 
