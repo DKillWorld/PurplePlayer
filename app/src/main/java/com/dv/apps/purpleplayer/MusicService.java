@@ -291,9 +291,16 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT,
-                mediaPlayer.getCurrentPosition(),1.0f).build());
-        playNext();
+        if (mediaSessionCompat.isActive()) {
+            if (looping) {
+                mediaPlayer.seekTo(0);
+                startPlayer();
+            } else {
+                mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT,
+                        mediaPlayer.getCurrentPosition(), 1.0f).build());
+                playNext();
+            }
+        }
     }
 
     @Override
@@ -432,9 +439,13 @@ public class MusicService extends MediaBrowserServiceCompat implements
             super.onPlay();
             mediaSessionCompat.setPlaybackState((playbackStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, mediaPlayer.getCurrentPosition(),
                     1.0f)).build());
-            if (mediaPlayer.getCurrentPosition() > 0) {
-                startPlayer();
-            }else{
+            if (mediaSessionCompat.isActive()) {
+                if (mediaPlayer.getCurrentPosition() > 0) {
+                    startPlayer();
+                } else {
+                    playSong();
+                }
+            }else {
                 playSong();
             }
 
