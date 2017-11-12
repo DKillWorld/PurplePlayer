@@ -15,6 +15,50 @@
       },
       "oauth_client": [
         {
+          "client_id": "408385930936-90v0qa5024rf3b9iup6lc8jfi42cl9av.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dv.apps.purpleplayer",
+            "certificate_hash": "1a2d90ea11167174dedde4785f9dee472a516acd"
+          }
+        },
+        {
+          "client_id": "408385930936-vpl10mv7s31td2iahinq37au2rplh53t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcCnzJcMP3tX0PN8-_yAbisj-Pw1liiZQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "408385930936-vpl10mv7s31td2iahinq37au2rplh53t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:408385930936:android:deec8a30d16fa279",
+        "android_client_info": {
+          "package_name": "com.dv.apps.purpleplayerpro"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "408385930936-vpl10mv7s31td2iahinq37au2rplh53t.apps.googleusercontent.com",
           "client_type": 3
         }

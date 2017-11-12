@@ -19,6 +19,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
+import static com.dv.apps.purpleplayer.R.id.adView;
 
 
 //Icon credit = psdblast.com
@@ -26,7 +27,6 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
 
     ImageButton emailButton, fBPageButton;
     TextView textView;
-    AdView adView;
 
     SharedPreferences preferences;
 
@@ -77,14 +77,17 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
             }
         });
 
-        adView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("DD0CDAB405F30F550CD856F507E39725")
-                .build();
-        adView.loadAd(adRequest);
-        boolean isTestDevice = adRequest.isTestDevice(this);
-        if (isTestDevice){
-            Toast.makeText(this, "Loaded on Test Device", Toast.LENGTH_SHORT).show();
+
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+            AdView adView = (AdView) findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice("DD0CDAB405F30F550CD856F507E39725")
+                    .build();
+            adView.loadAd(adRequest);
+            boolean isTestDevice = adRequest.isTestDevice(this);
+            if (isTestDevice) {
+                Toast.makeText(this, "Loaded on Test Device", Toast.LENGTH_SHORT).show();
+            }
         }
 
     }

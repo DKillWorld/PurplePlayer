@@ -148,8 +148,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         context = this;
         adapter = new SongAdapter(getApplicationContext(), songList);
 
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
-        setupInterstitialAd();
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+            MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+            setupInterstitialAd();
+        }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         preferences.registerOnSharedPreferenceChangeListener(this);
@@ -223,6 +225,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
     }
 
+    public void showInterstitial(){
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+            if (interstitialAd.isLoaded()) {
+                interstitialAd.show();
+            }
+        }
+    }
+
     public void setupDrawerLayout(){
         drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.drawer_list);
@@ -231,9 +241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (interstitialAd.isLoaded()){
-                    interstitialAd.show();
-                }
+                showInterstitial();
                 switch (position) {
                     case 0:
                         startActivity(new Intent(getApplicationContext(), AboutActivity.class));
@@ -338,6 +346,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tvMain:
                 Intent intent = new Intent(this, DetailActivity.class);
                 startActivity(intent);
+                showInterstitial();
                 break;
 
             case R.id.playPauseMain:
@@ -371,9 +380,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.about_menu:
                 Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(aIntent);
-                if (interstitialAd.isLoaded()){
-                    interstitialAd.show();
-                }
+                showInterstitial();
                 break;
             case R.id.equilizer:
                 Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
