@@ -125,6 +125,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
                         case (AudioManager.AUDIOFOCUS_LOSS):
                             pausePlayer();
                             systemStopped = false;
+                            stopSelf();
                             break;
 
                         case (AudioManager.AUDIOFOCUS_GAIN):
