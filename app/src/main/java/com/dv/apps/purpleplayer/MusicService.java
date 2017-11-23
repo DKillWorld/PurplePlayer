@@ -96,7 +96,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
 

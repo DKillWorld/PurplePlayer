@@ -50,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
             SharedPreferences.Editor editor = preferences.edit();
             editor.putInt("primary_color", i).apply();
         }
+        onSharedPreferenceChanged(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()), "primary_color");
 
     }
 

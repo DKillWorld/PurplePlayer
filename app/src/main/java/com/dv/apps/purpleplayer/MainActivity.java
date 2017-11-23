@@ -1,5 +1,6 @@
 package com.dv.apps.purpleplayer;
 
+import android.app.TabActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -52,6 +53,12 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TabLayout tabLayout;
     ListView drawerList;
     ActionBarDrawerToggle actionBarToggle;
+    ViewPager viewPager;
+    Drawer result;
 
     InterstitialAd interstitialAd;
 
@@ -157,7 +166,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         preferences.registerOnSharedPreferenceChangeListener(this);
 
         //Method to setup Drawer Layout , Permissions and TabLayout
-        setupDrawerLayout();
+//        setupDrawerLayout();
+        setupDrawerLayout2();
         setupPermissions(); //This encloses setupTabLayout && Permissions
 
         //Getting Views & Applying Theme
@@ -233,33 +243,124 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void setupDrawerLayout(){
-        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.drawer_list);
-        final String s[] = {"Support Development", "Rate Us"};
-        drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
-        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showInterstitial();
-                switch (position) {
-                    case 0:
-                        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
-                        Toast.makeText(context, "Send Feedback with Subject as \"Support Development\"", Toast.LENGTH_SHORT).show();
-                        drawerlayout.closeDrawers();
-                        break;
-                    case 1:
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
-                        startActivity(intent);
-                }
-            }
-        });
-        actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+//    public void setupDrawerLayout(){
+//        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawerList = (ListView) findViewById(R.id.drawer_list);
+//        final String s[] = {"Support Development", "Rate Us"};
+//        drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
+//        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                showInterstitial();
+//                switch (position) {
+//                    case 0:
+//                        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
+//                        Toast.makeText(context, "Send Feedback with Subject as \"Support Development\"", Toast.LENGTH_SHORT).show();
+//                        drawerlayout.closeDrawers();
+//                        break;
+//                    case 1:
+//                        Intent intent = new Intent(Intent.ACTION_VIEW);
+//                        intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
+//                        startActivity(intent);
+//                }
+//            }
+//        });
+//        actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+//            @Override
+//            public void onDrawerOpened(View drawerView) {
+//                super.onDrawerOpened(drawerView);
+//                Toast.makeText(getApplicationContext(), "Under Development !!", Toast.LENGTH_SHORT).show();
+//                if (getSupportActionBar() != null) {
+//                    getSupportActionBar().setTitle("Purple Player");
+//                }
+//            }
+//
+//            @Override
+//            public void onDrawerClosed(View drawerView) {
+//                super.onDrawerClosed(drawerView);
+//                if (getSupportActionBar() != null) {
+//                    getSupportActionBar().setTitle("Library");
+//                }
+//            }
+//        };
+//        drawerlayout.setDrawerListener(actionBarToggle);;
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
+//        actionBarToggle.syncState();
+//
+//        //Themeing
+//        drawerList.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+//    }
+
+    public void setupDrawerLayout2(){
+        new DrawerBuilder().withActivity(this).build();
+
+        result = new DrawerBuilder()
+                .withActivity(this)
+                .addDrawerItems(
+                        new DividerDrawerItem(),
+                        new DividerDrawerItem(),
+                        new DividerDrawerItem(),
+                        new DividerDrawerItem(),
+                        new DividerDrawerItem(),
+                        new PrimaryDrawerItem().withIdentifier(1).withName("Songs").withIcon(R.drawable.ic_drawer_songs).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(2).withName("Albums").withIcon(R.drawable.ic_drawer_album).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(3).withName("Artists").withIcon(R.drawable.ic_drawer_artist).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(4).withName("Genres").withIcon(R.drawable.ic_drawer_genre).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(5).withName("Playlists").withIcon(R.drawable.ic_drawer_playlist).withSelectable(false),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withIdentifier(6).withName("Support Development").withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(7).withName("Settings").withIcon(R.drawable.ic_drawer_settings).withSelectable(false)
+                )
+                .withTranslucentStatusBar(false)
+                .withDisplayBelowStatusBar(false)
+                .withActionBarDrawerToggle(true)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        // do something with the clicked item :D
+                        int selection = (int) drawerItem.getIdentifier();
+
+                        switch (selection){
+                            case 1:
+                                viewPager.setCurrentItem(0, true);
+                                break;
+                            case 2:
+                                viewPager.setCurrentItem(1, true);
+                                break;
+                            case 3:
+                                viewPager.setCurrentItem(2, true);
+                                break;
+                            case 4:
+                                viewPager.setCurrentItem(3, true);
+                                break;
+                            case 5:
+                                viewPager.setCurrentItem(4, true);
+                                break;
+                            case 6:
+                                Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
+                                startActivity(aIntent);
+                                Toast.makeText(context, "Send us feedback", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 7:
+                                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                                startActivity(sIntent);
+                                break;
+                        }
+
+                        result.getDrawerLayout().closeDrawers();
+                        return true;
+
+
+                    }
+                })
+                .build();
+
+
+        actionBarToggle = new ActionBarDrawerToggle(this,result.getDrawerLayout(), R.string.navigation_drawer_open, R.string.navigation_drawer_close){
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                Toast.makeText(getApplicationContext(), "Under Development !!", Toast.LENGTH_SHORT).show();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle("Purple Player");
                 }
@@ -273,19 +374,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
-        drawerlayout.setDrawerListener(actionBarToggle);;
+
+        result.getDrawerLayout().setDrawerListener(actionBarToggle);;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         actionBarToggle.syncState();
 
-        //Themeing
-        drawerList.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+
     }
 
     public void setupTabLayout(){
         tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        ViewPager viewPager = findViewById(R.id.viewpager);
+        viewPager = findViewById(R.id.viewpager);
         FragmentPagerAdapter fragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int i) {
@@ -375,7 +476,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.setting_menu:
                 Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(sIntent);
-                Toast.makeText(this, "Under Development !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.about_menu:
                 Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
@@ -427,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case "primary_color":
                 tvMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
                 playPauseMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-                drawerList.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+//                drawerList.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
                 tabLayout.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setBackgroundDrawable(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));

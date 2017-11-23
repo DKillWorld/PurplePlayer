@@ -77,7 +77,6 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
             }
         });
 
-
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
             AdView adView = (AdView) findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder()
