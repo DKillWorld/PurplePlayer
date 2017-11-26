@@ -7,7 +7,7 @@
     <Preference
         android:key="primary_color"
         android:title="Primary color"
-        android:summary="Base Color of app"/>
+        android:summary="Base Color of app" />
     <Preference
         android:key="list_background"
         android:title="List background color"
@@ -26,6 +26,33 @@
             android:summaryOff="Purple Player default"
             android:summaryOn="QuickLyric"
             android:defaultValue="false" />
+    </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Privacy">
+        <CheckBoxPreference
+            android:title="Send anonymous usage data"
+            android:defaultValue="true"
+            android:key="Anonymous_Data"
+            android:summary="For improvement of product"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Misc">
+        <Preference
+            android:title="FAQ"
+            android:key="FAQ"
+            android:icon="@drawable/ic_help_and_faq"/>
+        <Preference
+            android:title="Rate Us"
+            android:key="Rate_Us"
+            android:icon="@drawable/ic_drawer_support_development"/>
+        <Preference
+            android:title="Upgrade to Purple Player Pro"
+            android:key="Buy_Pro"
+            android:icon="@drawable/ic_drawer_buypro"/>
+        <Preference
+            android:title="Help in translating Purple Player!"
+            android:key="Translation_Help"/>
     </PreferenceCategory>
 </PreferenceScreen>

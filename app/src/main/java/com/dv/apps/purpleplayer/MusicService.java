@@ -431,7 +431,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        updatePreferences(preferences.edit());
+
     }
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback{

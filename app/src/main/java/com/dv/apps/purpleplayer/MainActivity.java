@@ -1,6 +1,5 @@
 package com.dv.apps.purpleplayer;
 
-import android.app.TabActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -34,13 +33,12 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.ListFragments.AlbumListFragment;
@@ -243,78 +241,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-//    public void setupDrawerLayout(){
-//        drawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawerList = (ListView) findViewById(R.id.drawer_list);
-//        final String s[] = {"Support Development", "Rate Us"};
-//        drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, s));
-//        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                showInterstitial();
-//                switch (position) {
-//                    case 0:
-//                        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
-//                        Toast.makeText(context, "Send Feedback with Subject as \"Support Development\"", Toast.LENGTH_SHORT).show();
-//                        drawerlayout.closeDrawers();
-//                        break;
-//                    case 1:
-//                        Intent intent = new Intent(Intent.ACTION_VIEW);
-//                        intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
-//                        startActivity(intent);
-//                }
-//            }
-//        });
-//        actionBarToggle = new ActionBarDrawerToggle(this,drawerlayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
-//            @Override
-//            public void onDrawerOpened(View drawerView) {
-//                super.onDrawerOpened(drawerView);
-//                Toast.makeText(getApplicationContext(), "Under Development !!", Toast.LENGTH_SHORT).show();
-//                if (getSupportActionBar() != null) {
-//                    getSupportActionBar().setTitle("Purple Player");
-//                }
-//            }
-//
-//            @Override
-//            public void onDrawerClosed(View drawerView) {
-//                super.onDrawerClosed(drawerView);
-//                if (getSupportActionBar() != null) {
-//                    getSupportActionBar().setTitle("Library");
-//                }
-//            }
-//        };
-//        drawerlayout.setDrawerListener(actionBarToggle);;
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//        actionBarToggle.syncState();
-//
-//        //Themeing
-//        drawerList.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-//    }
-
     public void setupDrawerLayout2(){
         new DrawerBuilder().withActivity(this).build();
 
         result = new DrawerBuilder()
                 .withActivity(this)
+                .withSelectedItem(-1)
                 .addDrawerItems(
-                        new DividerDrawerItem(),
-                        new DividerDrawerItem(),
-                        new DividerDrawerItem(),
-                        new DividerDrawerItem(),
-                        new DividerDrawerItem(),
                         new PrimaryDrawerItem().withIdentifier(1).withName("Songs").withIcon(R.drawable.ic_drawer_songs).withSelectable(false),
                         new PrimaryDrawerItem().withIdentifier(2).withName("Albums").withIcon(R.drawable.ic_drawer_album).withSelectable(false),
                         new PrimaryDrawerItem().withIdentifier(3).withName("Artists").withIcon(R.drawable.ic_drawer_artist).withSelectable(false),
                         new PrimaryDrawerItem().withIdentifier(4).withName("Genres").withIcon(R.drawable.ic_drawer_genre).withSelectable(false),
                         new PrimaryDrawerItem().withIdentifier(5).withName("Playlists").withIcon(R.drawable.ic_drawer_playlist).withSelectable(false),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withIdentifier(6).withName("Support Development").withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
-                        new SecondaryDrawerItem().withIdentifier(7).withName("Settings").withIcon(R.drawable.ic_drawer_settings).withSelectable(false)
+                        new SecondaryDrawerItem().withIdentifier(6).withName("Settings").withIcon(R.drawable.ic_drawer_settings).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(7).withName("Rate Us ").withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(8).withName("Upgrade to Purple Player Pro").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
                 .withTranslucentStatusBar(false)
                 .withDisplayBelowStatusBar(false)
                 .withActionBarDrawerToggle(true)
+                .withHeader(R.layout.drawer_header)
+                .withHeaderPadding(false)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -338,13 +286,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 viewPager.setCurrentItem(4, true);
                                 break;
                             case 6:
-                                Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
-                                startActivity(aIntent);
-                                Toast.makeText(context, "Send us feedback", Toast.LENGTH_SHORT).show();
-                                break;
-                            case 7:
                                 Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
                                 startActivity(sIntent);
+                                break;
+                            case 7:
+                                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
+                                    startActivity(intent);
+                                }else {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                                    startActivity(intent);
+                                }
+
+                                break;
+                            case 8:
+                                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                                    startActivity(intent);
+                                }else {
+                                    new MaterialDialog.Builder(MainActivity.this)
+                                            .content("You are already a Pro User !!")
+                                            .positiveText("OK")
+                                            .title("Info")
+                                    .show();
+                                }
+
                                 break;
                         }
 

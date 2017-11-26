@@ -1,12 +1,13 @@
 package com.dv.apps.purpleplayer;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.text.InputType;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
@@ -71,6 +72,61 @@ public class SettingsFragment extends PreferenceFragment {
 //            }
 //        });
 
+        Preference faq = findPreference("FAQ");
+        faq.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Toast.makeText(getActivity(), "FAQ section is under Development. \nMeanwhile use \"Send Feedback\" to get Help. ", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+        Preference rateUs = findPreference("Rate_Us");
+        rateUs.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
+                    startActivity(intent);
+                }else {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                    startActivity(intent);
+                }
+                return true;
+            }
+        });
+
+        Preference buyPro = findPreference("Buy_Pro");
+        buyPro.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                    startActivity(intent);
+                }else {
+                    new MaterialDialog.Builder(getActivity())
+                            .content("You are already a Pro User !!")
+                            .positiveText("OK")
+                            .title("Info")
+                            .show();
+                }
+                return true;
+            }
+        });
+
+        Preference translationHelp = findPreference("Translation_Help");
+        translationHelp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent aIntent = new Intent(getActivity(), AboutActivity.class);
+                startActivity(aIntent);
+                Toast.makeText(getActivity(), "Thanks for showing interest. \nContact Us using Email for further instructions.", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
     }
 
 
