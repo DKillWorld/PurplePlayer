@@ -55,7 +55,7 @@ public class SongListFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         listView = view.findViewById(R.id.fragment_song_list);
         listView.setFastScrollEnabled(true);
-        songList = MusicService.globalSongList;
+        songList = MusicService.getInstance().globalSongList;
         adapter = new SongAdapter(getActivity(), songList);
         listView.setAdapter(adapter);
         setHasOptionsMenu(true);
@@ -63,7 +63,7 @@ public class SongListFragment extends Fragment{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MusicService.setSongList(songList);
+                MusicService.getInstance().setSongList(songList);
                 Song tempSong = adapter.getItem(position);
                 Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
                 Bundle bundle = new Bundle();

@@ -13,6 +13,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.MediaStore;
@@ -44,8 +45,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
         MediaPlayer.OnCompletionListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     MediaPlayer mediaPlayer;
-    public static ArrayList<Song> songList;
-    public static ArrayList<Song> globalSongList;
+    public ArrayList<Song> songList;
+    public ArrayList<Song> globalSongList;
     int songPosn;
     static boolean systemStopped = false;
     public static boolean userStopped = false;
@@ -69,10 +70,20 @@ public class MusicService extends MediaBrowserServiceCompat implements
     public static final String REPEAT_STATUS = "Repeat_Status";
     public static boolean PERMISSION_GRANTED = false;
 
+    public static MusicService musicService;
+
+
+    public static MusicService getInstance(){
+        if (musicService == null){
+            musicService = new MusicService();
+        }
+        return musicService;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        musicService = this;
         songPosn = 0;
         mediaPlayer = new MediaPlayer();
         initMusicPlayer();
@@ -96,7 +107,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
 
@@ -198,8 +209,13 @@ public class MusicService extends MediaBrowserServiceCompat implements
         preference.apply();
     }
 
-    public static void setSongList(ArrayList<Song> tempSongList){
+    public void setSongList(ArrayList<Song> tempSongList){
         songList = tempSongList;
+    }
+
+    public void setGlobalSongList(ArrayList<Song> songs){
+        globalSongList = new ArrayList<Song>();
+        globalSongList.addAll(songs);
     }
 
     public Song getSong(){
@@ -361,7 +377,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         return new Random().nextInt(songList.size());
     }
 
-    public static ArrayList<Song> getSongs(Context context) {
+    public ArrayList<Song> getSongs(Context context) {
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Albums.ALBUM_ID,

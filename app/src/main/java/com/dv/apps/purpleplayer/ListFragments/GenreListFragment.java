@@ -111,7 +111,7 @@ public class GenreListFragment extends Fragment {
                     getActivity().invalidateOptionsMenu();
                 } else {
                     Song tempSong = songAdapter.getItem(position);
-                    MusicService.setSongList(tempSongList);
+                    MusicService.getInstance().setSongList(tempSongList);
                     MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
                             .playFromSearch(tempSong.getTitle(), null);
                 }

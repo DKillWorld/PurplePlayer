@@ -131,7 +131,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
             songList = (ArrayList<Song>) results.values;
             if (songList.size() > 0) {
                 notifyDataSetChanged();
-            }else{
+            } else {
                 notifyDataSetInvalidated();
             }
         }
