@@ -7,13 +7,14 @@ android {
         applicationId "com.dv.apps.purpleplayer"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 39
-        versionName '2.2.1'
+        versionCode 40
+        versionName '2.2.2'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -47,6 +48,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:26.0.1'
     compile 'com.afollestad.material-dialogs:commons:0.9.4.7'
     compile 'com.android.support:support-media-compat:26.0.1'
+    compile 'com.github.javiersantos:PiracyChecker:1.1'
     compile('com.mikepenz:materialdrawer:6.0.2@aar') {
         transitive = true
     }

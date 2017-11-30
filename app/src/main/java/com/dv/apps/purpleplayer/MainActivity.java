@@ -52,6 +52,8 @@ import com.dv.apps.purpleplayer.ListFragments.GenreListFragment;
 import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
+import com.github.javiersantos.piracychecker.PiracyChecker;
+import com.github.javiersantos.piracychecker.enums.Display;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -89,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     InterstitialAd interstitialAd;
 
     SharedPreferences preferences;
+
+    private PiracyChecker checker;;
 
     public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -1;
     public static final int PRIMARY_COLOR_DEFAULT = -14575885;
@@ -186,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         getWindow().getDecorView().setBackground(new ColorDrawable(preferences.getInt("list_background", LISTVIEW_BACKGROUND_COLOR_DEFAULT)));
 
+        authenticate(); //Checking for license and Piracy
     }
 
     public void buildTransportControls(){
@@ -473,6 +478,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    private void authenticate(){
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
+            checker = new PiracyChecker(this)
+                    .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
+                    .saveResultToSharedPreferences(preferences, "valid_license");
+            checker.start();
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -549,6 +563,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        checker.destroy();
         preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 

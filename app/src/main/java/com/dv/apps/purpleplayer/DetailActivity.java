@@ -366,7 +366,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.settingsDetail:
                 Intent sIntent = new Intent(this, SettingsActivity.class);
                 startActivity(sIntent);
-                Toast.makeText(this, "Under Development !!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.equilizerDetail:
                 Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
