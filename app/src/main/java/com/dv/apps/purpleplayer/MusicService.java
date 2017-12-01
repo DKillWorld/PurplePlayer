@@ -216,8 +216,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
     public void setGlobalSongList(ArrayList<Song> songs){
         globalSongList = new ArrayList<Song>();
         globalSongList.addAll(songs);
-        songList = new ArrayList<Song>();
-        songList.addAll(songs);
+        if (songList == null) {
+            songList = new ArrayList<Song>();
+            songList.addAll(songs);
+        }
     }
 
     public Song getSong(){
