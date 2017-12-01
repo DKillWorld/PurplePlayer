@@ -531,15 +531,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
                 PERMISSION_GRANTED = true;
-                GetSongs getSongs = new GetSongs();
-                getSongs.execute(this);
+                setupTabLayout();
             }else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
         }else {
             PERMISSION_GRANTED = true;
-            GetSongs getSongs = new GetSongs();
-            getSongs.execute(this);
+            setupTabLayout();
         }
     }
 
@@ -550,8 +548,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Welcome!!", Toast.LENGTH_SHORT).show();
                     PERMISSION_GRANTED = true;
-                    GetSongs getSongs = new GetSongs();
-                    getSongs.execute(this);
+                    setupTabLayout();
                 } else {
                     Toast.makeText(this, "One or more permission is denied !!", Toast.LENGTH_SHORT).show();
                     finish();
@@ -563,56 +560,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        checker.destroy();
         preferences.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    public class GetSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
-
-        @Override
-        protected ArrayList<Song> doInBackground(Context... params) {
-            Context context = params[0];
-
-            Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            String projection[] = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
-                    MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Albums.ALBUM_ID,
-                    MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.YEAR};
-            String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-            songList = new ArrayList<>();
-            Cursor songCursor = context.getContentResolver().query(uri, projection, selection, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-            if (songCursor != null && songCursor.moveToFirst()) {
-                int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
-                int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-                int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-                int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-                int songAlbumId = songCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
-                int songData = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-                int songYear = songCursor.getColumnIndex(MediaStore.Audio.Media.YEAR);
-
-                do {
-                    String currentTitle = songCursor.getString(songTitle);
-                    long currentId = songCursor.getLong(songId);
-                    int currentDuration = songCursor.getInt(songDuration);
-                    String currentArtist = songCursor.getString(songArtist);
-                    long currentAlbumId = songCursor.getLong(songAlbumId);
-                    String currentData = songCursor.getString(songData);
-                    long currentYear = songCursor.getLong(songYear);
-
-                    Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-                    Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
-
-                    songList.add(new Song(context, currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
-                } while (songCursor.moveToNext());
-                songCursor.close();
-            }
-            return songList;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Song> songs) {
-            super.onPostExecute(songs);
-            MusicService.getInstance().setGlobalSongList(songs);
-            setupTabLayout();
+        if (checker != null) {
+            checker.destroy();
         }
     }
 }

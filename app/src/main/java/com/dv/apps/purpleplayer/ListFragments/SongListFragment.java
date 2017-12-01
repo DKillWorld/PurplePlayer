@@ -2,6 +2,7 @@ package com.dv.apps.purpleplayer.ListFragments;
 
 
 import android.content.ContentUris;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -55,10 +56,11 @@ public class SongListFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         listView = view.findViewById(R.id.fragment_song_list);
         listView.setFastScrollEnabled(true);
-        songList = MusicService.getInstance().globalSongList;
-        adapter = new SongAdapter(getActivity(), songList);
-        listView.setAdapter(adapter);
         setHasOptionsMenu(true);
+        this.songList = getSongs();
+
+        adapter = new SongAdapter(getActivity(), this.songList);
+        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -103,5 +105,42 @@ public class SongListFragment extends Fragment{
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    public ArrayList<Song> getSongs(){
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String projection[] = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Albums.ALBUM_ID,
+                MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.YEAR};
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+        songList = new ArrayList<>();
+        Cursor songCursor = getActivity().getContentResolver().query(uri, projection, selection, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        if (songCursor != null && songCursor.moveToFirst()) {
+            int songId = songCursor.getColumnIndex((MediaStore.Audio.Media._ID));
+            int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+            int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int songAlbumId = songCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID);
+            int songData = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+            int songYear = songCursor.getColumnIndex(MediaStore.Audio.Media.YEAR);
+
+            do {
+                String currentTitle = songCursor.getString(songTitle);
+                long currentId = songCursor.getLong(songId);
+                int currentDuration = songCursor.getInt(songDuration);
+                String currentArtist = songCursor.getString(songArtist);
+                long currentAlbumId = songCursor.getLong(songAlbumId);
+                String currentData = songCursor.getString(songData);
+                long currentYear = songCursor.getLong(songYear);
+
+                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, currentAlbumId);
+
+                songList.add(new Song(getActivity(), currentTitle, currentId, currentDuration, currentArtist, albumArtUri));
+            } while (songCursor.moveToNext());
+            songCursor.close();
+        }
+        MusicService.getInstance().setGlobalSongList(songList);
+        return songList;
     }
 }
