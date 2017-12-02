@@ -9,18 +9,21 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 
+import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.aesthetic.AutoSwitchMode;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 
 import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
 
 
-public class SettingsActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback, SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
 
     SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Aesthetic.attach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -28,13 +31,6 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
             getSupportActionBar().setTitle("Settings");
         }
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(CircleView.shiftColorDown(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
     }
 
 
@@ -42,16 +38,17 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
     public void onColorSelection(@NonNull ColorChooserDialog colorChooserDialog, @ColorInt int i) {
         String dialogueTag = colorChooserDialog.tag();
         if (dialogueTag.equals("Secondary")){
-            preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("list_background", i).apply();
+            Aesthetic.get()
+                    .colorAccent(i)
+                    .apply();
         }else {
-            preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("primary_color", i).apply();
+            Aesthetic.get()
+                    .colorPrimary(i)
+                    .colorStatusBarAuto()
+                    .colorNavigationBarAuto()
+                    .lightStatusBarMode(AutoSwitchMode.AUTO)
+                    .apply();
         }
-        onSharedPreferenceChanged(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()), "primary_color");
-
     }
 
     @Override
@@ -60,18 +57,14 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(CircleView.shiftColorDown(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
+    protected void onPause() {
+        Aesthetic.pause(this);
+        super.onPause();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
+    protected void onResume() {
+        super.onResume();
+        Aesthetic.resume(this);
     }
 }

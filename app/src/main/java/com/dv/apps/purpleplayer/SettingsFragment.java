@@ -1,15 +1,19 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
+import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 
 /**
@@ -17,13 +21,14 @@ import com.afollestad.materialdialogs.color.ColorChooserDialog;
  */
 
 public class SettingsFragment extends PreferenceFragment {
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_main);
 
-        Preference listBackground = findPreference("list_background");
-        listBackground.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        Preference accentColorPreference = findPreference("accent_color");
+        accentColorPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 new ColorChooserDialog.Builder(getActivity(), R.string.app_name)
@@ -124,6 +129,29 @@ public class SettingsFragment extends PreferenceFragment {
                 Intent aIntent = new Intent(getActivity(), AboutActivity.class);
                 startActivity(aIntent);
                 Toast.makeText(getActivity(), "Thanks for showing interest. \nContact Us using Email for further instructions.", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
+
+        CheckBoxPreference baseTheme = (CheckBoxPreference) findPreference("base_theme");
+        baseTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (newValue.equals(true)){
+                    Aesthetic.get()
+                            .activityTheme(R.style.Theme_AppCompat)
+                            .textColorSecondaryRes(android.R.color.white)
+                            .textColorSecondaryInverseRes(android.R.color.black)
+                            .isDark(false)
+                            .apply();
+                }else {
+                    Aesthetic.get()
+                            .activityTheme(R.style.Theme_AppCompat_Light_DarkActionBar)
+                            .textColorSecondaryRes(android.R.color.black)
+                            .textColorSecondaryInverseRes(android.R.color.white)
+                            .isDark(true)
+                            .apply();
+                }
                 return true;
             }
         });

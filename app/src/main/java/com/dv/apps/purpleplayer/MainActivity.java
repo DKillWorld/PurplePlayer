@@ -2,23 +2,19 @@ package com.dv.apps.purpleplayer;
 
 import android.Manifest;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -43,6 +39,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -53,7 +50,6 @@ import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.github.javiersantos.piracychecker.PiracyChecker;
-import com.github.javiersantos.piracychecker.enums.Display;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -72,7 +68,7 @@ import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Context context;
     ArrayList<Song> songList;
@@ -151,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Aesthetic.attach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -170,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        preferences.registerOnSharedPreferenceChangeListener(this);
 
         //Method to setup Drawer Layout , Permissions and TabLayout
 //        setupDrawerLayout();
@@ -180,15 +176,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Getting Views & Applying Theme
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         tvMain = (TextView) findViewById(R.id.tvMain);
-        tvMain.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        playPauseMain.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(CircleView.shiftColorDown(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
-        getWindow().getDecorView().setBackground(new ColorDrawable(preferences.getInt("list_background", LISTVIEW_BACKGROUND_COLOR_DEFAULT)));
 
         authenticate(); //Checking for license and Piracy
     }
@@ -268,8 +255,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new SecondaryDrawerItem().withIdentifier(7).withName("Rate Us ").withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(8).withName("Upgrade to Purple Player Pro").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
-                .withTranslucentStatusBar(false)
-                .withDisplayBelowStatusBar(false)
+                .withTranslucentStatusBar(true)
+                .withDisplayBelowStatusBar(true)
                 .withActionBarDrawerToggle(true)
                 .withHeader(R.layout.drawer_header)
                 .withHeaderPadding(false)
@@ -364,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setupTabLayout(){
         tabLayout = findViewById(R.id.tab_layout);
-        tabLayout.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
         viewPager = findViewById(R.id.viewpager);
         FragmentPagerAdapter fragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -505,27 +491,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         actionBarToggle.onConfigurationChanged(newConfig);
     }
 
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        switch (key){
-            case "list_background":
-                getWindow().getDecorView().setBackground(new ColorDrawable(sharedPreferences.getInt("list_background", LISTVIEW_BACKGROUND_COLOR_DEFAULT)));
-                break;
-            case "primary_color":
-                tvMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-                playPauseMain.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-//                drawerList.setBackground(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-                tabLayout.setBackground(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    getWindow().setStatusBarColor(CircleView.shiftColorDown(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-                }
-        }
-    }
-
     //permissionHandler
     public void setupPermissions() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -560,10 +525,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
         if (checker != null) {
             checker.destroy();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        Aesthetic.pause(this);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Aesthetic.resume(this);
     }
 }
 

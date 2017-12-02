@@ -47,6 +47,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:11.4.2'
     compile 'com.android.support:recyclerview-v7:26.0.1'
     compile 'com.afollestad.material-dialogs:commons:0.9.4.7'
+    compile 'com.afollestad:aesthetic:0.4.6'
     compile 'com.android.support:support-media-compat:26.0.1'
     compile 'com.github.javiersantos:PiracyChecker:1.1'
     compile('com.mikepenz:materialdrawer:6.0.2@aar') {

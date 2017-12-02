@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -23,31 +24,22 @@ import static com.dv.apps.purpleplayer.R.id.adView;
 
 
 //Icon credit = psdblast.com
-public class AboutActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class AboutActivity extends AppCompatActivity {
 
     ImageButton emailButton, fBPageButton;
     TextView textView;
 
-    SharedPreferences preferences;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Aesthetic.attach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("About");
         }
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(CircleView.shiftColorDown(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
-
         textView = (TextView) findViewById(R.id.version_about);
         textView.setText("v " + BuildConfig.VERSION_NAME);
 
@@ -102,18 +94,14 @@ public class AboutActivity extends AppCompatActivity implements SharedPreference
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(CircleView.shiftColorDown(sharedPreferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
-        }
+    protected void onPause() {
+        Aesthetic.pause(this);
+        super.onPause();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
+    protected void onResume() {
+        super.onResume();
+        Aesthetic.resume(this);
     }
 }
