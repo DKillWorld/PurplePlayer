@@ -9,6 +9,12 @@
             android:summaryOn="Dark"
             android:summaryOff="Light"
             android:title="Base Theme" />
+        <CheckBoxPreference
+            android:key="dark_actionbar"
+            android:defaultValue="true"
+            android:summaryOn="Dark"
+            android:summaryOff="Light"
+            android:title="Use dark actionbar" />
         <Preference
             android:key="primary_color"
             android:summary="Change the arimary color of app"
@@ -38,6 +44,14 @@
             android:key="Anonymous_Data"
             android:summary="For improvement of product"
             android:title="Send anonymous usage data" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Experimental Features\n(Uncheck if app crashes)">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="Use_Root_Background"
+            android:summary="Set albumart as now playing background"
+            android:title="Albumart as background" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Misc">

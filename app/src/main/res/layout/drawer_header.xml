@@ -6,7 +6,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary">
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
@@ -25,6 +26,7 @@
             android:textStyle="bold"
             android:shadowColor="@color/md_black_1000"
             android:shadowRadius="1.5"
+            android:tag=":aesthetic_ignore"
             android:padding="20dp"
             android:textSize="32sp"/>
     </FrameLayout>

@@ -32,10 +32,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.aesthetic.AestheticActivity;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.CenterInside;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -49,6 +54,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 import static com.dv.apps.purpleplayer.MusicService.looping;
@@ -58,7 +64,7 @@ import static com.dv.apps.purpleplayer.MusicService.userStopped;
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     TextView textView1, textView2;
-    ImageView imageView;
+    ImageView imageView, rootBackground;
     ImageButton playPause, loop, next, prev, shuffle, showLyrics;
     SeekBar seekBar;
 
@@ -120,11 +126,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
+
+            if (preferences.getBoolean("Use_Root_Background", false)) {
+                Glide.with(getApplicationContext())
+                        .load(metadata.getDescription().getIconUri())
+                        .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
+                        .apply(new RequestOptions().dontAnimate())
+                        .into(rootBackground);
+            }
         }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Aesthetic.attach(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
@@ -163,6 +178,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView);
+
+        rootBackground = findViewById(R.id.root_background);
+        if (preferences.getBoolean("Use_Root_Background", false)) {
+            Glide.with(getApplicationContext())
+                    .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
+                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)).dontAnimate())
+                    .into(rootBackground);
+        }
 
         //Play Pause Button
         playPause = (ImageButton) findViewById(R.id.playPause);
@@ -536,5 +559,17 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     protected void onDestroy() {
         super.onDestroy();
         preferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        Aesthetic.pause(this);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Aesthetic.resume(this);
     }
 }

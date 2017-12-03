@@ -31,6 +31,8 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
             getSupportActionBar().setTitle("Settings");
         }
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
     }
 
 
@@ -46,8 +48,8 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                     .colorPrimary(i)
                     .colorStatusBarAuto()
                     .colorNavigationBarAuto()
-                    .lightStatusBarMode(AutoSwitchMode.AUTO)
                     .apply();
+            preferences.edit().putInt("primary_color", i).apply();
         }
     }
 

@@ -3,11 +3,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="backgroundColor">@drawable/background_purple</item>
-        <item name="backgroundColorControl">#773300FF</item>
 
     </style>
     <style name="BackgroundPurpleTheme" parent="AppTheme">
@@ -29,11 +24,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="MyTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@android:color/holo_blue_light</item>
-        <item name="colorPrimaryDark">@android:color/holo_blue_dark</item>
-        <item name="colorAccent">@color/purple</item>
-        <item name="backgroundColor">@android:color/holo_blue_light</item>
-        <item name="backgroundColorControl">#7700AAEE</item>
+        <item name="searchViewStyle">@style/Theme.AppCompat</item>
     </style>
 
 

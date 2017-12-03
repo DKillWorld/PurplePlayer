@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -30,6 +29,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.view.MenuItem;
@@ -68,7 +68,7 @@ import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     Context context;
     ArrayList<Song> songList;
@@ -151,6 +151,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Aesthetic.isFirstTime()){
+            Aesthetic.get()
+                    .activityTheme(R.style.Theme_AppCompat_Light_DarkActionBar)
+                    .colorPrimaryRes(android.R.color.holo_blue_dark)
+                    .textColorPrimaryRes(android.R.color.white)
+                    .colorIconTitleActiveRes(android.R.color.white)
+                    .isDark(false)
+                    .colorNavigationBarAuto()
+                    .colorStatusBarAuto()
+                    .apply();
+        }
+
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(getApplicationContext(), MusicService.class),connectionCallback, null);
 //        songList = new ArrayList<Song>();
 
@@ -168,8 +180,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(CircleView.shiftColorDown(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
+        }
+
         //Method to setup Drawer Layout , Permissions and TabLayout
-//        setupDrawerLayout();
         setupDrawerLayout2();
         setupPermissions(); //This encloses setupTabLayout && Permissions
 
@@ -239,7 +254,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setupDrawerLayout2(){
-        new DrawerBuilder().withActivity(this).build();
 
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -255,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new SecondaryDrawerItem().withIdentifier(7).withName("Rate Us ").withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(8).withName("Upgrade to Purple Player Pro").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
-                .withTranslucentStatusBar(true)
-                .withDisplayBelowStatusBar(true)
+                .withTranslucentStatusBar(false)
+                .withDisplayBelowStatusBar(false)
                 .withActionBarDrawerToggle(true)
                 .withHeader(R.layout.drawer_header)
                 .withHeaderPadding(false)
@@ -320,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                 })
+                .withSliderBackgroundColorRes(android.R.color.darker_gray)
                 .build();
 
 
@@ -543,5 +558,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         Aesthetic.resume(this);
     }
+
 }
 

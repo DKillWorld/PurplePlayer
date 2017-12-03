@@ -140,21 +140,55 @@ public class SettingsFragment extends PreferenceFragment {
                 if (newValue.equals(true)){
                     Aesthetic.get()
                             .activityTheme(R.style.Theme_AppCompat)
-                            .textColorSecondaryRes(android.R.color.white)
+                            .textColorPrimaryRes(android.R.color.white)
                             .textColorSecondaryInverseRes(android.R.color.black)
-                            .isDark(false)
+                            .textColorSecondaryRes(android.R.color.white)
+                            .colorIconTitleActiveRes(android.R.color.white)
+                            .colorIconTitleInactiveRes(android.R.color.white)
+                            .isDark(true)
                             .apply();
                 }else {
                     Aesthetic.get()
-                            .activityTheme(R.style.Theme_AppCompat_Light_DarkActionBar)
-                            .textColorSecondaryRes(android.R.color.black)
+                            .activityTheme(R.style.Theme_AppCompat_Light)
+                            .textColorPrimaryRes(android.R.color.black)
                             .textColorSecondaryInverseRes(android.R.color.white)
-                            .isDark(true)
+                            .textColorSecondaryRes(android.R.color.black)
+                            .colorIconTitleActiveRes(android.R.color.black)
+                            .colorIconTitleInactiveRes(android.R.color.black)
+                            .isDark(false)
                             .apply();
                 }
                 return true;
             }
         });
+
+        CheckBoxPreference darkActionbar = (CheckBoxPreference) findPreference("dark_actionbar");
+        darkActionbar.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (newValue.equals(true)){
+                    Aesthetic.get()
+                            .activityTheme(R.style.Theme_AppCompat_Light)
+                            .textColorPrimaryRes(android.R.color.white)
+//                            .textColorSecondaryRes(android.R.color.white)
+                            .colorIconTitleActiveRes(android.R.color.white)
+                            .isDark(false)
+                            .apply();
+                }else {
+                    Aesthetic.get()
+                            .activityTheme(R.style.Theme_AppCompat_Light_DarkActionBar)
+                            .textColorPrimaryRes(android.R.color.black)
+//                            .textColorSecondaryRes(android.R.color.black)
+                            .colorIconTitleActiveRes(android.R.color.black)
+                            .isDark(false)
+                            .apply();
+                }
+                return true;
+            }
+        });
+
+        CheckBoxPreference useAlbumArtBackground = (CheckBoxPreference) findPreference("Use_Root_Background");
+
     }
 
 
