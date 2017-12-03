@@ -266,14 +266,18 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.playPause:
-                if (MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED ||
-                        MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED ||
-                        MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE){
-                    MediaControllerCompat.getMediaController(this).getTransportControls().play();
-                    userStopped = false;
-                } else {
-                    MediaControllerCompat.getMediaController(this).getTransportControls().pause();
-                    userStopped = true;
+                if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
+                    if (MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED ||
+                            MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED ||
+                            MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE) {
+                        MediaControllerCompat.getMediaController(this).getTransportControls().play();
+                        userStopped = false;
+                    } else {
+                        MediaControllerCompat.getMediaController(this).getTransportControls().pause();
+                        userStopped = true;
+                    }
+                }else {
+                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -302,11 +306,19 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.next:
-                MediaControllerCompat.getMediaController(this).getTransportControls().skipToNext();
+                if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
+                    MediaControllerCompat.getMediaController(this).getTransportControls().skipToNext();
+                }else {
+                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
             case R.id.prev:
-                MediaControllerCompat.getMediaController(this).getTransportControls().skipToPrevious();
+                if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
+                    MediaControllerCompat.getMediaController(this).getTransportControls().skipToPrevious();
+                }else {
+                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

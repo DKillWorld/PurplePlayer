@@ -426,6 +426,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         MediaControllerCompat.getMediaController(this).getTransportControls().pause();
                         userStopped = true;
                     }
+                }else {
+                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
                 }
                 break;
 

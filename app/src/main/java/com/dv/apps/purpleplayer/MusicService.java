@@ -106,7 +106,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
+        if (intent != null) {
+            MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
+        }
         return START_STICKY;
     }
 
@@ -142,8 +144,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
                         case (AudioManager.AUDIOFOCUS_GAIN):
                             mediaPlayer.setVolume(1f, 1f);
                             if (systemStopped && !userStopped) {
-                                startPlayer();
-                                systemStopped = false; //resetting variable to default
+                                if (mediaSessionCompat.isActive()) {
+                                    startPlayer();
+                                    systemStopped = false; //resetting variable to default
+                                }
                             }
                             break;
 
