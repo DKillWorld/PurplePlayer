@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -14,7 +13,6 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -125,9 +123,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .into(imageView);
 
             if (preferences.getBoolean("Use_Root_Background", false)) {
-                rootBackground.clearAnimation();
-                Glide.with(getApplicationContext()).clear(rootBackground);
-                Glide.with(getApplicationContext())
+                Glide.with(DetailActivity.this)
                         .load(metadata.getDescription().getIconUri())
                         .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
                         .transition(DrawableTransitionOptions.withCrossFade())
@@ -154,8 +150,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
 
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
-        getWindow().getDecorView().setBackgroundResource(R.mipmap.background_list);
+//        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
+//        getWindow().getDecorView().setBackgroundResource(R.mipmap.background_list);
 //        getWindow().getDecorView().getBackground().setColorFilter(new ColorDrawable(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)).getColor(), PorterDuff.Mode.ADD);
 
     }
@@ -185,7 +181,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         if (preferences.getBoolean("Use_Root_Background", false)) {
             Glide.with(getApplicationContext())
                     .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
-                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)).dontAnimate())
+                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
                     .into(rootBackground);
         }
 
