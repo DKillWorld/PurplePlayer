@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
@@ -46,8 +47,10 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                     .colorPrimary(i)
                     .colorStatusBarAuto()
                     .colorNavigationBarAuto()
+                    .textColorSecondaryInverseRes(android.R.color.white)
                     .isDark(true)
                     .apply();
+            Toast.makeText(this, "Restart the app if you switched from dark to light actionbar theme or vice-versa !!", Toast.LENGTH_LONG).show();
             preferences.edit().putInt("primary_color", i).apply();
         }
     }
