@@ -29,7 +29,7 @@ public class SettingsFragment extends PreferenceFragment {
         accentColorPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new ColorChooserDialog.Builder(getActivity(), R.string.app_name)
+                new ColorChooserDialog.Builder(getActivity(), R.string.accent_color_select)
                         .titleSub(R.string.accent_color_select)  // title of dialog when viewing shades of a color
                         .doneButton(R.string.md_done_label)  // changes label of the done button
                         .cancelButton(R.string.md_cancel_label)  // changes label of the cancel button
@@ -47,7 +47,7 @@ public class SettingsFragment extends PreferenceFragment {
         primaryColorPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new ColorChooserDialog.Builder(getActivity(), R.string.app_name)
+                new ColorChooserDialog.Builder(getActivity(), R.string.primary_color_select)
                         .titleSub(R.string.primary_color_select)  // title of dialog when viewing shades of a color
                         .doneButton(R.string.md_done_label)  // changes label of the done button
                         .cancelButton(R.string.md_cancel_label)  // changes label of the cancel button

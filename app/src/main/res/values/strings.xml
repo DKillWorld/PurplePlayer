@@ -7,8 +7,9 @@
 
     <string name="action_settings">Settings</string>
 
-    <string name="accent_color_select">Choose Accent Color</string>
-    <string name="primary_color_select">Choose Primary Color</string>
+    <string name="accent_color_select">Accent Color</string>
+    <string name="primary_color_select">Primary Color</string>
+
 
     <string name="banner_about_activity">ca-app-pub-9589539002030859/7903238812</string>
     <string name="interstitial_drawer_onitemclick">ca-app-pub-9589539002030859/7346365267</string>
