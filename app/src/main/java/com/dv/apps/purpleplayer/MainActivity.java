@@ -29,9 +29,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -151,13 +151,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.menu_main);
+        setSupportActionBar(toolbar);
+
         if (Aesthetic.isFirstTime()){
             Aesthetic.get()
-                    .activityTheme(R.style.Theme_AppCompat_Light_DarkActionBar)
+                    .activityTheme(R.style.AppTheme)
                     .colorPrimaryRes(android.R.color.holo_blue_dark)
-                    .textColorPrimaryRes(android.R.color.white)
-                    .colorIconTitleActiveRes(android.R.color.white)
-                    .isDark(false)
                     .colorNavigationBarAuto()
                     .colorStatusBarAuto()
                     .apply();
@@ -269,11 +270,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new SecondaryDrawerItem().withIdentifier(7).withName("Rate Us ").withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(8).withName("Upgrade to Purple Player Pro").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
-                .withTranslucentStatusBar(false)
-                .withDisplayBelowStatusBar(false)
+                .withTranslucentStatusBar(true)
+                .withDisplayBelowStatusBar(true)
                 .withActionBarDrawerToggle(true)
-                .withHeader(R.layout.drawer_header)
-                .withHeaderPadding(false)
+                .withStickyHeader(R.layout.drawer_header)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -334,7 +334,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                 })
-                .withSliderBackgroundColorRes(android.R.color.darker_gray)
                 .build();
 
 
@@ -476,6 +475,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.close:
+                return false;
+            case R.id.search:
                 return false;
         }
         return true;

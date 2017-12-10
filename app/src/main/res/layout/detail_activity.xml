@@ -1,212 +1,228 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dv.apps.purpleplayer.DetailActivity">
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/root_background"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <FrameLayout
+        android:id="@+id/root_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="center"
-        android:background="?attr/colorPrimaryDark"/>
-
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        tools:context="com.dv.apps.purpleplayer.DetailActivity">
 
         <ImageView
-            android:id="@+id/albumArt"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@+id/titleDetail"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@mipmap/ic_launcher_web" />
+            android:id="@+id/root_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorPrimaryDark"
+            android:scaleType="center"/>
 
-        <TextView
-            android:id="@+id/titleDetail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:fontFamily="sans-serif-condensed"
-            android:gravity="center"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:tag=":aesthetic_ignore"
-            android:shadowColor="#000000"
-            android:shadowRadius="3"
-            app:layout_constraintBottom_toTopOf="@+id/artistDetail"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            tools:text="TextView" />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/artistDetail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:fontFamily="sans-serif-condensed"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:tag=":aesthetic_ignore"
-            android:shadowColor="#000000"
-            android:shadowRadius="3"
-            app:layout_constraintBottom_toTopOf="@+id/showLyrics"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            tools:text="TextView" />
+            <ImageView
+                android:id="@+id/albumArt"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toTopOf="@+id/titleDetail"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@mipmap/ic_launcher_web" />
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:alpha="0.9"
-            android:background="?attr/colorPrimary"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent">
-
-            <SeekBar
-                android:id="@+id/seekbar"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/titleDetail"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:elevation="4dp" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:shadowColor="#000000"
+                android:shadowRadius="3"
+                android:tag=":aesthetic_ignore"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/artistDetail"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                tools:text="TextView" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/artistDetail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:shadowColor="#000000"
+                android:shadowRadius="3"
+                android:tag=":aesthetic_ignore"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/showLyrics"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                tools:text="TextView" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:alpha="0.9"
+                android:background="?attr/colorPrimary"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <SeekBar
+                    android:id="@+id/seekbar"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:elevation="4dp" />
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                    <ImageButton
-                        android:id="@+id/prev"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginRight="16dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/background_buttons"
-                        android:src="@drawable/ic_skip_previous_black_24dp" />
-
-                    <ImageButton
-                        android:id="@+id/shuffle"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/background_buttons"
-                        android:button="@android:color/transparent"
-                        android:src="@drawable/ic_shuffle_black_24dp" />
-
-                    <ImageButton
-                        android:id="@+id/playPause"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/background_buttons"
-                        android:src="@mipmap/ic_play" />
-
-                    <ImageButton
-                        android:id="@+id/loop"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/background_buttons"
-                        android:src="@drawable/ic_repeat_one_black_24dp" />
-
-                    <ImageButton
-                        android:id="@+id/next"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="16dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/background_buttons"
-                        android:src="@drawable/ic_skip_next_black_24dp" />
-
-                </LinearLayout>
-            </FrameLayout>
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/showLyrics"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/background_buttons"
-            android:src="@drawable/ic_music_note_black_24dp"
-            app:layout_constraintBottom_toTopOf="@+id/textView"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:tag=":aesthetic_ignore"
-            android:shadowColor="#000000"
-            android:shadowRadius="3"
-            android:fontFamily="sans-serif-condensed"
-            android:text="Show Lyrics"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintHorizontal_bias="0.501"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+                        android:orientation="horizontal"
+                        android:padding="12dp">
 
 
-    </android.support.constraint.ConstraintLayout>
+                        <ImageButton
+                            android:id="@+id/prev"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="16dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_buttons"
+                            android:src="@drawable/ic_skip_previous_black_24dp" />
 
-</FrameLayout>
+                        <ImageButton
+                            android:id="@+id/shuffle"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_buttons"
+                            android:button="@android:color/transparent"
+                            android:src="@drawable/ic_shuffle_black_24dp" />
+
+                        <ImageButton
+                            android:id="@+id/playPause"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_buttons"
+                            android:src="@mipmap/ic_play" />
+
+                        <ImageButton
+                            android:id="@+id/loop"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_buttons"
+                            android:src="@drawable/ic_repeat_one_black_24dp" />
+
+                        <ImageButton
+                            android:id="@+id/next"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="16dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_buttons"
+                            android:src="@drawable/ic_skip_next_black_24dp" />
+
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/showLyrics"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/background_buttons"
+                android:src="@drawable/ic_music_note_black_24dp"
+                app:layout_constraintBottom_toTopOf="@+id/textView"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-condensed"
+                android:shadowColor="#000000"
+                android:shadowRadius="3"
+                android:tag=":aesthetic_ignore"
+                android:text="Show Lyrics"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintHorizontal_bias="0.501"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+
+        </android.support.constraint.ConstraintLayout>
+
+    </FrameLayout>
+</LinearLayout>

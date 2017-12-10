@@ -3,18 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory android:title="UI">
-        <CheckBoxPreference
-            android:key="base_theme"
-            android:defaultValue="false"
-            android:summaryOn="Dark"
-            android:summaryOff="Light"
-            android:title="Base Theme" />
-        <CheckBoxPreference
-            android:key="dark_actionbar"
-            android:defaultValue="true"
-            android:summaryOn="Dark"
-            android:summaryOff="Light"
-            android:title="Use dark actionbar" />
         <Preference
             android:key="primary_color"
             android:summary="Change the arimary color of app"
@@ -22,7 +10,7 @@
         <Preference
             android:key="accent_color"
             android:summary="Change the accent color of app"
-            android:title="Accent Color" />
+            android:title="Accent Color"/>
         <!--<Preference-->
         <!--android:key="playback_speed"-->
         <!--android:title="Playback Speed"-->

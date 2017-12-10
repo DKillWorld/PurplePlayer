@@ -1,7 +1,6 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 
 /**
@@ -37,6 +35,8 @@ public class SettingsFragment extends PreferenceFragment {
                         .cancelButton(R.string.md_cancel_label)  // changes label of the cancel button
                         .backButton(R.string.md_back_label)  // changes label of the back button
                         .tag("Secondary")
+                        .accentMode(true)
+                        .preselect(Aesthetic.get().colorAccent().blockingFirst())
                         .dynamicButtonColor(true)  // defaults to true, false will disable changing action buttons' color to currently selected color
                         .show((FragmentActivity) getActivity());
                 return true;
@@ -53,6 +53,7 @@ public class SettingsFragment extends PreferenceFragment {
                         .cancelButton(R.string.md_cancel_label)  // changes label of the cancel button
                         .backButton(R.string.md_back_label)  // changes label of the back button
                         .tag("Primary")
+                        .preselect(Aesthetic.get().colorPrimary().blockingFirst())
                         .dynamicButtonColor(true)  // defaults to true, false will disable changing action buttons' color to currently selected color
                         .show((FragmentActivity) getActivity());
                 return true;
@@ -129,60 +130,6 @@ public class SettingsFragment extends PreferenceFragment {
                 Intent aIntent = new Intent(getActivity(), AboutActivity.class);
                 startActivity(aIntent);
                 Toast.makeText(getActivity(), "Thanks for showing interest. \nContact Us using Email for further instructions.", Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
-        CheckBoxPreference baseTheme = (CheckBoxPreference) findPreference("base_theme");
-        baseTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if (newValue.equals(true)){
-                    Aesthetic.get()
-                            .activityTheme(R.style.Theme_AppCompat)
-                            .textColorPrimaryRes(android.R.color.white)
-                            .textColorSecondaryInverseRes(android.R.color.black)
-                            .textColorSecondaryRes(android.R.color.white)
-                            .colorIconTitleActiveRes(android.R.color.white)
-                            .colorIconTitleInactiveRes(android.R.color.white)
-                            .isDark(true)
-                            .apply();
-                }else {
-                    Aesthetic.get()
-                            .activityTheme(R.style.Theme_AppCompat_Light)
-                            .textColorPrimaryRes(android.R.color.black)
-                            .textColorSecondaryInverseRes(android.R.color.white)
-                            .textColorSecondaryRes(android.R.color.black)
-                            .colorIconTitleActiveRes(android.R.color.black)
-                            .colorIconTitleInactiveRes(android.R.color.black)
-                            .isDark(false)
-                            .apply();
-                }
-                return true;
-            }
-        });
-
-        CheckBoxPreference darkActionbar = (CheckBoxPreference) findPreference("dark_actionbar");
-        darkActionbar.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if (newValue.equals(true)){
-                    Aesthetic.get()
-                            .activityTheme(R.style.Theme_AppCompat_Light)
-                            .textColorPrimaryRes(android.R.color.white)
-//                            .textColorSecondaryRes(android.R.color.white)
-                            .colorIconTitleActiveRes(android.R.color.white)
-                            .isDark(false)
-                            .apply();
-                }else {
-                    Aesthetic.get()
-                            .activityTheme(R.style.Theme_AppCompat_Light_DarkActionBar)
-                            .textColorPrimaryRes(android.R.color.black)
-//                            .textColorSecondaryRes(android.R.color.black)
-                            .colorIconTitleActiveRes(android.R.color.black)
-                            .isDark(false)
-                            .apply();
-                }
                 return true;
             }
         });

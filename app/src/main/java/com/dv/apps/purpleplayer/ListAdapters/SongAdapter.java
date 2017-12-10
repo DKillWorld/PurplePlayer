@@ -129,10 +129,12 @@ public class SongAdapter extends ArrayAdapter<Song> {
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             songList = (ArrayList<Song>) results.values;
-            if (songList.size() > 0) {
-                notifyDataSetChanged();
-            } else {
-                notifyDataSetInvalidated();
+            if (songList != null) {
+                if (songList.size() > 0) {
+                    notifyDataSetChanged();
+                } else {
+                    notifyDataSetInvalidated();
+                }
             }
         }
     };

@@ -1,20 +1,15 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
 
 import com.afollestad.aesthetic.Aesthetic;
-import com.afollestad.aesthetic.AutoSwitchMode;
-import com.afollestad.materialdialogs.color.CircleView;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
-
-import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
 
 
 public class SettingsActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
@@ -27,8 +22,11 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Settings");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -48,6 +46,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                     .colorPrimary(i)
                     .colorStatusBarAuto()
                     .colorNavigationBarAuto()
+                    .isDark(true)
                     .apply();
             preferences.edit().putInt("primary_color", i).apply();
         }

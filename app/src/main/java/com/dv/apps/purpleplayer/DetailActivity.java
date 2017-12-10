@@ -23,6 +23,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,14 +34,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
-import com.afollestad.aesthetic.AestheticActivity;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.CenterInside;
-import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -128,10 +125,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .into(imageView);
 
             if (preferences.getBoolean("Use_Root_Background", false)) {
+                rootBackground.clearAnimation();
+                Glide.with(getApplicationContext()).clear(rootBackground);
                 Glide.with(getApplicationContext())
                         .load(metadata.getDescription().getIconUri())
                         .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
-                        .apply(new RequestOptions().dontAnimate())
+                        .transition(DrawableTransitionOptions.withCrossFade())
                         .into(rootBackground);
             }
         }
@@ -143,8 +142,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Now Playing");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

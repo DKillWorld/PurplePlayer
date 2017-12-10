@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -35,11 +36,14 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("About");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         textView = (TextView) findViewById(R.id.version_about);
         textView.setText("v " + BuildConfig.VERSION_NAME);
 

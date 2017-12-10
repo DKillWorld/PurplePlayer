@@ -10,6 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="4dp"
+            app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat"/>
+
 
         <LinearLayout
 
@@ -17,6 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:layout_marginTop="?attr/actionBarSize"
             tools:context="com.dv.apps.purpleplayer.MainActivity">
 
 
@@ -85,7 +94,7 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:text="Select a Song"
-                    android:textColor="?android:textColorPrimary"
+                    android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 

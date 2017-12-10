@@ -6,22 +6,21 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary">
+        android:layout_height="172dp">
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="?android:actionBarSize"
-        app:srcCompat="@mipmap/header_drawer" />
+        android:layout_height="match_parent"
+        app:srcCompat="@mipmap/header_drawer"/>
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:text="Purple Player"
             android:textColor="@color/white"
-            android:layout_marginTop="165dp"
+            android:layout_marginBottom="0dp"
             android:fontFamily="sans-serif-condensed"
             android:textStyle="bold"
             android:shadowColor="@color/md_black_1000"
