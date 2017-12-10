@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Aesthetic.get()
                     .activityTheme(R.style.AppTheme)
                     .colorPrimaryRes(android.R.color.holo_blue_dark)
+                    .textColorSecondaryInverseRes(android.R.color.white)
                     .colorNavigationBarAuto()
                     .colorStatusBarAuto()
                     .apply();
