@@ -3,14 +3,12 @@ package com.dv.apps.purpleplayer.ListFragments;
 
 import android.content.ContentUris;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,7 +21,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.afollestad.aesthetic.Aesthetic;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
@@ -33,8 +30,6 @@ import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
 
 import java.util.ArrayList;
-
-import static com.dv.apps.purpleplayer.R.id.search;
 
 
 /**
@@ -151,9 +146,10 @@ public class AlbumListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
         inflater.inflate(R.menu.menu_main, menu);
 
-        MenuItem searchItem = menu.findItem(search);
+        MenuItem searchItem = menu.findItem(R.id.search);
         MenuItem closeItem = menu.findItem(R.id.close);
 
         if (!in_detail_view) {
@@ -179,6 +175,8 @@ public class AlbumListFragment extends Fragment {
             searchItem.setVisible(false);
         }
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

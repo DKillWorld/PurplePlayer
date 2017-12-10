@@ -6,9 +6,9 @@
     <item android:id="@+id/about_menu" android:title="About"
         android:orderInCategory="400"/>
     <item android:id="@+id/search"
-        android:title="Search"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView"
+        android:icon="@drawable/ic_search_white"
         android:orderInCategory="100"
         >
 

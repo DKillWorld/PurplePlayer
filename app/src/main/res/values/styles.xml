@@ -4,25 +4,15 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
-
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">
         <!-- Background for the search query section (e.g. EditText) -->
         <item name="queryBackground">@drawable/background_searchbar</item>
         <item name="searchIcon">@drawable/ic_search_white</item>
-        <item name="colorControlNormal">@color/white</item>
-        <item name="colorControlActivated">@color/white</item>
-        <item name="colorControlHighlight">@color/white</item>
     </style>
-
-    <style name="MyTextViewStyle" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">@color/white</item>
-    </style>
-    <style name="BackgroundPurpleTheme" parent="AppTheme">
-        <item name="android:background">@drawable/background_buttons</item>
-    </style>
-
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -36,6 +26,5 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
 
 </resources>

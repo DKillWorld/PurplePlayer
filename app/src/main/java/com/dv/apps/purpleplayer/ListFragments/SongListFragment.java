@@ -53,7 +53,6 @@ public class SongListFragment extends Fragment{
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         listView = view.findViewById(R.id.fragment_song_list);
         listView.setFastScrollEnabled(true);
         setHasOptionsMenu(true);
@@ -79,6 +78,7 @@ public class SongListFragment extends Fragment{
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
         inflater.inflate(R.menu.menu_main, menu);
 
         //SearchView Code
@@ -96,7 +96,9 @@ public class SongListFragment extends Fragment{
                 return true;
             }
         });
+
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
