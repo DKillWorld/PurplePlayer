@@ -50,6 +50,7 @@ import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.github.javiersantos.piracychecker.PiracyChecker;
+import com.github.javiersantos.piracychecker.enums.Display;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -487,7 +488,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
             checker = new PiracyChecker(this)
                     .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
-                    .saveResultToSharedPreferences(preferences, "valid_license");
+                    .saveResultToSharedPreferences(preferences, "valid_license")
+                    .display(Display.ACTIVITY);
             checker.start();
         }
     }

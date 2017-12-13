@@ -129,13 +129,17 @@ public class MusicService extends MediaBrowserServiceCompat implements
                             break;
 
                         case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
-                            pausePlayer();
-                            systemStopped = true;
+                            if (mediaSessionCompat.isActive()) {
+                                pausePlayer();
+                                systemStopped = true;
+                            }
                             break;
 
                         case (AudioManager.AUDIOFOCUS_LOSS):
-                            pausePlayer();
-                            systemStopped = false;
+                            if (mediaSessionCompat.isActive()) {
+                                pausePlayer();
+                                systemStopped = false;
+                            }
                             stopSelf();
                             break;
 
@@ -564,4 +568,5 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         }
     }
+
 }

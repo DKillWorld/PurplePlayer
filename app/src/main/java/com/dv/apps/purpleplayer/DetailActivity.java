@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -123,11 +125,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .into(imageView);
 
             if (preferences.getBoolean("Use_Root_Background", false)) {
-                Glide.with(DetailActivity.this)
+                Glide.with(getApplicationContext())
                         .load(metadata.getDescription().getIconUri())
+                        .apply(new RequestOptions().placeholder(rootBackground.getDrawable()).error(R.mipmap.background_list))
                         .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(rootBackground);
+            }else{
+                Glide.with(getApplicationContext())
+                        .load(R.mipmap.background_list)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(rootBackground);
+                if  (Build.VERSION.SDK_INT >= 21 && (rootBackground.getDrawable() != null))  {
+                    rootBackground.setColorFilter(Aesthetic.get().colorPrimary().blockingFirst(), PorterDuff.Mode.OVERLAY);
+                }
             }
         }
     };
@@ -138,7 +149,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Now Playing");
@@ -182,7 +194,16 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             Glide.with(getApplicationContext())
                     .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
                     .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .into(rootBackground);
+        }else{
+            Glide.with(getApplicationContext())
+                    .load(R.mipmap.background_list)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(rootBackground);
+            if  (Build.VERSION.SDK_INT >= 21 && (rootBackground.getDrawable() != null))  {
+                rootBackground.setColorFilter(Aesthetic.get().colorPrimary().blockingFirst(), PorterDuff.Mode.OVERLAY);
+            }
         }
 
         //Play Pause Button
@@ -436,25 +457,46 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
+
+    @Override
+    protected void onDestroy() {
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        Aesthetic.pause(this);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        Aesthetic.resume(this);
+        super.onResume();
+
+    }
+
     /**
      * Created by Dhaval on 31-10-2017.
      * To get lyrics by lyrics.ovh
      */
 
-    private class FetchLyricsTask extends AsyncTask<String, Void, String> {
+    private class FetchLyricsTask extends AsyncTask<String, Integer, String> {
 
         HttpURLConnection urlConnection;
         MaterialDialog progressDialog, lyricsDialog;
         String artName, songName;
-
+        int requestCode;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             progressDialog = new MaterialDialog.Builder(DetailActivity.this)
                     .title("Checking for Lyrics")
-                    .content("Please Wait")
                     .progress(true, 0)
+                    .content("Please Wait")
                     .show();
         }
 
@@ -472,13 +514,18 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             try {
                 URL url = new URL(lyricsUri.toString());
                 urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                requestCode = urlConnection.getResponseCode();
+                if (requestCode == 200) {
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                }else {
+                    result = null;
                 }
 
             }catch( Exception e) {
@@ -547,27 +594,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     e.printStackTrace();
                 }
             }
-
-
-
         }
+
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    protected void onPause() {
-        Aesthetic.pause(this);
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Aesthetic.resume(this);
-    }
 }
