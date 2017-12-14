@@ -60,6 +60,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     TextView textView1, textView2;
     ImageView imageView, rootBackground;
     ImageButton playPause, loop, next, prev, shuffle, showLyrics;
+    int currentPrimaryColor;
     SeekBar seekBar;
 
     Handler seekHandler;
@@ -139,7 +140,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 Picasso.with(getApplicationContext())
                         .load(metadata.getDescription().getIconUri())
                         .fit()
-                        .error(new ColorDrawable(Aesthetic.get().colorPrimary().blockingFirst()))
+                        .error(new ColorDrawable(currentPrimaryColor))
                         .placeholder(rootBackground.getDrawable())
                         .transform(new BlurTransformation(getApplicationContext(), 20))
                         .into(rootBackground);
@@ -155,7 +156,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 Picasso.with(getApplicationContext())
                         .load(R.mipmap.background_list)
                         .fit()
-                        .transform(new ColorFilterTransformation(Aesthetic.get().colorPrimary().blockingFirst()))
+                        .transform(new ColorFilterTransformation(currentPrimaryColor))
                         .into(rootBackground);
             }
         }
@@ -174,6 +175,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             getSupportActionBar().setTitle("Now Playing");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        currentPrimaryColor = Aesthetic.get().colorPrimary().blockingFirst();
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         preferences.registerOnSharedPreferenceChangeListener(this);
@@ -223,7 +226,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
             Picasso.with(getApplicationContext())
                     .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
-                    .error(new ColorDrawable(Aesthetic.get().colorPrimary().blockingFirst()))
+                    .error(new ColorDrawable(currentPrimaryColor))
                     .placeholder(rootBackground.getDrawable())
                     .fit()
                     .transform(new BlurTransformation(getApplicationContext(), 20))
@@ -240,7 +243,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             Picasso.with(getApplicationContext())
                     .load(R.mipmap.background_list)
                     .fit()
-                    .transform(new ColorFilterTransformation(Aesthetic.get().colorPrimary().blockingFirst()))
+                    .transform(new ColorFilterTransformation(currentPrimaryColor))
                     .into(rootBackground);
         }
 
