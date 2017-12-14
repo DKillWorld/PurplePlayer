@@ -514,6 +514,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         Aesthetic.resume(this);
+        currentPrimaryColor = Aesthetic.get().colorPrimary().blockingFirst();
         super.onResume();
 
     }
