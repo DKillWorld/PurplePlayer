@@ -5,11 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -37,9 +36,7 @@ import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,8 +48,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import jp.wasabeef.glide.transformations.BlurTransformation;
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+import jp.wasabeef.picasso.transformations.BlurTransformation;
+import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
 
 import static com.dv.apps.purpleplayer.MusicService.looping;
 import static com.dv.apps.purpleplayer.MusicService.randomize;
@@ -117,28 +114,49 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //            if (imageView.getDrawable() == null) {
 //                imageView.setImageResource(R.mipmap.ic_launcher_web);
 //            }
-            Glide.with(getApplicationContext())
+
+//            Glide.with(getApplicationContext())
+//                    .load(metadata.getDescription().getIconUri())
+//                    .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(30, 0)))
+//                    .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
+//                    .transition(DrawableTransitionOptions.withCrossFade())
+//                    .into(imageView);
+
+            Picasso.with(getApplicationContext())
                     .load(metadata.getDescription().getIconUri())
-                    .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(30, 0)))
-                    .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
-                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .transform(new jp.wasabeef.picasso.transformations.RoundedCornersTransformation(20, 0))
+                    .placeholder(R.mipmap.ic_launcher_web)
                     .into(imageView);
 
             if (preferences.getBoolean("Use_Root_Background", false)) {
-                Glide.with(getApplicationContext())
+//                Glide.with(getApplicationContext())
+//                        .load(metadata.getDescription().getIconUri())
+//                        .apply(new RequestOptions().placeholder(rootBackground.getDrawable()).error(R.mipmap.background_list))
+//                        .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
+//                        .transition(DrawableTransitionOptions.withCrossFade())
+//                        .into(rootBackground);
+
+                Picasso.with(getApplicationContext())
                         .load(metadata.getDescription().getIconUri())
-                        .apply(new RequestOptions().placeholder(rootBackground.getDrawable()).error(R.mipmap.background_list))
-                        .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
-                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .fit()
+                        .error(new ColorDrawable(Aesthetic.get().colorPrimary().blockingFirst()))
+                        .placeholder(rootBackground.getDrawable())
+                        .transform(new BlurTransformation(getApplicationContext(), 20))
                         .into(rootBackground);
             }else{
-                Glide.with(getApplicationContext())
+//                Glide.with(getApplicationContext())
+//                        .load(R.mipmap.background_list)
+//                        .transition(DrawableTransitionOptions.withCrossFade())
+//                        .into(rootBackground);
+//                if  (Build.VERSION.SDK_INT >= 21 && (rootBackground.getDrawable() != null))  {
+//                    rootBackground.setColorFilter(Aesthetic.get().colorPrimary().blockingFirst(), PorterDuff.Mode.OVERLAY);
+//                }
+
+                Picasso.with(getApplicationContext())
                         .load(R.mipmap.background_list)
-                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .fit()
+                        .transform(new ColorFilterTransformation(Aesthetic.get().colorPrimary().blockingFirst()))
                         .into(rootBackground);
-                if  (Build.VERSION.SDK_INT >= 21 && (rootBackground.getDrawable() != null))  {
-                    rootBackground.setColorFilter(Aesthetic.get().colorPrimary().blockingFirst(), PorterDuff.Mode.OVERLAY);
-                }
             }
         }
     };
@@ -182,28 +200,48 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         textView2.setText(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getSubtitle());
 
         imageView = (ImageView) findViewById(R.id.albumArt);
-        Glide.with(getApplicationContext())
+//        Glide.with(getApplicationContext())
+//                .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
+//                .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(30, 0)))
+//                .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
+//                .transition(DrawableTransitionOptions.withCrossFade())
+//                .into(imageView);
+
+        Picasso.with(getApplicationContext())
                 .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
-                .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(30, 0)))
-                .apply(new RequestOptions().placeholder(imageView.getDrawable()).error(R.mipmap.ic_launcher_web))
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .transform(new jp.wasabeef.picasso.transformations.RoundedCornersTransformation(20, 0))
+                .placeholder(R.mipmap.ic_launcher_web)
                 .into(imageView);
 
         rootBackground = findViewById(R.id.root_background);
         if (preferences.getBoolean("Use_Root_Background", false)) {
-            Glide.with(getApplicationContext())
+//            Glide.with(getApplicationContext())
+//                    .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
+//                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
+//                    .transition(DrawableTransitionOptions.withCrossFade())
+//                    .into(rootBackground);
+
+            Picasso.with(getApplicationContext())
                     .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
-                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
-                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .error(new ColorDrawable(Aesthetic.get().colorPrimary().blockingFirst()))
+                    .placeholder(rootBackground.getDrawable())
+                    .fit()
+                    .transform(new BlurTransformation(getApplicationContext(), 20))
                     .into(rootBackground);
         }else{
-            Glide.with(getApplicationContext())
+//            Glide.with(getApplicationContext())
+//                    .load(R.mipmap.background_list)
+//                    .transition(DrawableTransitionOptions.withCrossFade())
+//                    .into(rootBackground);
+//            if  (Build.VERSION.SDK_INT >= 21 && (rootBackground.getDrawable() != null))  {
+//                rootBackground.setColorFilter(Aesthetic.get().colorPrimary().blockingFirst(), PorterDuff.Mode.OVERLAY);
+//            }
+
+            Picasso.with(getApplicationContext())
                     .load(R.mipmap.background_list)
-                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .fit()
+                    .transform(new ColorFilterTransformation(Aesthetic.get().colorPrimary().blockingFirst()))
                     .into(rootBackground);
-            if  (Build.VERSION.SDK_INT >= 21 && (rootBackground.getDrawable() != null))  {
-                rootBackground.setColorFilter(Aesthetic.get().colorPrimary().blockingFirst(), PorterDuff.Mode.OVERLAY);
-            }
         }
 
         //Play Pause Button

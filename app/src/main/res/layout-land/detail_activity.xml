@@ -28,8 +28,7 @@
         <ImageView
             android:id="@+id/root_background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
+            android:layout_height="match_parent"/>
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"

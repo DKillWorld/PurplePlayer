@@ -12,11 +12,9 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -82,11 +80,17 @@ public class SongAdapter extends ArrayAdapter<Song> {
         myholder.textView2.setText(song.getArtist() + "");
         myholder.textView3.setText(songTime + "");
 //        myholder.imageView.setImageURI(song.getImage());
-        Glide.with(context)
+//        Glide.with(context)
+//                .load(song.getImage())
+//                .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher))
+//                .transition(DrawableTransitionOptions.withCrossFade())
+//                .into(myholder.imageView);
+
+        Picasso.with(context)
                 .load(song.getImage())
-                .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher))
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .placeholder(R.mipmap.ic_launcher)
                 .into(myholder.imageView);
+
 
         return view;
     }

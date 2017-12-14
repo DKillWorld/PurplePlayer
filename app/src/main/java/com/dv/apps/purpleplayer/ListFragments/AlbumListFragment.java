@@ -21,13 +21,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -125,12 +123,19 @@ public class AlbumListFragment extends Fragment {
                     MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
                             .playFromSearch(tempSong.getTitle(), null);
                 }
-                Glide.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
+//                Glide.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
+//                        albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums._ID))))
+//                        .apply(new RequestOptions().placeholder(R.mipmap.ic_play))
+//                        .apply(new RequestOptions().centerCrop())
+//                        .transition(DrawableTransitionOptions.withCrossFade())
+//                        .into(imageView);
+
+                Picasso.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
                         albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums._ID))))
-                        .apply(new RequestOptions().placeholder(R.mipmap.ic_play))
-                        .apply(new RequestOptions().centerCrop())
-                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .fit()
+                        .placeholder(R.mipmap.ic_launcher)
                         .into(imageView);
+
 
 
             }
