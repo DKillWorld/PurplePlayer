@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         tvMain = (TextView) findViewById(R.id.tvMain);
 
-        authenticate(); //Checking for license and Piracy
+        purple();
     }
 
     public void buildTransportControls(){
@@ -485,12 +485,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    private void authenticate(){
+    private void purple(){
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
             checker = new PiracyChecker(this)
                     .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
                     .saveResultToSharedPreferences(preferences, "valid_license")
-                    .enableSigningCertificate("uxh/RlppBQNr/6nlf3bO4UmKmNg=")
+//                    .enableSigningCertificate("uxh/RlppBQNr/6nlf3bO4UmKmNg=")
 //                    .enableUnauthorizedAppsCheck()
 //                    .blockIfUnauthorizedAppUninstalled(preferences, "app_unauth")
                     .display(Display.ACTIVITY);
