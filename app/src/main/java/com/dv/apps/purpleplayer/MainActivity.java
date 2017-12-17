@@ -459,6 +459,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.setting_menu:
                 Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(sIntent);
+                showInterstitial();
                 break;
             case R.id.about_menu:
                 Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
