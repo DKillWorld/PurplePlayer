@@ -570,6 +570,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             try {
                 URL url = new URL(lyricsUri.toString());
                 urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setConnectTimeout(2000);
+                urlConnection.setReadTimeout(2000);
                 requestCode = urlConnection.getResponseCode();
                 if (requestCode == 200) {
                     InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -597,11 +599,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         @Override
         protected void onPostExecute(String result) {
-            progressDialog.dismiss();
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
             if (result == null || result.length() == 0){
                 lyricsDialog = new MaterialDialog.Builder(DetailActivity.this)
                         .title("Oops !!")
-                        .content("No Lyrics Found. \nMake sure you are connected to network and metadata is correct.")
+                        .content("No lyrics found on server. \nTry QuickLyric.")
                         .negativeText("Damn It !!")
                         .positiveText("QuickLyric")
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
