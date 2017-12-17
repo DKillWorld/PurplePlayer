@@ -107,7 +107,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         if (intent != null) {
             MediaButtonReceiver.handleIntent(mediaSessionCompat, intent);
         }
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
 

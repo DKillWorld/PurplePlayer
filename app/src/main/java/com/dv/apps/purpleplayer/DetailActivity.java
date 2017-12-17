@@ -36,6 +36,7 @@ import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.dv.apps.purpleplayer.Utils.OnSwipeTouchListener;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -203,6 +204,19 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         textView2.setText(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getSubtitle());
 
         imageView = (ImageView) findViewById(R.id.albumArt);
+
+        imageView.setOnTouchListener(new OnSwipeTouchListener(DetailActivity.this) {
+            public void onSwipeRight() {
+                if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
+                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToNext();
+                }
+            }
+            public void onSwipeLeft() {
+                if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
+                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToPrevious();
+                }
+            }
+        });
 //        Glide.with(getApplicationContext())
 //                .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
 //                .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(30, 0)))
