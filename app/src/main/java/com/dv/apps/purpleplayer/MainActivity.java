@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PiracyChecker checker;;
 
     public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -1;
-    public static final int PRIMARY_COLOR_DEFAULT = -14575885;
+    public static final int PRIMARY_COLOR_DEFAULT = -15108398;
+    public static final int ACCENT_COLOR_DEFAULT = -10752;
 
     //TEST THINGS
     private MediaBrowserCompat mediaBrowserCompat;
@@ -159,7 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Aesthetic.isFirstTime()){
             Aesthetic.get()
                     .activityTheme(R.style.AppTheme)
-                    .colorPrimaryRes(android.R.color.holo_blue_dark)
+                    .colorPrimary(PRIMARY_COLOR_DEFAULT)
+                    .colorAccent(ACCENT_COLOR_DEFAULT)
                     .textColorSecondaryInverseRes(android.R.color.white)
                     .colorNavigationBarAuto()
                     .colorStatusBarAuto()
@@ -490,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             checker = new PiracyChecker(this)
                     .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
                     .saveResultToSharedPreferences(preferences, "valid_license")
+                    .enableSigningCertificate("ldgUxo13aF54Jsqay5L9W/S4/g0=")
 //                    .enableSigningCertificate("uxh/RlppBQNr/6nlf3bO4UmKmNg=")
 //                    .enableUnauthorizedAppsCheck()
 //                    .blockIfUnauthorizedAppUninstalled(preferences, "app_unauth")

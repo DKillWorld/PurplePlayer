@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.aesthetic.AutoSwitchMode;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 
 
@@ -46,6 +47,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
             Aesthetic.get()
                     .colorPrimary(i)
                     .colorStatusBarAuto()
+                    .lightStatusBarMode(AutoSwitchMode.AUTO)
                     .colorNavigationBarAuto()
                     .textColorSecondaryInverseRes(android.R.color.white)
                     .isDark(true)

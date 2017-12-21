@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -130,6 +131,23 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .placeholder(R.mipmap.ic_launcher_web)
                     .into(imageView);
 
+            //TODO:Fix Palette API
+//            if (imageView.getDrawable() != null){
+//            Palette palette = Palette.from(((BitmapDrawable) imageView.getDrawable()).getBitmap()).generate();
+//
+//                int vibrant = palette.getVibrantSwatch().getRgb();
+//                int muted = palette.getMutedSwatch().getRgb();
+//                int darkVibrant = palette.getDarkVibrantSwatch().getRgb();
+//                int darkMuted = palette.getDarkMutedSwatch().getRgb();
+//                int lightVibrant = palette.getLightVibrantSwatch().getRgb();
+//                int lightMuted = palette.getLightMutedSwatch().getRgb();
+//
+//            Aesthetic.get()
+//                    .colorPrimary(vibrant)
+//                    .colorStatusBarAuto()
+//                    .apply();
+//            }
+
             if (preferences.getBoolean("Use_Root_Background", false)) {
 //                Glide.with(getApplicationContext())
 //                        .load(metadata.getDescription().getIconUri())
@@ -157,7 +175,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 Picasso.with(getApplicationContext())
                         .load(R.mipmap.background_list)
                         .fit()
-                        .transform(new ColorFilterTransformation(currentPrimaryColor))
+                        .transform(new ColorFilterTransformation(ColorUtils.setAlphaComponent(currentPrimaryColor, 100)))
                         .into(rootBackground);
             }
         }
@@ -208,12 +226,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         imageView.setOnTouchListener(new OnSwipeTouchListener(DetailActivity.this) {
             public void onSwipeRight() {
                 if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
-                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToNext();
+                    if (preferences.getBoolean("Inverse_Swipe", false)) {
+                        MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToPrevious();
+                    }else {
+                        MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToNext();
+                    }
                 }
             }
             public void onSwipeLeft() {
                 if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
-                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToPrevious();
+                    if (preferences.getBoolean("Inverse_Swipe", false)) {
+                        MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToNext();
+                    }else {
+                        MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToPrevious();
+                    }
                 }
             }
         });
@@ -257,7 +283,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             Picasso.with(getApplicationContext())
                     .load(R.mipmap.background_list)
                     .fit()
-                    .transform(new ColorFilterTransformation(currentPrimaryColor))
+                    .transform(new ColorFilterTransformation(ColorUtils.setAlphaComponent(currentPrimaryColor, 100)))
                     .into(rootBackground);
         }
 
@@ -570,21 +596,21 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             try {
                 URL url = new URL(lyricsUri.toString());
                 urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setConnectTimeout(2000);
-                urlConnection.setReadTimeout(2000);
-                requestCode = urlConnection.getResponseCode();
-                if (requestCode == 200) {
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+//                urlConnection.setConnectTimeout(2000);
+//                urlConnection.setReadTimeout(2000);
+//                requestCode = urlConnection.getResponseCode();
+//                if (requestCode == 200) {
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        result.append(line);
-                    }
-                }else {
-                    result = null;
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
                 }
+//                }else {
+//                    result = null;
+//                }
 
             }catch( Exception e) {
                 e.printStackTrace();
@@ -606,7 +632,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 lyricsDialog = new MaterialDialog.Builder(DetailActivity.this)
                         .title("Oops !!")
                         .content("No lyrics found on server. \nTry QuickLyric.")
-                        .negativeText("Damn It !!")
+                        .negativeText("Okay")
                         .positiveText("QuickLyric")
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override

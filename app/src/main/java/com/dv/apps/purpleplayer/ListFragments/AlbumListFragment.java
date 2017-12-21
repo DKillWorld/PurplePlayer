@@ -17,11 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.dv.apps.purpleplayer.ListAdapters.AlbumAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Album;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
@@ -42,7 +43,7 @@ public class AlbumListFragment extends Fragment {
     ImageView imageView;
     SearchView searchView;
 
-    ArrayAdapter<String> albumAdapter;
+    AlbumAdapter albumAdapter;
     SongAdapter songAdapter;
     ArrayList<Song> tempSongList;
 
@@ -66,15 +67,25 @@ public class AlbumListFragment extends Fragment {
         listView = view.findViewById(R.id.fragment_album_list);
         imageView = view.findViewById(R.id.fragment_album_image);
         Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-        final ArrayList<String> arrayList = new ArrayList<>();
+        final ArrayList<Album> arrayList = new ArrayList<>();
         final Cursor albumCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
         if (albumCursor != null && albumCursor.moveToFirst()) {
             do {
                 String albumName = albumCursor.getString(albumCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM));
-                arrayList.add(albumName);
+                long year = albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums.FIRST_YEAR));
+                int numberOfSongs = albumCursor.getInt(albumCursor.getColumnIndex(MediaStore.Audio.Albums.NUMBER_OF_SONGS));
+                long id = albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums._ID));
+                long art = albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+
+                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, id);
+
+                Album album = new Album(getActivity(), albumName, id, numberOfSongs, year, albumArtUri);
+
+                arrayList.add(album);
             } while (albumCursor.moveToNext());
         }
-        albumAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item, R.id.songName, arrayList);
+        albumAdapter = new AlbumAdapter(getActivity(), arrayList);
         listView.setAdapter(albumAdapter);
 
 
@@ -82,12 +93,12 @@ public class AlbumListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!in_detail_view) {
-                    String s = albumAdapter.getItem(position);
+                    String s = albumAdapter.getItem(position).getAlbumName();
                     albumCursor.moveToPosition(arrayList.indexOf(s));
 
                     Uri uri1 = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                     String selection = MediaStore.Audio.Albums.ALBUM + " = ?";
-                    String selectrionArgs[] = {albumCursor.getString(albumCursor.getColumnIndex((MediaStore.Audio.Albums.ALBUM)))};
+                    String selectrionArgs[] = {s};
 
                     tempSongList = new ArrayList<Song>();
                     Cursor songCursor = getActivity().getContentResolver().query(uri1, null, selection, selectrionArgs, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
@@ -131,7 +142,7 @@ public class AlbumListFragment extends Fragment {
 //                        .into(imageView);
 
                 Picasso.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
-                        albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums._ID))))
+                        albumAdapter.getItem(position).getId()))
                         .fit()
                         .placeholder(R.mipmap.ic_launcher)
                         .into(imageView);
@@ -197,4 +208,44 @@ public class AlbumListFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+//    public static class AlbumListMainFragment extends Fragment {
+//
+//        ListView listView;
+//        ImageView imageView;
+//        SearchView searchView;
+//
+//        ArrayAdapter<String> albumAdapter;
+//        SongAdapter songAdapter;
+//        ArrayList<Song> tempSongList;
+//
+//        @Nullable
+//        @Override
+//        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+//            return inflater.inflate(R.layout.fragment_album_list, container, false);
+//        }
+//
+//        @Override
+//        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+//            listView = view.findViewById(R.id.fragment_album_list);
+//            Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+//            final ArrayList<Album> arrayList = new ArrayList<>();
+//            final Cursor albumCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
+//            if (albumCursor != null && albumCursor.moveToFirst()) {
+//                do {
+//                    String albumName = albumCursor.getString(albumCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM));
+//                    long year = albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums.FIRST_YEAR));
+//                    int numberOfSongs = albumCursor.getInt(albumCursor.getColumnIndex(MediaStore.Audio.Albums.NUMBER_OF_SONGS));
+//                    long id = albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID));
+//
+//                    Album album = new Album(getActivity(), albumName, id, numberOfSongs, year);
+//
+//                    arrayList.add(album);
+//                } while (albumCursor.moveToNext());
+//            }
+////            albumAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item, R.id.songName, arrayList);
+//            listView.setAdapter(albumAdapter);
+//        }
+//
+//        }
 }

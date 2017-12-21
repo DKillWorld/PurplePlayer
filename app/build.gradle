@@ -9,8 +9,8 @@ android {
         applicationId "com.dv.apps.purpleplayer"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 47
-        versionName '2.3.4'
+        versionCode 50
+        versionName '2.4.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
