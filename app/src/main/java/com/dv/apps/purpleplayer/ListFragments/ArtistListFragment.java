@@ -17,10 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.dv.apps.purpleplayer.ListAdapters.ArtistAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Artist;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
@@ -36,7 +37,7 @@ public class ArtistListFragment extends Fragment {
     boolean in_detail_view = false;
     SearchView searchView;
 
-    ArrayAdapter<String> artistAdapter;
+    ArtistAdapter artistAdapter;
     SongAdapter songAdapter;
     ArrayList<Song> tempSongList;
 
@@ -59,27 +60,33 @@ public class ArtistListFragment extends Fragment {
 
         listView = view.findViewById(R.id.fragment_artist_list);
         Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-        final ArrayList<String> arrayList = new ArrayList<>();
+        final ArrayList<Artist> arrayList = new ArrayList<>();
         final Cursor artistCursor = getContext().getContentResolver().query(uri, null, null, null, MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
         if (artistCursor != null && artistCursor.moveToFirst()) {
             do {
-                String albumName = artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST));
-                arrayList.add(albumName);
+                String artistName = artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST));
+                int numberOfTracks = artistCursor.getInt(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS));
+                long id = artistCursor.getLong(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID));
+                int numberOfAlbums = artistCursor.getInt(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_ALBUMS));
+
+                Artist artist = new Artist(getActivity(), artistName, id, numberOfTracks, numberOfAlbums);
+
+                arrayList.add(artist);
             } while (artistCursor.moveToNext());
         }
-        artistAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item,R.id.songName, arrayList);
+        artistAdapter = new ArtistAdapter(getActivity(), arrayList);
         listView.setAdapter(artistAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!in_detail_view) {
-                    String s = artistAdapter.getItem(position);
+                    String s = artistAdapter.getItem(position).getArtistName();
                     artistCursor.moveToPosition(arrayList.indexOf(s));
 
                     Uri uri1 = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                     String selection = MediaStore.Audio.Albums.ARTIST + " = ?";
-                    String selectrionArgs[] = {artistCursor.getString(artistCursor.getColumnIndex((MediaStore.Audio.Albums.ARTIST)))};
+                    String selectrionArgs[] = {s};
 
                     tempSongList = new ArrayList<Song>();
                     Cursor songCursor = getActivity().getContentResolver().query(uri1, null, selection, selectrionArgs, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
