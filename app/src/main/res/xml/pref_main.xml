@@ -4,6 +4,11 @@
 
 
     <PreferenceCategory android:title="UI">
+        <!--<CheckBoxPreference-->
+            <!--android:key="BaseTheme"-->
+            <!--android:title="Base theme"-->
+            <!--android:summaryOff="Light"-->
+            <!--android:summaryOn="Dark"/>-->
         <Preference
             android:key="primary_color"
             android:summary="Change the arimary color of app"

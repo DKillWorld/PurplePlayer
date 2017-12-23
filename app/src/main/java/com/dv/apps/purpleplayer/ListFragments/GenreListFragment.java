@@ -1,6 +1,7 @@
 package com.dv.apps.purpleplayer.ListFragments;
 
 
+import android.animation.LayoutTransition;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -136,6 +138,8 @@ public class GenreListFragment extends Fragment {
         if (!in_detail_view) {
             searchItem.setVisible(true);
             searchView = (SearchView) searchItem.getActionView();
+            LinearLayout searchBar = (LinearLayout) searchView.findViewById(R.id.search_bar);
+            searchBar.setLayoutTransition(new LayoutTransition());
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {

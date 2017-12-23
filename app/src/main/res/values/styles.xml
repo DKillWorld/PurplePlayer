@@ -8,6 +8,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="searchViewStyle">@style/MySearchViewStyle</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">
         <!-- Background for the search query section (e.g. EditText) -->
         <item name="queryBackground">@drawable/background_searchbar</item>
