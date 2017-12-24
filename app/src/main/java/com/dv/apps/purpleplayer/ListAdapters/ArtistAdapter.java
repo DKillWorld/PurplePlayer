@@ -43,7 +43,7 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
         Myholder(View view) {
             textView = (TextView) view.findViewById(R.id.songName);
             textView2 = (TextView) view.findViewById(R.id.songArtist);
-            textView3 = (TextView) view.findViewById(R.id.songDuration);
+//            textView3 = (TextView) view.findViewById(R.id.songDuration);
             imageView = (ImageView) view.findViewById(R.id.image_view);
         }
     }
@@ -71,9 +71,7 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
         }else {
             myholder.textView2.setText(artist.getNumberOfSongs() + " Songs");
         }
-        if (artist.getNumberOfAlbums() != 0) {
-            myholder.textView3.setText("Albums: " + artist.getNumberOfAlbums());
-        }
+
 
 //        myholder.imageView.setImageURI(song.getImage());
 //        Glide.with(context)
