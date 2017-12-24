@@ -68,8 +68,8 @@
     <string name="inversed">Inversed</string>
     <string name="normal">Normal</string>
     <string name="inverseSwipeControl">Inverse swipe controls</string>
-    <string name="quickLyric">QuickLyric</string>
-    <string name="defaultServer">Default</string>
+    <string name="quickLyric" translatable="false">QuickLyric</string>
+    <string name="defaultServer" translatable="false">Default</string>
     <string name="lyricsServer">Lyrics server</string>
     <string name="privacy">Privacy</string>
     <string name="forImprovement">For improvement of product</string>
