@@ -1,13 +1,9 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,12 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
-import com.afollestad.materialdialogs.color.CircleView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-
-import static com.dv.apps.purpleplayer.MainActivity.PRIMARY_COLOR_DEFAULT;
-import static com.dv.apps.purpleplayer.R.id.adView;
 
 
 //Icon credit = psdblast.com
@@ -39,7 +31,7 @@ public class AboutActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("About");
+            getSupportActionBar().setTitle(R.string.about);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 

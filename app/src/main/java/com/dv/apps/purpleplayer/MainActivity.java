@@ -55,6 +55,9 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -69,7 +72,7 @@ import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, RewardedVideoAdListener {
 
     Context context;
     ArrayList<Song> songList;
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Drawer result;
 
     InterstitialAd interstitialAd;
+    RewardedVideoAd rewardedVideoAd;
 
     SharedPreferences preferences;
 
@@ -181,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
             MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
             setupInterstitialAd();
+//            setupRewardedVideoAd();
         }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -219,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mediaControllerCompat.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
             tvMain.setText(mediaControllerCompat.getMetadata().getDescription().getTitle());
         }else {
-            tvMain.setText("Select a Song");
+            tvMain.setText(R.string.select_song);
         }
 
 
@@ -258,21 +263,76 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void setupRewardedVideoAd(){
+        rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        rewardedVideoAd.loadAd("ca-app-pub-9589539002030859/2050180592", getInterstitialAdrequest());
+        rewardedVideoAd.setRewardedVideoAdListener(this);
+    }
+
+    public void showRewardedVideo(){
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+            if (rewardedVideoAd.isLoaded()) {
+                rewardedVideoAd.show();
+            }
+        }
+    }
+
+    @Override
+    public void onRewarded(RewardItem reward) {
+        Toast.makeText(MainActivity.this, "onRewarded! currency: " + reward.getType() + "  amount: " +
+                reward.getAmount(), Toast.LENGTH_SHORT).show();
+        preferences.edit().putBoolean("Rewarded", true).apply();
+        // Reward the user.
+    }
+
+    @Override
+    public void onRewardedVideoAdLeftApplication() {
+        Toast.makeText(MainActivity.this, "onRewardedVideoAdLeftApplication",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdClosed() {
+        Toast.makeText(MainActivity.this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdFailedToLoad(int errorCode) {
+        Toast.makeText(MainActivity.this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdLoaded() {
+        Toast.makeText(MainActivity.this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+            result.addItem(result.getDrawerItem(9));
+        }
+    }
+
+    @Override
+    public void onRewardedVideoAdOpened() {
+    }
+
+    @Override
+    public void onRewardedVideoStarted() {
+    }
+
     public void setupDrawerLayout2(){
 
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withSelectedItem(-1)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withIdentifier(1).withName("Songs").withIcon(R.drawable.ic_drawer_songs).withSelectable(false),
-                        new PrimaryDrawerItem().withIdentifier(2).withName("Albums").withIcon(R.drawable.ic_drawer_album).withSelectable(false),
-                        new PrimaryDrawerItem().withIdentifier(3).withName("Artists").withIcon(R.drawable.ic_drawer_artist).withSelectable(false),
-                        new PrimaryDrawerItem().withIdentifier(4).withName("Genres").withIcon(R.drawable.ic_drawer_genre).withSelectable(false),
-                        new PrimaryDrawerItem().withIdentifier(5).withName("Playlists").withIcon(R.drawable.ic_drawer_playlist).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(1).withName(R.string.songs).withIcon(R.drawable.ic_drawer_songs).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(2).withName(R.string.albums).withIcon(R.drawable.ic_drawer_album).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(3).withName(R.string.artists).withIcon(R.drawable.ic_drawer_artist).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(4).withName(R.string.genres).withIcon(R.drawable.ic_drawer_genre).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(5).withName(R.string.playlists).withIcon(R.drawable.ic_drawer_playlist).withSelectable(false),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withIdentifier(6).withName("Settings").withIcon(R.drawable.ic_drawer_settings).withSelectable(false),
-                        new SecondaryDrawerItem().withIdentifier(7).withName("Rate Us ").withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
-                        new SecondaryDrawerItem().withIdentifier(8).withName("Upgrade to Purple Player Pro").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
+                        new SecondaryDrawerItem().withIdentifier(6).withName(R.string.settings).withIcon(R.drawable.ic_drawer_settings).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(7).withName(R.string.rateUs).withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
+//                        new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
                 .withTranslucentStatusBar(true)
                 .withDisplayBelowStatusBar(true)
@@ -323,13 +383,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     startActivity(intent);
                                 }else {
                                     new MaterialDialog.Builder(MainActivity.this)
-                                            .content("You are already a Pro User !!")
-                                            .positiveText("OK")
-                                            .title("Info")
-                                    .show();
+                                            .content(R.string.alreadyProUser)
+                                            .positiveText(R.string.ok)
+                                            .title(R.string.info)
+                                            .show();
                                 }
-
                                 break;
+                            case 9:
+                                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+                                    showRewardedVideo();
+                                }
                         }
 
                         result.getDrawerLayout().closeDrawers();
@@ -340,13 +403,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 })
                 .build();
 
-
         actionBarToggle = new ActionBarDrawerToggle(this,result.getDrawerLayout(), R.string.navigation_drawer_open, R.string.navigation_drawer_close){
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle("Purple Player");
+                    getSupportActionBar().setTitle(R.string.app_name);
                 }
             }
 
@@ -354,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle("Library");
+                    getSupportActionBar().setTitle(R.string.library);
                 }
             }
         };
@@ -405,15 +467,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public CharSequence getPageTitle(int position) {
                 switch (position){
                     case 0:
-                        return "Songs";
+                        return getResources().getString(R.string.songs);
                     case 1:
-                        return "Albums";
+                        return getResources().getString(R.string.albums);
                     case 2:
-                        return "Artists";
+                        return getResources().getString(R.string.artists);
                     case 3:
-                        return "Genres";
+                        return getResources().getString(R.string.genres);
                     case 4:
-                        return "Playlists";
+                        return getResources().getString(R.string.playlists);
                     default:
                         return null;
                 }
@@ -445,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         userStopped = true;
                     }
                 }else {
-                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -476,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (bIntent.resolveActivity(getPackageManager()) != null){
                     startActivityForResult(bIntent, 100);
                 }else {
-                    Toast.makeText(this, "No Equalizer Found !!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.noEqualierFound, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.close:
@@ -539,11 +601,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode) {
             case 1: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Welcome!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.welcome, Toast.LENGTH_SHORT).show();
                     PERMISSION_GRANTED = true;
                     setupTabLayout();
                 } else {
-                    Toast.makeText(this, "One or more permission is denied !!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.oneOrMorePermissionDenied, Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -553,6 +615,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+//        rewardedVideoAd.destroy(this);
         if (checker != null) {
             checker.destroy();
         }
@@ -561,6 +624,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         Aesthetic.pause(this);
+//        rewardedVideoAd.pause(this);
         super.onPause();
     }
 
@@ -568,6 +632,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         Aesthetic.resume(this);
+//        rewardedVideoAd.resume(this);
     }
 
 }

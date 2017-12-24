@@ -96,8 +96,8 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                        .positiveText("OK")
-                        .title("Frequently Asked Questions")
+                        .positiveText(R.string.ok)
+                        .title(R.string.faq)
                         .content("Q. Is this project open-source? \nA: Shhh! Not Yet. \n\n" +
                                 "Q. How can I see Now Playing songs list? \nA: You can't see it. However all songs from same type will be added to Now Playing list. For Example, If you play a song from some album via \"Albums\" tab, all songs from that specific album are added to Now Playing. \nNote: To get all songs in Now Playing list, simply play a song from \"Songs\" tab. \n\n" +
                                 "Q. How can I create my playlist? \nA: You can only play created playlists. Support for creating new playlist will be added soon ! \n\n" +
@@ -137,9 +137,9 @@ public class SettingsFragment extends PreferenceFragment {
                     startActivity(intent);
                 }else {
                     new MaterialDialog.Builder(getActivity())
-                            .content("You are already a Pro User !!")
-                            .positiveText("OK")
-                            .title("Info")
+                            .content(R.string.alreadyProUser)
+                            .positiveText(R.string.ok)
+                            .title(R.string.info)
                             .show();
                 }
                 return true;

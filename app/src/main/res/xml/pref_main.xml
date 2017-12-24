@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <PreferenceCategory android:title="UI">
+    <PreferenceCategory android:title="@string/UI">
         <!--<CheckBoxPreference-->
             <!--android:key="BaseTheme"-->
             <!--android:title="Base theme"-->
@@ -11,12 +11,12 @@
             <!--android:summaryOn="Dark"/>-->
         <Preference
             android:key="primary_color"
-            android:summary="Change the arimary color of app"
-            android:title="Primary color" />
+            android:summary="@string/changePrimaryColor"
+            android:title="@string/primaryColor" />
         <Preference
             android:key="accent_color"
-            android:summary="Change the accent color of app"
-            android:title="Accent color"/>
+            android:summary="@string/changeAccentColor"
+            android:title="@string/accentColor"/>
         <!--<Preference-->
         <!--android:key="playback_speed"-->
         <!--android:title="Playback Speed"-->
@@ -24,59 +24,59 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Player">
+    <PreferenceCategory android:title="@string/player">
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="Use_Root_Background"
-            android:summary="Set albumart as now playing background"
-            android:title="Albumart as background" />
+            android:summary="@string/setAlbumartAsBackground"
+            android:title="@string/albumartAsBackgound" />
 
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="Inverse_Swipe"
-            android:summaryOn="Inversed"
-            android:summaryOff="Normal"
-            android:title="Inverse swipe controls" />
+            android:summaryOn="@string/inversed"
+            android:summaryOff="@string/normal"
+            android:title="@string/inverseSwipeControl" />
 
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Lyrics">
+    <PreferenceCategory android:title="@string/lyrics">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/key_use_quicklyric"
-            android:summaryOff="Default"
-            android:summaryOn="QuickLyric"
-            android:title="Lyrics server" />
+            android:summaryOff="@string/defaultServer"
+            android:summaryOn="@string/quickLyric"
+            android:title="@string/lyricsServer" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Privacy">
+    <PreferenceCategory android:title="@string/privacy">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="Anonymous_Data"
-            android:summary="For improvement of product"
-            android:title="Send anonymous usage data" />
+            android:summary="@string/forImprovement"
+            android:title="@string/sendAnynomousUsageDate" />
     </PreferenceCategory>
 
     <!--<PreferenceCategory android:title="Experimental Features\n(Uncheck if app crashes)">-->
 
     <!--</PreferenceCategory>-->
 
-    <PreferenceCategory android:title="Misc">
+    <PreferenceCategory android:title="@string/misc">
         <Preference
             android:icon="@drawable/ic_help_and_faq"
             android:key="FAQ"
-            android:title="FAQ" />
+            android:title="@string/faq" />
         <Preference
             android:icon="@drawable/ic_drawer_support_development"
             android:key="Rate_Us"
-            android:title="Rate us" />
+            android:title="@string/rateUs" />
         <Preference
             android:icon="@drawable/ic_drawer_buypro"
             android:key="Buy_Pro"
-            android:title="Upgrade to Purple Player Pro" />
+            android:title="@string/upgradeToPurplePlayerPro" />
         <Preference
             android:key="Translation_Help"
-            android:title="Help in translating Purple Player!" />
+            android:title="@string/helpInTranslation" />
     </PreferenceCategory>
 </PreferenceScreen>

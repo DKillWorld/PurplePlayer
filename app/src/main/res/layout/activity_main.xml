@@ -94,7 +94,7 @@
                     android:paddingTop="16dp"
                     android:scrollHorizontally="true"
                     android:singleLine="true"
-                    android:text="Select a Song"
+                    android:text="@string/select_song"
                     android:textColor="?android:textColorSecondaryInverse"
                     android:textSize="16sp"
                     android:textStyle="bold"

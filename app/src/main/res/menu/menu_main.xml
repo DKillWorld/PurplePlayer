@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/setting_menu" android:title="Settings"
+    <item android:id="@+id/setting_menu" android:title="@string/action_settings"
         android:orderInCategory="300"/>
-    <item android:id="@+id/about_menu" android:title="About"
+    <item android:id="@+id/about_menu" android:title="@string/about"
         android:orderInCategory="400"/>
     <item android:id="@+id/search"
         app:showAsAction="collapseActionView|ifRoom"
@@ -14,7 +14,7 @@
 
     </item>
     <item android:id="@+id/equilizer"
-        android:title="Equalizer"
+        android:title="@string/equalizer"
         android:orderInCategory="200"/>
     <item android:id="@+id/close"
         app:showAsAction="always"

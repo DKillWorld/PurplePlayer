@@ -27,7 +27,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Settings");
+            getSupportActionBar().setTitle(R.string.action_settings);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                     .isDark(true)
                     .apply();
 
-            Toast.makeText(this, "Restart the app if you switched from dark to light actionbar theme or vice-versa !!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.restartAppIfThemeChanged, Toast.LENGTH_LONG).show();
             preferences.edit().putInt("primary_color", i).apply();
         }
     }

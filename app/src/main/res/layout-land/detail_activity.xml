@@ -212,7 +212,7 @@
                 android:shadowColor="#000000"
                 android:shadowRadius="3"
                 android:tag=":aesthetic_ignore"
-                android:text="Show Lyrics"
+                android:text="@string/showLyrics"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/linearLayout"

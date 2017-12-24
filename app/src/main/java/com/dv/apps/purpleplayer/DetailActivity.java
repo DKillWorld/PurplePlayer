@@ -191,7 +191,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Now Playing");
+            getSupportActionBar().setTitle(R.string.nowPlaying);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -369,7 +369,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 String ArtName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getSubtitle();
                 String SongName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getTitle();
                 if ((ArtName == null) || (SongName == null)) {
-                    Toast.makeText(this, "Nothing is playing !!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.nothingIsPlaying, Toast.LENGTH_SHORT).show();
                     break;
                 }
                 if (useQuickLyric) {
@@ -400,7 +400,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         userStopped = true;
                     }
                 }else {
-                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -408,11 +408,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if (!looping){
                     loop.setBackgroundResource(R.drawable.background_button_selected);
                     MediaControllerCompat.getMediaController(this).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ONE);
-                    Toast.makeText(getApplicationContext(), "Repeat ON!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.repeatOn, Toast.LENGTH_SHORT).show();
                 }else{
                     loop.setBackgroundResource(R.drawable.background_buttons);
                     MediaControllerCompat.getMediaController(this).getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
-                    Toast.makeText(getApplicationContext(), "Repeat OFF!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.repeatOff, Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -420,11 +420,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if (!randomize){
                     shuffle.setBackgroundResource(R.drawable.background_button_selected);
                     MediaControllerCompat.getMediaController(this).getTransportControls().setShuffleModeEnabled(true);
-                    Toast.makeText(getApplicationContext(), "Shuffle ON!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.shuffleOn, Toast.LENGTH_SHORT).show();
                 }else{
                     shuffle.setBackgroundResource(R.drawable.background_buttons);
                     MediaControllerCompat.getMediaController(this).getTransportControls().setShuffleModeEnabled(false);
-                    Toast.makeText(getApplicationContext(), "Shuffle OFF!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.shuffleOff, Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -432,7 +432,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
                     MediaControllerCompat.getMediaController(this).getTransportControls().skipToNext();
                 }else {
-                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -440,7 +440,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
                     MediaControllerCompat.getMediaController(this).getTransportControls().skipToPrevious();
                 }else {
-                    Toast.makeText(this, "Empty playlist !! \nSelect a Song", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -510,7 +510,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if (bIntent.resolveActivity(getPackageManager()) != null){
                     startActivityForResult(bIntent, 100);
                 }else {
-                    Toast.makeText(this, "No Equalizer Found !!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.noEqualierFound, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case android.R.id.home:
@@ -576,9 +576,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             super.onPreExecute();
 
             progressDialog = new MaterialDialog.Builder(DetailActivity.this)
-                    .title("Checking for Lyrics")
+                    .title(R.string.checkingForLyrics)
                     .progress(true, 0)
-                    .content("Please Wait")
+                    .content(R.string.pleaseWait)
                     .show();
         }
 
@@ -630,9 +630,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             }
             if (result == null || result.length() == 0){
                 lyricsDialog = new MaterialDialog.Builder(DetailActivity.this)
-                        .title("Oops !!")
-                        .content("No lyrics found on server. \nTry QuickLyric.")
-                        .negativeText("Okay")
+                        .title(R.string.oops)
+                        .content(R.string.noLyricsFoundTryQuickLyric)
+                        .negativeText(R.string.okay)
                         .positiveText("QuickLyric")
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
@@ -654,7 +654,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     if (jsonObject.has("lyrics")) {
                         String s = jsonObject.getString("lyrics");
                         lyricsDialog = new MaterialDialog.Builder(DetailActivity.this)
-                                .title("Lyrics")
+                                .title(R.string.lyrics)
                                 .content(s)
                                 .contentGravity(GravityEnum.CENTER)
                                 .positiveText("QuickLyric")
@@ -670,10 +670,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                                         }
                                     }
                                 })
-                                .neutralText("Great")
+                                .neutralText(R.string.great)
                                 .show();
                     } else {
-                        Toast.makeText(DetailActivity.this, "No Lyrics Found !!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DetailActivity.this, R.string.noLyricsFoundTryQuickLyric, Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (JSONException e) {
