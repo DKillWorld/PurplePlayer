@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Purple Player</string>
-    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="app_name" translatable="false">Purple Player</string>
+    <string name="title_activity_navigation" translatable="false">NavigationActivity</string>
 
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
@@ -10,8 +10,8 @@
     <string name="accent_color_select">Accent Color</string>
     <string name="primary_color_select">Primary Color</string>
 
-    <string name="banner_about_activity">ca-app-pub-9589539002030859/7903238812</string>
-    <string name="interstitial_drawer_onitemclick">ca-app-pub-9589539002030859/7346365267</string>
+    <string name="banner_about_activity" translatable="false">ca-app-pub-9589539002030859/7903238812</string>
+    <string name="interstitial_drawer_onitemclick" translatable="false">ca-app-pub-9589539002030859/7346365267</string>
 
     <string name="key_use_quicklyric" translatable="false">QuickLyric_Key</string>
     <!--<string name="appwidget_text">EXAMPLE</string>-->
