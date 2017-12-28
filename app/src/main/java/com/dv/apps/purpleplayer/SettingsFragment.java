@@ -99,7 +99,7 @@ public class SettingsFragment extends PreferenceFragment {
                         .positiveText(R.string.ok)
                         .title(R.string.faq)
                         .content("Q. Is this project open-source? \nA: Shhh! Not Yet. \n\n" +
-                                "Q. How can I see Now Playing songs list? \nA: You can't see it. However all songs from same type will be added to Now Playing list. For Example, If you play a song from some album via \"Albums\" tab, all songs from that specific album are added to Now Playing. \nNote: To get all songs in Now Playing list, simply play a song from \"Songs\" tab. \n\n" +
+                                "Q. How can I see Now Playing songs list? \nA: Just swipe down on albumart, as easy as that.\n\n" +
                                 "Q. How can I create my playlist? \nA: You can only play created playlists. Support for creating new playlist will be added soon ! \n\n" +
                                 "Q. After changing app primary color, all songs disappeared. What to do? \nA: This happens when you change from dark actionbar theme to light or vice-versa. However, a quick restart will fix this issue. \n\n" +
                                 "Q. I found a bug. Where/How to report? \nA: Shoot an email describing the bug and steps to reproduce it.\n\n" +

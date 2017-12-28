@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        songList = new ArrayList<Song>();
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Library");
+            getSupportActionBar().setTitle(R.string.library);
         }
 
         context = this;

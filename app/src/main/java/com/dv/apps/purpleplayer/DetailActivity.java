@@ -1,6 +1,7 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.media.MediaBrowserCompat;
@@ -27,8 +29,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +41,8 @@ import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.Utils.OnSwipeTouchListener;
 import com.squareup.picasso.Picasso;
 
@@ -240,6 +246,29 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     }else {
                         MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().skipToPrevious();
                     }
+                }
+            }
+
+            public void onSwipeBottom() {
+                if (MusicService.getInstance().mediaSessionCompat.isActive()) {
+                    MaterialDialog dialog = new MaterialDialog.Builder(DetailActivity.this)
+                            .customView(R.layout.now_playing, false)
+                            .cancelable(true)
+                            .show();
+                    ListView nowPlaying = dialog.getCustomView().findViewById(R.id.now_playing_list);
+                    final SongAdapter songAdapter = new SongAdapter(DetailActivity.this, MusicService.getInstance().songList);
+                    nowPlaying.setAdapter(songAdapter);
+                    nowPlaying.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Song tempSong = songAdapter.getItem(position);
+                            Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("Pos", MusicService.getInstance().songList.indexOf(tempSong));
+                            MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls()
+                                    .playFromUri(playUri, bundle);
+                        }
+                    });
                 }
             }
         });
