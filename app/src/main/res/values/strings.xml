@@ -76,6 +76,9 @@
     <string name="sendAnynomousUsageDate">Send anonymous usage data</string>
     <string name="misc">Miscellaneous</string>
     <string name="helpInTranslation">Help in translating Purple Player!</string>
+    <string name="restartApp">Ads removed for today! Restart app.</string>
+    <string name="later">Later</string>
+    <string name="removeAdsForDay">Watch video ad and get ad-free experience for today.</string>
 
 
 </resources>

@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -51,6 +52,7 @@ import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.github.javiersantos.piracychecker.PiracyChecker;
 import com.github.javiersantos.piracychecker.enums.Display;
+import com.github.javiersantos.piracychecker.enums.InstallerID;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -67,6 +69,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
@@ -172,6 +175,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     .apply();
         }
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(getApplicationContext(), MusicService.class),connectionCallback, null);
 //        songList = new ArrayList<Song>();
 
@@ -185,10 +190,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
             MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
             setupInterstitialAd();
-//            setupRewardedVideoAd();
+            setupRewardedVideoAd();
         }
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(CircleView.shiftColorDown(preferences.getInt("primary_color", PRIMARY_COLOR_DEFAULT)));
@@ -237,16 +240,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setupInterstitialAd(){
-        interstitialAd = new InterstitialAd(this);
-        interstitialAd.setAdUnitId("ca-app-pub-9589539002030859/7346365267");
-        interstitialAd.loadAd(getInterstitialAdrequest());
-        interstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdClosed() {
-                super.onAdClosed();
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+            if (Calendar.getInstance().getTimeInMillis() > preferences.getLong("ad_free_till", 0)) {
+                interstitialAd = new InterstitialAd(this);
+                interstitialAd.setAdUnitId("ca-app-pub-9589539002030859/7346365267");
                 interstitialAd.loadAd(getInterstitialAdrequest());
+                interstitialAd.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        interstitialAd.loadAd(getInterstitialAdrequest());
+                    }
+                });
             }
-        });
+        }
     }
 
     public AdRequest getInterstitialAdrequest(){
@@ -257,16 +264,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void showInterstitial(){
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
-            if (interstitialAd.isLoaded()) {
-                interstitialAd.show();
+            if (interstitialAd != null) {
+                if (interstitialAd.isLoaded()) {
+                    interstitialAd.show();
+                }
             }
         }
     }
 
     public void setupRewardedVideoAd(){
-        rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
-        rewardedVideoAd.loadAd("ca-app-pub-9589539002030859/2050180592", getInterstitialAdrequest());
-        rewardedVideoAd.setRewardedVideoAdListener(this);
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+            if (Calendar.getInstance().getTimeInMillis() > preferences.getLong("ad_free_till", 0)) {
+                rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+                rewardedVideoAd.loadAd("ca-app-pub-9589539002030859/2050180592", getInterstitialAdrequest());
+                rewardedVideoAd.setRewardedVideoAdListener(this);
+            }
+        }
     }
 
     public void showRewardedVideo(){
@@ -279,9 +292,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRewarded(RewardItem reward) {
-        Toast.makeText(MainActivity.this, "onRewarded! currency: " + reward.getType() + "  amount: " +
-                reward.getAmount(), Toast.LENGTH_SHORT).show();
-        preferences.edit().putBoolean("Rewarded", true).apply();
+        Calendar cal = Calendar.getInstance(); //current date and time
+//        cal.add(Calendar.DAY_OF_MONTH, 1); //add a day
+        cal.set(Calendar.HOUR_OF_DAY, 23); //set hour to last hour
+        cal.set(Calendar.MINUTE, 59); //set minutes to last minute
+        cal.set(Calendar.SECOND, 59); //set seconds to last second
+        cal.set(Calendar.MILLISECOND, 999); //set milliseconds to last millisecond
+        long millis = cal.getTimeInMillis();
+        preferences.edit().putLong("ad_free_till", millis).apply();
+        if (result.getDrawerItem(9) != null){
+            result.removeItem(9);
+        }
+        new MaterialDialog.Builder(this)
+                .positiveText(R.string.ok)
+                .title(R.string.info)
+                .content(R.string.restartApp)
+                .show();
         // Reward the user.
     }
 
@@ -294,6 +320,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onRewardedVideoAdClosed() {
         Toast.makeText(MainActivity.this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+        if (result.getDrawerItem(9) != null){
+            result.removeItem(9);
+        }
     }
 
     @Override
@@ -305,7 +334,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRewardedVideoAdLoaded() {
         Toast.makeText(MainActivity.this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
-            result.addItem(result.getDrawerItem(9));
+            result.addItem(new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day")
+                    .withIcon(R.drawable.ic_drawer_buypro).withSelectable(false));
+            new MaterialDialog.Builder(this)
+                    .content(R.string.removeAdsForDay)
+                    .title(R.string.info)
+                    .positiveText(R.string.ok)
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                            showRewardedVideo();
+                        }
+                    })
+                    .negativeText(R.string.later)
+                    .show();
         }
     }
 
@@ -554,10 +596,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             checker = new PiracyChecker(this)
                     .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
                     .saveResultToSharedPreferences(preferences, "valid_license")
-                    .enableSigningCertificate("ldgUxo13aF54Jsqay5L9W/S4/g0=")
+//                    .enableSigningCertificate("ldgUxo13aF54Jsqay5L9W/S4/g0=")     google
 //                    .enableSigningCertificate("uxh/RlppBQNr/6nlf3bO4UmKmNg=")
-//                    .enableUnauthorizedAppsCheck()
-//                    .blockIfUnauthorizedAppUninstalled(preferences, "app_unauth")
+                    .enableUnauthorizedAppsCheck()
+                    .enableInstallerId(InstallerID.GOOGLE_PLAY)
+                    .enableInstallerId(InstallerID.AMAZON_APP_STORE)
+                    .enableInstallerId(InstallerID.GALAXY_APPS)
+                    .blockIfUnauthorizedAppUninstalled(preferences, "app_unauth")
                     .display(Display.ACTIVITY);
             checker.start();
         }
@@ -615,7 +660,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        rewardedVideoAd.destroy(this);
+        if (rewardedVideoAd != null) {
+            rewardedVideoAd.destroy(this);
+        }
         if (checker != null) {
             checker.destroy();
         }
@@ -624,7 +671,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         Aesthetic.pause(this);
-//        rewardedVideoAd.pause(this);
+        if (rewardedVideoAd != null) {
+            rewardedVideoAd.pause(this);
+        }
         super.onPause();
     }
 
@@ -632,7 +681,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         Aesthetic.resume(this);
-//        rewardedVideoAd.resume(this);
+        if (rewardedVideoAd != null) {
+            rewardedVideoAd.resume(this);
+        }
     }
 
 }
