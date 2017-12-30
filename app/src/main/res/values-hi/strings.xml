@@ -56,4 +56,7 @@
     <string name="sendAnynomousUsageDate">अनाम उपयोग डेटा भेजें</string>
     <string name="misc">विविध</string>
     <string name="helpInTranslation">ऐप को अनुवाद करने में सहायता करें</string>
+    <string name="restartApp">Ads removed for today! Restart app.</string>
+    <string name="later">Later</string>
+    <string name="removeAdsForDay">Watch video ad and get ad-free experience for today.</string>
 </resources>
