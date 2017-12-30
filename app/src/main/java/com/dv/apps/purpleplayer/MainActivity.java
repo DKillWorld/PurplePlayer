@@ -313,13 +313,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRewardedVideoAdLeftApplication() {
-        Toast.makeText(MainActivity.this, "onRewardedVideoAdLeftApplication",
-                Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, "onRewardedVideoAdLeftApplication",
+//                Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoAdClosed() {
-        Toast.makeText(MainActivity.this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
         if (result.getDrawerItem(9) != null){
             result.removeItem(9);
         }
@@ -327,12 +327,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRewardedVideoAdFailedToLoad(int errorCode) {
-        Toast.makeText(MainActivity.this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoAdLoaded() {
-        Toast.makeText(MainActivity.this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
             result.addItem(new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day")
                     .withIcon(R.drawable.ic_drawer_buypro).withSelectable(false));
