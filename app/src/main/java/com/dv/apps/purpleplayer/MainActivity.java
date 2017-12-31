@@ -375,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new SecondaryDrawerItem().withIdentifier(7).withName(R.string.rateUs).withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
 //                        new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
+//                        new SecondaryDrawerItem().withIdentifier(10).withName("Radio").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
                 .withTranslucentStatusBar(true)
                 .withDisplayBelowStatusBar(true)
@@ -435,6 +436,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
                                     showRewardedVideo();
                                 }
+                                break;
+                            case 10:
+                                Intent intent = new Intent(MainActivity.this, RadioActivity.class);
+                                startActivity(intent);
                         }
 
                         result.getDrawerLayout().closeDrawers();
