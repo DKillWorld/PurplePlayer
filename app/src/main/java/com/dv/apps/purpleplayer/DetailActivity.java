@@ -271,6 +271,37 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     });
                 }
             }
+
+//            public void onSwipeTop() {
+//                if (MusicService.getInstance().mediaSessionCompat.isActive()) {
+//                    MaterialDialog dialog = new MaterialDialog.Builder(DetailActivity.this)
+//                            .customView(R.layout.tag_editor_activity, true)
+//                            .cancelable(true)
+//                            .positiveText(R.string.ok)
+//                            .show();
+//                    final EditText eT1 = dialog.getCustomView().findViewById(R.id.editText);
+//                    final EditText eT2 = dialog.getCustomView().findViewById(R.id.editText2);
+//
+//                    eT1.setText(MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getDescription().getTitle());
+//                    eT2.setText(MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getDescription().getSubtitle());
+//
+//                    final String textToSearch = eT1.getText().toString();
+//
+//                    dialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
+//                        @Override
+//                        public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+//                            ContentValues contentValues = new ContentValues();
+//                            contentValues.put(MediaStore.Audio.Media.TITLE, eT1.getText().toString());
+//                            contentValues.put(MediaStore.Audio.Media.ARTIST, eT2.getText().toString());
+//
+//                            boolean success = getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues,
+//                                    MediaStore.Audio.Media.TITLE + "= \"" + textToSearch + "\"",null  ) == 1;
+//
+//
+//                        }
+//                    });
+//                }
+//            }
         });
 //        Glide.with(getApplicationContext())
 //                .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())

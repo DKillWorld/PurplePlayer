@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -13,14 +14,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.dv.apps.purpleplayer.ListAdapters.RadioStationAdapter;
 import com.dv.apps.purpleplayer.Models.RadioStation;
+import com.dv.apps.purpleplayer.Utils.OnSwipeTouchListener;
 
 import java.util.ArrayList;
 
@@ -104,6 +109,27 @@ public class RadioActivity extends AppCompatActivity implements View.OnClickList
         }
 
         tvMain.setSelected(true);
+        tvMain.setOnTouchListener(new OnSwipeTouchListener(this){
+
+            @Override
+            public void onSwipeRight() {
+                MaterialDialog dialog = new MaterialDialog.Builder(RadioActivity.this)
+                        .positiveText(R.string.ok)
+                        .customView(R.layout.tag_editor_activity, true)
+                        .show();
+                final EditText editText = dialog.getCustomView().findViewById(R.id.editText);
+                dialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                        String playLink = editText.getText().toString();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("Pos", 0);
+                        MediaControllerCompat.getMediaController(RadioActivity.this).getTransportControls()
+                                .playFromUri(Uri.parse(playLink), bundle);
+                    }
+                });
+            }
+        });
         tvMain.setOnClickListener(this);
         if (mediaControllerCompat.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
             tvMain.setText(mediaControllerCompat.getMetadata().getDescription().getTitle());
