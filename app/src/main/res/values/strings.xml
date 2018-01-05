@@ -2,6 +2,44 @@
     <string name="app_name" translatable="false">Purple Player</string>
     <string name="title_activity_navigation" translatable="false">NavigationActivity</string>
 
+    <string-array name="transition_selector">
+        <item>Default</item>
+        <item>Accordion</item>
+        <item>BackgroundToForeground</item>
+        <item>CubeIn</item>
+        <item>CubeOut</item>
+        <item>DepthPage</item>
+        <item>FlipHorizontal</item>
+        <item>ForegroundToBackground</item>
+        <item>RotateDown</item>
+        <item>RotateUp</item>
+        <item>ScaleInOut</item>
+        <item>Stack</item>
+        <item>Tablet</item>
+        <item>ZoomIn</item>
+        <item>ZoomOut</item>
+        <item>ZoomOutSlide</item>
+    </string-array>
+
+    <string-array name="transition_selector_values">
+        <item>Default</item>
+        <item>Accordion</item>
+        <item>BackgroundToForeground</item>
+        <item>CubeIn</item>
+        <item>CubeOut</item>
+        <item>DepthPage</item>
+        <item>FlipHorizontal</item>
+        <item>ForegroundToBackground</item>
+        <item>RotateDown</item>
+        <item>RotateUp</item>
+        <item>ScaleInOut</item>
+        <item>Stack</item>
+        <item>Tablet</item>
+        <item>ZoomIn</item>
+        <item>ZoomOut</item>
+        <item>ZoomOutSlide</item>
+    </string-array>
+
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
@@ -79,6 +117,7 @@
     <string name="restartApp">Ads removed for today! Restart app.</string>
     <string name="later">Later</string>
     <string name="removeAdsForDay">Watch video ad and get ad-free experience for today.</string>
+    <string name="changeTransition">Transition effect</string>
 
 
 </resources>

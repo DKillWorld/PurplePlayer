@@ -39,6 +39,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ToxicBakery.viewpager.transforms.AccordionTransformer;
+import com.ToxicBakery.viewpager.transforms.BackgroundToForegroundTransformer;
+import com.ToxicBakery.viewpager.transforms.CubeInTransformer;
+import com.ToxicBakery.viewpager.transforms.CubeOutTransformer;
+import com.ToxicBakery.viewpager.transforms.DefaultTransformer;
+import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
+import com.ToxicBakery.viewpager.transforms.FlipHorizontalTransformer;
+import com.ToxicBakery.viewpager.transforms.ForegroundToBackgroundTransformer;
+import com.ToxicBakery.viewpager.transforms.RotateDownTransformer;
+import com.ToxicBakery.viewpager.transforms.RotateUpTransformer;
+import com.ToxicBakery.viewpager.transforms.ScaleInOutTransformer;
+import com.ToxicBakery.viewpager.transforms.StackTransformer;
+import com.ToxicBakery.viewpager.transforms.TabletTransformer;
+import com.ToxicBakery.viewpager.transforms.ZoomInTransformer;
+import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
+import com.ToxicBakery.viewpager.transforms.ZoomOutTranformer;
 import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -529,7 +545,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         viewPager.setAdapter(fragmentPagerAdapter);
+        setupTransitionEffect(preferences.getString("transition_effect", "Default"));
         tabLayout.setupWithViewPager(viewPager);
+
+    }
+
+    public void setupTransitionEffect(String value){
+        switch (value){
+            case "Default":
+                viewPager.setPageTransformer(true, new DefaultTransformer());
+                break;
+            case "Accordion":
+                viewPager.setPageTransformer(true, new AccordionTransformer());
+                break;
+            case "BackgroundToForeground":
+                viewPager.setPageTransformer(true, new BackgroundToForegroundTransformer());
+                break;
+            case "CubeIn":
+                viewPager.setPageTransformer(true, new CubeInTransformer());
+                break;
+            case "CubeOut":
+                viewPager.setPageTransformer(true, new CubeOutTransformer());
+                break;
+            case "DepthPage":
+                viewPager.setPageTransformer(true, new DepthPageTransformer());
+                break;
+            case "FlipHorizontal":
+                viewPager.setPageTransformer(true, new FlipHorizontalTransformer());
+                break;
+            case "ForegroundToBackground":
+                viewPager.setPageTransformer(true, new ForegroundToBackgroundTransformer());
+                break;
+            case "RotateDown":
+                viewPager.setPageTransformer(true, new RotateDownTransformer());
+                break;
+            case "RotateUp":
+                viewPager.setPageTransformer(true, new RotateUpTransformer());
+                break;
+            case "ScaleInOut":
+                viewPager.setPageTransformer(true, new ScaleInOutTransformer());
+                break;
+            case "Stack":
+                viewPager.setPageTransformer(true, new StackTransformer());
+                break;
+            case "Tablet":
+                viewPager.setPageTransformer(true, new TabletTransformer());
+                break;
+            case "ZoomIn":
+                viewPager.setPageTransformer(true, new ZoomInTransformer());
+                break;
+            case "ZoomOut":
+                viewPager.setPageTransformer(true, new ZoomOutTranformer());
+                break;
+            case "ZoomOutSlide":
+                viewPager.setPageTransformer(true, new ZoomOutSlideTransformer());
+                break;
+
+
+        }
     }
 
     @Override
@@ -685,11 +758,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        setupTransitionEffect(preferences.getString("transition_effect", "Default"));
         Aesthetic.resume(this);
         if (rewardedVideoAd != null) {
             rewardedVideoAd.resume(this);
         }
     }
-
 }
 

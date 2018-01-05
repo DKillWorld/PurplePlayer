@@ -17,6 +17,12 @@
             android:key="accent_color"
             android:summary="@string/changeAccentColor"
             android:title="@string/accentColor"/>
+        <ListPreference
+            android:key="transition_effect"
+            android:title="@string/changeTransition"
+            android:summary="@string/defaultServer"
+            android:entries="@array/transition_selector"
+            android:entryValues="@array/transition_selector_values"/>
         <!--<Preference-->
         <!--android:key="playback_speed"-->
         <!--android:title="Playback Speed"-->

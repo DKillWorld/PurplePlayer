@@ -1,11 +1,14 @@
 package com.dv.apps.purpleplayer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
@@ -18,12 +21,17 @@ import com.afollestad.materialdialogs.color.ColorChooserDialog;
  * Created by Dhaval on 02-09-2017.
  */
 
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    SharedPreferences preferences;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_main);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        preferences.registerOnSharedPreferenceChangeListener(this);
 
         Preference accentColorPreference = findPreference("accent_color");
         accentColorPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -159,7 +167,28 @@ public class SettingsFragment extends PreferenceFragment {
 
         CheckBoxPreference useAlbumArtBackground = (CheckBoxPreference) findPreference("Use_Root_Background");
 
+        ListPreference transition = (ListPreference) findPreference("transition_effect");
+        transition.setSummary(preferences.getString("transition_effect", "Default"));
+
+
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        updatePreference(findPreference(key), key);
+    }
 
+    private void updatePreference(Preference preference, String key) {
+        if (preference == null) return;
+        if (preference instanceof ListPreference) {
+            ListPreference listPreference = (ListPreference) preference;
+            listPreference.setSummary(listPreference.getEntry());
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroy();
+    }
 }
