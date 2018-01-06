@@ -39,22 +39,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ToxicBakery.viewpager.transforms.AccordionTransformer;
-import com.ToxicBakery.viewpager.transforms.BackgroundToForegroundTransformer;
-import com.ToxicBakery.viewpager.transforms.CubeInTransformer;
-import com.ToxicBakery.viewpager.transforms.CubeOutTransformer;
-import com.ToxicBakery.viewpager.transforms.DefaultTransformer;
-import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
-import com.ToxicBakery.viewpager.transforms.FlipHorizontalTransformer;
-import com.ToxicBakery.viewpager.transforms.ForegroundToBackgroundTransformer;
-import com.ToxicBakery.viewpager.transforms.RotateDownTransformer;
-import com.ToxicBakery.viewpager.transforms.RotateUpTransformer;
-import com.ToxicBakery.viewpager.transforms.ScaleInOutTransformer;
-import com.ToxicBakery.viewpager.transforms.StackTransformer;
-import com.ToxicBakery.viewpager.transforms.TabletTransformer;
-import com.ToxicBakery.viewpager.transforms.ZoomInTransformer;
-import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
-import com.ToxicBakery.viewpager.transforms.ZoomOutTranformer;
 import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -66,6 +50,22 @@ import com.dv.apps.purpleplayer.ListFragments.GenreListFragment;
 import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
+import com.eftimoff.viewpagertransformers.AccordionTransformer;
+import com.eftimoff.viewpagertransformers.BackgroundToForegroundTransformer;
+import com.eftimoff.viewpagertransformers.CubeInTransformer;
+import com.eftimoff.viewpagertransformers.CubeOutTransformer;
+import com.eftimoff.viewpagertransformers.DefaultTransformer;
+import com.eftimoff.viewpagertransformers.DepthPageTransformer;
+import com.eftimoff.viewpagertransformers.DrawFromBackTransformer;
+import com.eftimoff.viewpagertransformers.FlipHorizontalTransformer;
+import com.eftimoff.viewpagertransformers.ForegroundToBackgroundTransformer;
+import com.eftimoff.viewpagertransformers.RotateDownTransformer;
+import com.eftimoff.viewpagertransformers.RotateUpTransformer;
+import com.eftimoff.viewpagertransformers.StackTransformer;
+import com.eftimoff.viewpagertransformers.TabletTransformer;
+import com.eftimoff.viewpagertransformers.ZoomInTransformer;
+import com.eftimoff.viewpagertransformers.ZoomOutSlideTransformer;
+import com.eftimoff.viewpagertransformers.ZoomOutTranformer;
 import com.github.javiersantos.piracychecker.PiracyChecker;
 import com.github.javiersantos.piracychecker.enums.Display;
 import com.github.javiersantos.piracychecker.enums.InstallerID;
@@ -582,8 +582,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case "RotateUp":
                 viewPager.setPageTransformer(true, new RotateUpTransformer());
                 break;
-            case "ScaleInOut":
-                viewPager.setPageTransformer(true, new ScaleInOutTransformer());
+            case "DrawFromBack":
+                viewPager.setPageTransformer(true, new DrawFromBackTransformer());
                 break;
             case "Stack":
                 viewPager.setPageTransformer(true, new StackTransformer());
@@ -600,7 +600,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case "ZoomOutSlide":
                 viewPager.setPageTransformer(true, new ZoomOutSlideTransformer());
                 break;
-
+            default:
+                viewPager.setPageTransformer(true, new AccordionTransformer());
+                break;
 
         }
     }
@@ -758,7 +760,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        setupTransitionEffect(preferences.getString("transition_effect", "Default"));
+        if (viewPager != null) {
+            setupTransitionEffect(preferences.getString("transition_effect", "Default"));
+        }
         Aesthetic.resume(this);
         if (rewardedVideoAd != null) {
             rewardedVideoAd.resume(this);

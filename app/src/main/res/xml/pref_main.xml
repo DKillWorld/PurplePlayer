@@ -17,16 +17,32 @@
             android:key="accent_color"
             android:summary="@string/changeAccentColor"
             android:title="@string/accentColor"/>
+
+        <!--<Preference-->
+        <!--android:key="playback_speed"-->
+        <!--android:title="Playback Speed"-->
+        <!--android:summary="Change speed of player"/>-->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Animation">
+        <CheckBoxPreference
+            android:key="Animate_Albumart"
+            android:title="Animate albumart"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="Animate_Playpause"
+            android:title="Animate playpause button"
+            android:defaultValue="false"/>
         <ListPreference
             android:key="transition_effect"
             android:title="@string/changeTransition"
             android:summary="@string/defaultServer"
             android:entries="@array/transition_selector"
-            android:entryValues="@array/transition_selector_values"/>
-        <!--<Preference-->
-        <!--android:key="playback_speed"-->
-        <!--android:title="Playback Speed"-->
-        <!--android:summary="Change speed of player"/>-->
+            android:entryValues="@array/transition_selector_values"
+            android:defaultValue="Default"/>
+
 
     </PreferenceCategory>
 

@@ -189,7 +189,6 @@ public class AlbumListFragment extends Fragment {
             });
             closeItem.setVisible(false);
 
-
         }else {
             closeItem.setVisible(true);
             searchItem.setVisible(false);

@@ -44,6 +44,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.Utils.OnSwipeTouchListener;
+import com.github.florent37.viewanimator.ViewAnimator;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -136,6 +137,18 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .transform(new jp.wasabeef.picasso.transformations.RoundedCornersTransformation(20, 0))
                     .placeholder(R.mipmap.ic_launcher_web)
                     .into(imageView);
+
+            if (preferences.getBoolean("Animate_Albumart", true)) {
+                ViewAnimator
+                        .animate(imageView)
+                        .flipVertical()
+                        .decelerate()
+                        .duration(1000)
+                        .start();
+            }
+
+
+
 
             //TODO:Fix Palette API
 //            if (imageView.getDrawable() != null){
@@ -353,7 +366,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE ||
                 MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED){
             playPause.setImageResource(R.mipmap.ic_play);
-        }else playPause.setImageResource(R.mipmap.ic_pause);
+        }else {
+            playPause.setImageResource(R.mipmap.ic_pause);
+        }
         playPause.setOnClickListener(this);
 
         //Loop Button
@@ -454,9 +469,33 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                             MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED ||
                             MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE) {
                         MediaControllerCompat.getMediaController(this).getTransportControls().play();
+                        if (preferences.getBoolean("Animate_Playpause", false)) {
+                            ViewAnimator
+                                    .animate(playPause)
+                                    .rollOut()
+                                    .duration(300)
+                                    .accelerate()
+                                    .thenAnimate(playPause)
+                                    .rollIn()
+                                    .duration(200)
+                                    .decelerate()
+                                    .start();
+                        }
                         userStopped = false;
                     } else {
                         MediaControllerCompat.getMediaController(this).getTransportControls().pause();
+                        if (preferences.getBoolean("Animate_Playpause", false)) {
+                            ViewAnimator
+                                    .animate(playPause)
+                                    .rollOut()
+                                    .duration(300)
+                                    .accelerate()
+                                    .thenAnimate(playPause)
+                                    .rollIn()
+                                    .duration(200)
+                                    .decelerate()
+                                    .start();
+                        }
                         userStopped = true;
                     }
                 }else {
