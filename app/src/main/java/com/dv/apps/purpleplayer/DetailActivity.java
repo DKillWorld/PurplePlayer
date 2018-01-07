@@ -2,6 +2,7 @@ package com.dv.apps.purpleplayer;
 
 import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -285,36 +287,62 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
 
-//            public void onSwipeTop() {
-//                if (MusicService.getInstance().mediaSessionCompat.isActive()) {
-//                    MaterialDialog dialog = new MaterialDialog.Builder(DetailActivity.this)
-//                            .customView(R.layout.tag_editor_activity, true)
-//                            .cancelable(true)
-//                            .positiveText(R.string.ok)
-//                            .show();
-//                    final EditText eT1 = dialog.getCustomView().findViewById(R.id.editText);
-//                    final EditText eT2 = dialog.getCustomView().findViewById(R.id.editText2);
-//
-//                    eT1.setText(MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getDescription().getTitle());
-//                    eT2.setText(MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getDescription().getSubtitle());
-//
-//                    final String textToSearch = eT1.getText().toString();
-//
-//                    dialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
-//                        @Override
-//                        public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-//                            ContentValues contentValues = new ContentValues();
-//                            contentValues.put(MediaStore.Audio.Media.TITLE, eT1.getText().toString());
-//                            contentValues.put(MediaStore.Audio.Media.ARTIST, eT2.getText().toString());
-//
-//                            boolean success = getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues,
-//                                    MediaStore.Audio.Media.TITLE + "= \"" + textToSearch + "\"",null  ) == 1;
-//
-//
-//                        }
-//                    });
-//                }
-//            }
+            public void onSwipeTop() {
+                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
+                    if (MusicService.getInstance().mediaSessionCompat.isActive()) {
+                        MaterialDialog dialog = new MaterialDialog.Builder(DetailActivity.this)
+                                .customView(R.layout.tag_editor_activity, true)
+                                .cancelable(true)
+                                .positiveText(R.string.ok)
+                                .title("Simple Tag Editor")
+                                .show();
+                        final EditText eT1 = dialog.getCustomView().findViewById(R.id.editText);
+                        final EditText eT2 = dialog.getCustomView().findViewById(R.id.editText2);
+
+                        eT1.setText(MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getDescription().getTitle());
+                        eT2.setText(MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getDescription().getSubtitle());
+
+                        final String textToSearch = eT1.getText().toString();
+
+                        dialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put(MediaStore.Audio.Media.TITLE, eT1.getText().toString());
+                                contentValues.put(MediaStore.Audio.Media.ARTIST, eT2.getText().toString());
+
+                                boolean success = getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues,
+                                        MediaStore.Audio.Media.TITLE + "= \"" + textToSearch + "\"", null) == 1;
+                                if (success){
+                                    MusicService.getInstance().getSong().setTile(eT1.getText().toString());
+                                    MusicService.getInstance().getSong().setArtist(eT2.getText().toString());
+                                }
+                                MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().pause();
+                                MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().play();
+
+
+                            }
+                        });
+                    }
+                }else {
+//                    Toast.makeText(DetailActivity.this, "Tag editor is pro feature", Toast.LENGTH_SHORT).show();
+                    MaterialDialog dialog = new MaterialDialog.Builder(DetailActivity.this)
+                            .content("• \"Simple Tag Editor\" is pro feature. \n• You can edit track \"Title\" and \"Artist\" with it." +
+                                    "\n• Get \"Simple Tag Editor\" + all transition effects + remove all ads by upgrading to pro.")
+                            .cancelable(true)
+                            .positiveText(R.string.upgradeToPurplePlayerPro)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                                    startActivity(intent);
+                                }
+                            })
+                            .title(R.string.info)
+                            .show();
+                }
+            }
         });
 //        Glide.with(getApplicationContext())
 //                .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())

@@ -3,7 +3,6 @@ package com.dv.apps.purpleplayer.Models;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -36,6 +35,10 @@ public class Song {
         return title;
     }
 
+    public void setTile(String title){
+        this.title = title;
+    }
+
     public long getId(){
         return id;
     }
@@ -46,6 +49,10 @@ public class Song {
 
     public String getArtist(){
         return artist;
+    }
+
+    public void setArtist(String artist){
+        this.artist = artist;
     }
 
     public Uri getImage() {

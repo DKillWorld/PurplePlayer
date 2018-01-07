@@ -9,11 +9,13 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 
@@ -108,6 +110,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         .title(R.string.faq)
                         .content("Q. Is this project open-source? \nA: Shhh! Not Yet. \n\n" +
                                 "Q. How can I see Now Playing songs list? \nA: Just swipe down on albumart, as easy as that.\n\n" +
+                                "Q. How can I edit tags? \nA: Just swipe up on albumart.\n\n" +
                                 "Q. How can I create my playlist? \nA: You can only play created playlists. Support for creating new playlist will be added soon ! \n\n" +
                                 "Q. After changing app primary color, all songs disappeared. What to do? \nA: This happens when you change from dark actionbar theme to light or vice-versa. However, a quick restart will fix this issue. \n\n" +
                                 "Q. I found a bug. Where/How to report? \nA: Shoot an email describing the bug and steps to reproduce it.\n\n" +
@@ -167,8 +170,32 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         CheckBoxPreference useAlbumArtBackground = (CheckBoxPreference) findPreference("Use_Root_Background");
 
-        ListPreference transition = (ListPreference) findPreference("transition_effect");
+        final ListPreference transition = (ListPreference) findPreference("transition_effect");
         transition.setSummary(preferences.getString("transition_effect", "Default"));
+        transition.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+                    if (!(newValue.equals("Default") || newValue.equals("Accordion"))) {
+                        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                                .content("• Only \"Default\" and \"Accordion\" transitions available. \n• Get all transition effects + \"Simple Tag Editor\" + remove all ads by upgrading to pro.")
+                                .cancelable(true)
+                                .positiveText(R.string.upgradeToPurplePlayerPro)
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                                        startActivity(intent);
+                                    }
+                                })
+                                .title(R.string.info)
+                                .show();
+                    }
+                }
+                return true;
+            }
+        });
 
 
     }

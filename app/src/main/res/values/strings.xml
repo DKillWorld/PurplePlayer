@@ -1,8 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
     <string name="app_name" translatable="false">Purple Player</string>
     <string name="title_activity_navigation" translatable="false">NavigationActivity</string>
 
-    <string-array name="transition_selector">
+    <string-array name="transition_selector" >
         <item>Default</item>
         <item>Accordion</item>
         <item>BackgroundToForeground</item>
@@ -21,7 +22,7 @@
         <item>ZoomOutSlide</item>
     </string-array>
 
-    <string-array name="transition_selector_values">
+    <string-array name="transition_selector_values" translateble="false">
         <item>Default</item>
         <item>Accordion</item>
         <item>BackgroundToForeground</item>
@@ -117,7 +118,7 @@
     <string name="restartApp">Ads removed for today! Restart app.</string>
     <string name="later">Later</string>
     <string name="removeAdsForDay">Watch video ad and get ad-free experience for today.</string>
-    <string name="changeTransition">Transition effect</string>
+    <string name="changeTransition" translatable="false">Transition effect</string>
 
 
 </resources>

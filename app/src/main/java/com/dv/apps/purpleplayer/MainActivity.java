@@ -217,11 +217,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupDrawerLayout2();
         setupPermissions(); //This encloses setupTabLayout && Permissions
 
+        validate();
+
         //Getting Views & Applying Theme
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         tvMain = (TextView) findViewById(R.id.tvMain);
-
-        purple();
     }
 
     public void buildTransportControls(){
@@ -551,59 +551,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setupTransitionEffect(String value){
-        switch (value){
-            case "Default":
-                viewPager.setPageTransformer(true, new DefaultTransformer());
-                break;
-            case "Accordion":
-                viewPager.setPageTransformer(true, new AccordionTransformer());
-                break;
-            case "BackgroundToForeground":
-                viewPager.setPageTransformer(true, new BackgroundToForegroundTransformer());
-                break;
-            case "CubeIn":
-                viewPager.setPageTransformer(true, new CubeInTransformer());
-                break;
-            case "CubeOut":
-                viewPager.setPageTransformer(true, new CubeOutTransformer());
-                break;
-            case "DepthPage":
-                viewPager.setPageTransformer(true, new DepthPageTransformer());
-                break;
-            case "FlipHorizontal":
-                viewPager.setPageTransformer(true, new FlipHorizontalTransformer());
-                break;
-            case "ForegroundToBackground":
-                viewPager.setPageTransformer(true, new ForegroundToBackgroundTransformer());
-                break;
-            case "RotateDown":
-                viewPager.setPageTransformer(true, new RotateDownTransformer());
-                break;
-            case "RotateUp":
-                viewPager.setPageTransformer(true, new RotateUpTransformer());
-                break;
-            case "DrawFromBack":
-                viewPager.setPageTransformer(true, new DrawFromBackTransformer());
-                break;
-            case "Stack":
-                viewPager.setPageTransformer(true, new StackTransformer());
-                break;
-            case "Tablet":
-                viewPager.setPageTransformer(true, new TabletTransformer());
-                break;
-            case "ZoomIn":
-                viewPager.setPageTransformer(true, new ZoomInTransformer());
-                break;
-            case "ZoomOut":
-                viewPager.setPageTransformer(true, new ZoomOutTranformer());
-                break;
-            case "ZoomOutSlide":
-                viewPager.setPageTransformer(true, new ZoomOutSlideTransformer());
-                break;
-            default:
-                viewPager.setPageTransformer(true, new AccordionTransformer());
-                break;
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
+            switch (value) {
+                case "Default":
+                    viewPager.setPageTransformer(true, new DefaultTransformer());
+                    break;
+                case "Accordion":
+                    viewPager.setPageTransformer(true, new AccordionTransformer());
+                    break;
+                case "BackgroundToForeground":
+                    viewPager.setPageTransformer(true, new BackgroundToForegroundTransformer());
+                    break;
+                case "CubeIn":
+                    viewPager.setPageTransformer(true, new CubeInTransformer());
+                    break;
+                case "CubeOut":
+                    viewPager.setPageTransformer(true, new CubeOutTransformer());
+                    break;
+                case "DepthPage":
+                    viewPager.setPageTransformer(true, new DepthPageTransformer());
+                    break;
+                case "FlipHorizontal":
+                    viewPager.setPageTransformer(true, new FlipHorizontalTransformer());
+                    break;
+                case "ForegroundToBackground":
+                    viewPager.setPageTransformer(true, new ForegroundToBackgroundTransformer());
+                    break;
+                case "RotateDown":
+                    viewPager.setPageTransformer(true, new RotateDownTransformer());
+                    break;
+                case "RotateUp":
+                    viewPager.setPageTransformer(true, new RotateUpTransformer());
+                    break;
+                case "DrawFromBack":
+                    viewPager.setPageTransformer(true, new DrawFromBackTransformer());
+                    break;
+                case "Stack":
+                    viewPager.setPageTransformer(true, new StackTransformer());
+                    break;
+                case "Tablet":
+                    viewPager.setPageTransformer(true, new TabletTransformer());
+                    break;
+                case "ZoomIn":
+                    viewPager.setPageTransformer(true, new ZoomInTransformer());
+                    break;
+                case "ZoomOut":
+                    viewPager.setPageTransformer(true, new ZoomOutTranformer());
+                    break;
+                case "ZoomOutSlide":
+                    viewPager.setPageTransformer(true, new ZoomOutSlideTransformer());
+                    break;
+                default:
+                    viewPager.setPageTransformer(true, new AccordionTransformer());
+                    break;
 
+            }
+        }else {
+            switch (value) {
+                case "Default":
+                    viewPager.setPageTransformer(true, new DefaultTransformer());
+                    break;
+                case "Accordion":
+                default:
+                    viewPager.setPageTransformer(true, new AccordionTransformer());
+                    break;
+            }
         }
     }
 
@@ -671,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    private void purple(){
+    private void validate(){
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
             checker = new PiracyChecker(this)
                     .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
