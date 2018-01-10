@@ -9,8 +9,8 @@ android {
         applicationId "com.dv.apps.purpleplayer"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 58
-        versionName '2.5.2'
+        versionCode 60
+        versionName '2.5.3'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.android.support:design:26.0.1'
     implementation 'com.android.support:preference-v7:26.0.1'
     implementation 'com.android.support:support-v4:26.0.1'
-    //    implementation 'com.android.support:palette-v7:26.0.1'
+    implementation 'com.android.support:palette-v7:26.0.1'
     implementation 'com.github.bumptech.glide:glide:4.3.1'
     implementation 'jp.wasabeef:glide-transformations:3.0.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'

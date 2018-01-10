@@ -17,6 +17,13 @@
             android:key="accent_color"
             android:summary="@string/changeAccentColor"
             android:title="@string/accentColor"/>
+        <!--<CheckBoxPreference-->
+            <!--android:key="auto_color"-->
+            <!--android:title="Auto change theme with albumart"-->
+            <!--android:summaryOn="Auto"-->
+            <!--android:summaryOff="Off"-->
+            <!--android:defaultValue="false"/>-->
+
 
         <!--<Preference-->
         <!--android:key="playback_speed"-->

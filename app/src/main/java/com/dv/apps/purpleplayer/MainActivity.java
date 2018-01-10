@@ -35,6 +35,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +67,7 @@ import com.eftimoff.viewpagertransformers.TabletTransformer;
 import com.eftimoff.viewpagertransformers.ZoomInTransformer;
 import com.eftimoff.viewpagertransformers.ZoomOutSlideTransformer;
 import com.eftimoff.viewpagertransformers.ZoomOutTranformer;
+import com.github.florent37.viewanimator.ViewAnimator;
 import com.github.javiersantos.piracychecker.PiracyChecker;
 import com.github.javiersantos.piracychecker.enums.Display;
 import com.github.javiersantos.piracychecker.enums.InstallerID;
@@ -165,6 +167,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             super.onMetadataChanged(metadata);
             tvMain.setText(metadata.getDescription().getTitle());
+            LinearLayout tvMainView = findViewById(R.id.tvMainLayout);
+            ViewAnimator
+                    .animate(tvMainView)
+                    .bounce()
+                    .accelerate()
+                    .duration(1000)
+                    .start();
 
         }
     };
@@ -352,18 +361,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
             result.addItem(new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day")
                     .withIcon(R.drawable.ic_drawer_buypro).withSelectable(false));
-            new MaterialDialog.Builder(this)
-                    .content(R.string.removeAdsForDay)
-                    .title(R.string.info)
-                    .positiveText(R.string.ok)
-                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                            showRewardedVideo();
-                        }
-                    })
-                    .negativeText(R.string.later)
-                    .show();
+            if (!getSupportFragmentManager().isDestroyed()) {
+                new MaterialDialog.Builder(this)
+                        .content(R.string.removeAdsForDay)
+                        .title(R.string.info)
+                        .positiveText(R.string.ok)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                showRewardedVideo();
+                            }
+                        })
+                        .negativeText(R.string.later)
+                        .show();
+            }
         }
     }
 
@@ -465,6 +476,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 })
                 .build();
+
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")){
+            result.removeItem(8);
+        }
 
         actionBarToggle = new ActionBarDrawerToggle(this,result.getDrawerLayout(), R.string.navigation_drawer_open, R.string.navigation_drawer_close){
             @Override
@@ -686,8 +701,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void validate(){
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
             checker = new PiracyChecker(this)
-                    .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
-                    .saveResultToSharedPreferences(preferences, "valid_license")
+//                    .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
+//                    .saveResultToSharedPreferences(preferences, "valid_license")
 //                    .enableSigningCertificate("ldgUxo13aF54Jsqay5L9W/S4/g0=")     google
 //                    .enableSigningCertificate("uxh/RlppBQNr/6nlf3bO4UmKmNg=")
                     .enableUnauthorizedAppsCheck()

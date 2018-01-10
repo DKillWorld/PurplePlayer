@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.dv.apps.purpleplayer.Models.Artist;
 import com.dv.apps.purpleplayer.R;
+import com.github.florent37.viewanimator.ViewAnimator;
 
 import java.util.ArrayList;
 
@@ -81,6 +82,12 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
 //                .into(myholder.imageView);
 
 
+        ViewAnimator
+                .animate(view)
+                .slideRight()
+                .decelerate()
+                .duration(300)
+                .start();
 
         return view;
     }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.dv.apps.purpleplayer.Models.Album;
 import com.dv.apps.purpleplayer.R;
+import com.github.florent37.viewanimator.ViewAnimator;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -88,6 +89,13 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
                 .placeholder(R.mipmap.ic_launcher)
                 .into(myholder.imageView);
 
+
+        ViewAnimator
+                .animate(view)
+                .slideRight()
+                .decelerate()
+                .duration(300)
+                .start();
 
         return view;
     }

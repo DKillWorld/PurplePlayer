@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -24,6 +25,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
@@ -46,7 +48,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.Utils.OnSwipeTouchListener;
+import com.dv.apps.purpleplayer.Utils.PurpleColorHelper;
 import com.github.florent37.viewanimator.ViewAnimator;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -138,7 +142,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .load(metadata.getDescription().getIconUri())
                     .transform(new jp.wasabeef.picasso.transformations.RoundedCornersTransformation(20, 0))
                     .placeholder(R.mipmap.ic_launcher_web)
-                    .into(imageView);
+                    .into(imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+//                            if (preferences.getBoolean("auto_color", false)) {
+//                                getAutoColor();
+//                            }
+                            getAutoBackground();
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
 
             if (preferences.getBoolean("Animate_Albumart", true)) {
                 ViewAnimator
@@ -149,27 +166,34 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         .start();
             }
 
+        }
+    };
 
+    public void getAutoColor(){
+        if (imageView.getDrawable() != null){
+            Palette palette = PurpleColorHelper.generatePalette(((BitmapDrawable) imageView.getDrawable()).getBitmap());
 
+            int color = PurpleColorHelper.getColor(palette, MainActivity.PRIMARY_COLOR_DEFAULT);
 
-            //TODO:Fix Palette API
-//            if (imageView.getDrawable() != null){
-//            Palette palette = Palette.from(((BitmapDrawable) imageView.getDrawable()).getBitmap()).generate();
-//
-//                int vibrant = palette.getVibrantSwatch().getRgb();
-//                int muted = palette.getMutedSwatch().getRgb();
-//                int darkVibrant = palette.getDarkVibrantSwatch().getRgb();
-//                int darkMuted = palette.getDarkMutedSwatch().getRgb();
-//                int lightVibrant = palette.getLightVibrantSwatch().getRgb();
-//                int lightMuted = palette.getLightMutedSwatch().getRgb();
-//
-//            Aesthetic.get()
-//                    .colorPrimary(vibrant)
-//                    .colorStatusBarAuto()
-//                    .apply();
-//            }
+//            int vibrant = palette.getVibrantSwatch().getRgb();
+//            int muted = palette.getMutedSwatch().getRgb();
+//            int darkVibrant = palette.getDarkVibrantSwatch().getRgb();
+//            int darkMuted = palette.getDarkMutedSwatch().getRgb();
+//            int lightVibrant = palette.getLightVibrantSwatch().getRgb();
+//            int lightMuted = palette.getLightMutedSwatch().getRgb();
 
-            if (preferences.getBoolean("Use_Root_Background", false)) {
+            Aesthetic.get()
+                    .colorPrimary(color)
+                    .colorStatusBarAuto()
+                    .colorNavigationBarAuto()
+                    .apply();
+
+            currentPrimaryColor = color;
+        }
+    }
+
+    public void getAutoBackground(){
+        if (preferences.getBoolean("Use_Root_Background", false)) {
 //                Glide.with(getApplicationContext())
 //                        .load(metadata.getDescription().getIconUri())
 //                        .apply(new RequestOptions().placeholder(rootBackground.getDrawable()).error(R.mipmap.background_list))
@@ -177,14 +201,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //                        .transition(DrawableTransitionOptions.withCrossFade())
 //                        .into(rootBackground);
 
-                Picasso.with(getApplicationContext())
-                        .load(metadata.getDescription().getIconUri())
-                        .fit()
-                        .error(new ColorDrawable(currentPrimaryColor))
-                        .placeholder(rootBackground.getDrawable())
-                        .transform(new BlurTransformation(getApplicationContext(), 20))
-                        .into(rootBackground);
-            }else{
+            Picasso.with(getApplicationContext())
+                    .load(MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getIconUri())
+                    .fit()
+                    .error(new ColorDrawable(currentPrimaryColor))
+                    .placeholder(rootBackground.getDrawable())
+                    .transform(new BlurTransformation(getApplicationContext(), 20))
+                    .into(rootBackground);
+        }else{
 //                Glide.with(getApplicationContext())
 //                        .load(R.mipmap.background_list)
 //                        .transition(DrawableTransitionOptions.withCrossFade())
@@ -193,14 +217,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //                    rootBackground.setColorFilter(Aesthetic.get().colorPrimary().blockingFirst(), PorterDuff.Mode.OVERLAY);
 //                }
 
-                Picasso.with(getApplicationContext())
-                        .load(R.mipmap.background_list)
-                        .fit()
-                        .transform(new ColorFilterTransformation(ColorUtils.setAlphaComponent(currentPrimaryColor, 100)))
-                        .into(rootBackground);
-            }
+            Picasso.with(getApplicationContext())
+                    .load(R.mipmap.background_list)
+                    .fit()
+                    .transform(new ColorFilterTransformation(ColorUtils.setAlphaComponent(currentPrimaryColor, 100)))
+                    .into(rootBackground);
         }
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
