@@ -19,7 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -53,16 +53,12 @@ import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.eftimoff.viewpagertransformers.AccordionTransformer;
 import com.eftimoff.viewpagertransformers.BackgroundToForegroundTransformer;
-import com.eftimoff.viewpagertransformers.CubeInTransformer;
 import com.eftimoff.viewpagertransformers.CubeOutTransformer;
 import com.eftimoff.viewpagertransformers.DefaultTransformer;
 import com.eftimoff.viewpagertransformers.DepthPageTransformer;
-import com.eftimoff.viewpagertransformers.DrawFromBackTransformer;
-import com.eftimoff.viewpagertransformers.FlipHorizontalTransformer;
 import com.eftimoff.viewpagertransformers.ForegroundToBackgroundTransformer;
 import com.eftimoff.viewpagertransformers.RotateDownTransformer;
 import com.eftimoff.viewpagertransformers.RotateUpTransformer;
-import com.eftimoff.viewpagertransformers.StackTransformer;
 import com.eftimoff.viewpagertransformers.TabletTransformer;
 import com.eftimoff.viewpagertransformers.ZoomInTransformer;
 import com.eftimoff.viewpagertransformers.ZoomOutSlideTransformer;
@@ -510,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setupTabLayout(){
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.viewpager);
-        FragmentPagerAdapter fragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
+        FragmentStatePagerAdapter fragmentStatePagerAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int i) {
                 Fragment fragment;
@@ -559,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
-        viewPager.setAdapter(fragmentPagerAdapter);
+        viewPager.setAdapter(fragmentStatePagerAdapter);
         setupTransitionEffect(preferences.getString("transition_effect", "Default"));
         tabLayout.setupWithViewPager(viewPager);
 
@@ -577,18 +573,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case "BackgroundToForeground":
                     viewPager.setPageTransformer(true, new BackgroundToForegroundTransformer());
                     break;
-                case "CubeIn":
-                    viewPager.setPageTransformer(true, new CubeInTransformer());
-                    break;
+////                case "CubeIn":
+//                    viewPager.setPageTransformer(true, new CubeInTransformer());
+//                    break;
                 case "CubeOut":
                     viewPager.setPageTransformer(true, new CubeOutTransformer());
                     break;
                 case "DepthPage":
                     viewPager.setPageTransformer(true, new DepthPageTransformer());
                     break;
-                case "FlipHorizontal":
-                    viewPager.setPageTransformer(true, new FlipHorizontalTransformer());
-                    break;
+//                case "FlipHorizontal":
+//                    viewPager.setPageTransformer(true, new FlipHorizontalTransformer());
+//                    break;
                 case "ForegroundToBackground":
                     viewPager.setPageTransformer(true, new ForegroundToBackgroundTransformer());
                     break;
@@ -598,12 +594,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case "RotateUp":
                     viewPager.setPageTransformer(true, new RotateUpTransformer());
                     break;
-                case "DrawFromBack":
-                    viewPager.setPageTransformer(true, new DrawFromBackTransformer());
-                    break;
-                case "Stack":
-                    viewPager.setPageTransformer(true, new StackTransformer());
-                    break;
+//                case "DrawFromBack":
+//                    viewPager.setPageTransformer(true, new DrawFromBackTransformer());
+//                    break;
+//                case "Stack":
+//                    viewPager.setPageTransformer(true, new StackTransformer());
+//                    break;
                 case "Tablet":
                     viewPager.setPageTransformer(true, new TabletTransformer());
                     break;
@@ -662,6 +658,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

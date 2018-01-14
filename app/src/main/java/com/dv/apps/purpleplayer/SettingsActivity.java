@@ -50,7 +50,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                     .lightStatusBarMode(AutoSwitchMode.AUTO)
                     .colorNavigationBarAuto()
                     .textColorSecondaryInverseRes(android.R.color.white)
-                    .isDark(true)
+                    .isDark(false)
                     .apply();
 
             Toast.makeText(this, R.string.restartAppIfThemeChanged, Toast.LENGTH_LONG).show();

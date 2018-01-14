@@ -9,7 +9,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
@@ -183,7 +182,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 .positiveText(R.string.upgradeToPurplePlayerPro)
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
-                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                         Intent intent = new Intent(Intent.ACTION_VIEW);
                                         intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
                                         startActivity(intent);

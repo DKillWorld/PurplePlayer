@@ -138,7 +138,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //                    .transition(DrawableTransitionOptions.withCrossFade())
 //                    .into(imageView);
 
-            Picasso.with(getApplicationContext())
+            Picasso.with(DetailActivity.this)
                     .load(metadata.getDescription().getIconUri())
                     .transform(new jp.wasabeef.picasso.transformations.RoundedCornersTransformation(20, 0))
                     .placeholder(R.mipmap.ic_launcher_web)

@@ -7,15 +7,15 @@
         <item>Default</item>
         <item>Accordion</item>
         <item>BackgroundToForeground</item>
-        <item>CubeIn</item>
+        <!--<item>CubeIn</item>-->
         <item>CubeOut</item>
         <item>DepthPage</item>
-        <item>FlipHorizontal</item>
+        <!--<item>FlipHorizontal</item>-->
         <item>ForegroundToBackground</item>
         <item>RotateDown</item>
         <item>RotateUp</item>
-        <item>DrawFromBack</item>
-        <item>Stack</item>
+        <!--<item>DrawFromBack</item>-->
+        <!--<item>Stack</item>-->
         <item>Tablet</item>
         <item>ZoomIn</item>
         <item>ZoomOut</item>
@@ -26,15 +26,15 @@
         <item>Default</item>
         <item>Accordion</item>
         <item>BackgroundToForeground</item>
-        <item>CubeIn</item>
+        <!--<item>CubeIn</item>-->
         <item>CubeOut</item>
         <item>DepthPage</item>
-        <item>FlipHorizontal</item>
+        <!--<item>FlipHorizontal</item>-->
         <item>ForegroundToBackground</item>
         <item>RotateDown</item>
         <item>RotateUp</item>
-        <item>DrawFromBack</item>
-        <item>Stack</item>
+        <!--<item>DrawFromBack</item>-->
+        <!--<item>Stack</item>-->
         <item>Tablet</item>
         <item>ZoomIn</item>
         <item>ZoomOut</item>

@@ -10,9 +10,7 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:icon="@drawable/ic_search_white"
         android:orderInCategory="100"
-        >
-
-    </item>
+        />
     <item android:id="@+id/equilizer"
         android:title="@string/equalizer"
         android:orderInCategory="200"/>
