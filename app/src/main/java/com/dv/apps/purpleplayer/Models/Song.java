@@ -13,7 +13,6 @@ import java.io.IOException;
 /**
  * Created by Dhaval on 01-07-2017.
  */
-
 public class Song {
 
     private String title, artist;

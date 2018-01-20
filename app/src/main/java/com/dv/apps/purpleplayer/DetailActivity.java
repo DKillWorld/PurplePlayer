@@ -520,31 +520,43 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                             MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_STOPPED ||
                             MediaControllerCompat.getMediaController(this).getPlaybackState().getState() == PlaybackStateCompat.STATE_NONE) {
                         MediaControllerCompat.getMediaController(this).getTransportControls().play();
-                        if (preferences.getBoolean("Animate_Playpause", false)) {
+                        if (preferences.getBoolean("Animate_Playpause", true)) {
+//                            ViewAnimator
+//                                    .animate(playPause)
+//                                    .rollOut()
+//                                    .duration(300)
+//                                    .accelerate()
+//                                    .thenAnimate(playPause)
+//                                    .rollIn()
+//                                    .duration(200)
+//                                    .decelerate()
+//                                    .start();
                             ViewAnimator
                                     .animate(playPause)
-                                    .rollOut()
-                                    .duration(300)
-                                    .accelerate()
-                                    .thenAnimate(playPause)
-                                    .rollIn()
-                                    .duration(200)
+                                    .rotation(360)
                                     .decelerate()
+                                    .duration(300)
                                     .start();
                         }
                         userStopped = false;
                     } else {
                         MediaControllerCompat.getMediaController(this).getTransportControls().pause();
-                        if (preferences.getBoolean("Animate_Playpause", false)) {
+                        if (preferences.getBoolean("Animate_Playpause", true)) {
+//                            ViewAnimator
+//                                    .animate(playPause)
+//                                    .rollOut()
+//                                    .duration(300)
+//                                    .accelerate()
+//                                    .thenAnimate(playPause)
+//                                    .rollIn()
+//                                    .duration(200)
+//                                    .decelerate()
+//                                    .start();
                             ViewAnimator
                                     .animate(playPause)
-                                    .rollOut()
-                                    .duration(300)
-                                    .accelerate()
-                                    .thenAnimate(playPause)
-                                    .rollIn()
-                                    .duration(200)
+                                    .rotation(0)
                                     .decelerate()
+                                    .duration(300)
                                     .start();
                         }
                         userStopped = true;

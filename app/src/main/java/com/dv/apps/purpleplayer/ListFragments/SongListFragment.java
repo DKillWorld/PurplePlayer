@@ -70,6 +70,7 @@ public class SongListFragment extends Fragment{
                 Song tempSong = adapter.getItem(position);
                 Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
                 Bundle bundle = new Bundle();
+//                bundle.putParcelable("Song", Parcels.wrap(tempSong));
                 bundle.putInt("Pos", songList.indexOf(tempSong));
                 MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
                         .playFromUri(playUri, bundle);

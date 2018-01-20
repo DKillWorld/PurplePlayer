@@ -9,8 +9,8 @@ android {
         applicationId "com.dv.apps.purpleplayer"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 60
-        versionName '2.5.3'
+        versionCode 61
+        versionName '2.5.4'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -64,6 +64,8 @@ dependencies {
     implementation 'com.github.javiersantos:PiracyChecker:1.1'
     implementation 'com.eftimoff:android-viewpager-transformers:1.0.1@aar'
     implementation 'com.github.florent37:viewanimator:1.0.5'
+    implementation 'org.parceler:parceler-api:1.1.9'
+    annotationProcessor 'org.parceler:parceler:1.1.9'
     implementation('com.mikepenz:materialdrawer:6.0.2@aar') {
         transitive = true
     }

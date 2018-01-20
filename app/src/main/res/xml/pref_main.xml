@@ -41,7 +41,7 @@
         <CheckBoxPreference
             android:key="Animate_Playpause"
             android:title="Animate playpause button"
-            android:defaultValue="false"/>
+            android:defaultValue="true"/>
         <ListPreference
             android:key="transition_effect"
             android:title="@string/changeTransition"
