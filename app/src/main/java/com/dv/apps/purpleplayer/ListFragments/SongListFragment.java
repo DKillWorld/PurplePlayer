@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v7.widget.SearchView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.Models.Song;
@@ -57,6 +59,7 @@ public class SongListFragment extends Fragment{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         listView = view.findViewById(R.id.fragment_song_list);
         listView.setFastScrollEnabled(true);
+        registerForContextMenu(listView);
         setHasOptionsMenu(true);
         this.songList = getSongs();
 
@@ -149,5 +152,32 @@ public class SongListFragment extends Fragment{
         }
         MusicService.getInstance().setGlobalSongList(songList);
         return songList;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getActivity().getMenuInflater().inflate(R.menu.menu_song_context, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if ((MusicService.getInstance().songList != null) && (MusicService.getInstance().songList.size() != 0)) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            switch (item.getItemId()) {
+                case R.id.play_next:
+                    MusicService.getInstance().songList.add(MusicService.getInstance().songPosn + 1, adapter.getItem(info.position));
+                    Toast.makeText(getActivity(), "Playing next", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.add_to_queue:
+                    MusicService.getInstance().songList.add(adapter.getItem(info.position));
+                    Toast.makeText(getActivity(), "Added to queue", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.add_to_playlist:
+                    break;
+            }
+        }else {
+            Toast.makeText(getActivity(), R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();
+        }
+        return true;
     }
 }

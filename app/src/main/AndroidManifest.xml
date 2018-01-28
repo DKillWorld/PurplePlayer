@@ -44,8 +44,9 @@
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".RadioActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".RadioActivity"
+            android:parentActivityName=".MainActivity" />
 
         <service android:name=".MusicService">
             <intent-filter>
@@ -56,6 +57,15 @@
         <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".Utils.SleepTimerReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.dv.action.sleeptimer"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
     </application>

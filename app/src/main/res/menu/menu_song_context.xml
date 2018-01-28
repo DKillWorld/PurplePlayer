@@ -4,6 +4,8 @@
 
     <item android:title="Play next"
         android:id="@+id/play_next"/>
-    <item android:title="Go to artist"
-        android:id="@+id/go_to_artist"/>
+    <item android:title="Add to queue"
+        android:id="@+id/add_to_queue"/>
+    <item android:title="Add to playlist"
+        android:id="@+id/add_to_playlist"/>
 </menu>

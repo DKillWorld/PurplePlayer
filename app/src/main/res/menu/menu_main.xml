@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/setting_menu" android:title="@string/action_settings"
-        android:orderInCategory="300"/>
-    <item android:id="@+id/about_menu" android:title="@string/about"
         android:orderInCategory="400"/>
+    <item android:id="@+id/about_menu" android:title="@string/about"
+        android:orderInCategory="500"/>
     <item android:id="@+id/search"
         app:showAsAction="collapseActionView|ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"
@@ -14,9 +14,12 @@
     <item android:id="@+id/equilizer"
         android:title="@string/equalizer"
         android:orderInCategory="200"/>
+    <item android:id="@+id/sleep_timer"
+        android:title="@string/sleep_timer"
+        android:orderInCategory="300"/>
     <item android:id="@+id/close"
         app:showAsAction="always"
         android:visible="false"
         android:icon="@drawable/ic_close_white_24dp"
-        android:orderInCategory="500"/>
+        android:orderInCategory="600"/>
 </menu>

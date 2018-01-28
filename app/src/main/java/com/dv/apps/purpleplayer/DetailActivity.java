@@ -153,7 +153,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
                         @Override
                         public void onError() {
-
+                            getAutoBackground();
                         }
                     });
 
@@ -307,6 +307,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                                     .playFromUri(playUri, bundle);
                         }
                     });
+//                    FloatingActionButton floatingActionButton = dialog.getCustomView().findViewById(R.id.playFab);
+//                    floatingActionButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            Collections.shuffle(MusicService.getInstance().songList);
+//                            songAdapter.notifyDataSetChanged();
+//                        }
+//                    });
                 }
             }
 

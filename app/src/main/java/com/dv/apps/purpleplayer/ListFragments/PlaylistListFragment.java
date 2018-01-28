@@ -168,6 +168,9 @@ public class PlaylistListFragment extends Fragment {
                 listView.setAdapter(playlistAdapter);
                 playlistAdapter.getFilter().filter("");
                 getActivity().invalidateOptionsMenu();
+//                ContentValues cv = new ContentValues();
+//                cv.put(MediaStore.Audio.Playlists.NAME, "New 21/01");
+//                getActivity().getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

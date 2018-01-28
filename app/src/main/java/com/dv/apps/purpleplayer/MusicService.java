@@ -31,6 +31,8 @@ import com.dv.apps.purpleplayer.Utils.MediaStyleHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -45,7 +47,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
     MediaPlayer mediaPlayer;
     public ArrayList<Song> songList;
     public ArrayList<Song> globalSongList;
-    int songPosn;
+    public int songPosn;
+    public int[] lastSongPosn = new int[]{-1, -1, -1};
     static boolean systemStopped = false;
     public static boolean userStopped = false;
     static boolean randomize = false;
@@ -291,7 +294,18 @@ public class MusicService extends MediaBrowserServiceCompat implements
     }
 
     public void playPrev(){
-        songPosn--;
+        if (randomize){
+            if ((lastSongPosn[0] != -1) && lastSongPosn[0] != songPosn) {
+                songPosn = lastSongPosn[0];
+                lastSongPosn[0] = lastSongPosn[1];
+                lastSongPosn[1] = lastSongPosn[2];
+                lastSongPosn[2] = -1;
+            }else {
+                songPosn--;
+            }
+        }else {
+            songPosn--;
+        }
         if (songPosn == -1){
             songPosn = songList.size() - 1;
         }
@@ -300,6 +314,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     public void playNext(){
         if (randomize){
+            lastSongPosn[2] = lastSongPosn[1];
+            lastSongPosn[1] = lastSongPosn[0];
+            lastSongPosn[0] = songPosn;
             songPosn = getRandom();
         }else {
             songPosn++;
@@ -384,7 +401,13 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
     //get random song when randomize/shuffle ON
     public int getRandom(){
-        return new Random().nextInt(songList.size());
+        int[] nums = new int[songList.size()];
+        for (int i = 0; i < songList.size(); i++){
+            nums[i] = i;
+        }
+        Collections.shuffle(Arrays.asList(nums));
+        return new Random().nextInt(nums.length);
+
     }
 
     @Override

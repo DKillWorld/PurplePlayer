@@ -1,8 +1,12 @@
 package com.dv.apps.purpleplayer;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -26,18 +30,16 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
@@ -51,6 +53,7 @@ import com.dv.apps.purpleplayer.ListFragments.GenreListFragment;
 import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
+import com.dv.apps.purpleplayer.Utils.SleepTimerReceiver;
 import com.eftimoff.viewpagertransformers.AccordionTransformer;
 import com.eftimoff.viewpagertransformers.BackgroundToForegroundTransformer;
 import com.eftimoff.viewpagertransformers.CubeOutTransformer;
@@ -96,11 +99,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SongAdapter adapter;
     ImageButton playPauseMain;
     TextView tvMain;
-    SearchView searchView;
+//    SearchView searchView;
 
-    DrawerLayout drawerlayout;
+//    DrawerLayout drawerlayout;
     TabLayout tabLayout;
-    ListView drawerList;
+//    ListView drawerList;
     ActionBarDrawerToggle actionBarToggle;
     ViewPager viewPager;
     Drawer result;
@@ -112,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private PiracyChecker checker;;
 
-    public static final int LISTVIEW_BACKGROUND_COLOR_DEFAULT = -1;
     public static final int PRIMARY_COLOR_DEFAULT = -15108398;
     public static final int ACCENT_COLOR_DEFAULT = -10752;
 
@@ -250,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else {
             tvMain.setText(R.string.select_song);
         }
-
 
     }
 
@@ -655,7 +656,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();
                 }
                 break;
-
         }
     }
 
@@ -686,6 +686,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }else {
                     Toast.makeText(this, R.string.noEqualierFound, Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case R.id.sleep_timer:
+                final Calendar calendar = Calendar.getInstance();
+                TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        calendar.set(Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
+
+                        long millis = calendar.getTimeInMillis();
+
+                        Intent intent = new Intent(MainActivity.this, SleepTimerReceiver.class);
+                        intent.setAction("com.dv.action.sleeptimer");
+
+                        PendingIntent sleepTimerIntent = PendingIntent
+                                .getBroadcast(MainActivity.this,0, intent, 0);
+
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        alarmManager.set(AlarmManager.RTC, millis, sleepTimerIntent);
+
+                        Toast.makeText(context, "Sleep Timer Set Successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE) + 5, false);
+
+                timePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        Intent intent = new Intent(MainActivity.this, SleepTimerReceiver.class);
+                        intent.setAction("com.dv.action.sleeptimer");
+
+                        PendingIntent sleepTimerIntent = PendingIntent
+                                .getBroadcast(MainActivity.this,0, intent, 0);
+
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        alarmManager.cancel(sleepTimerIntent);
+
+                        Toast.makeText(context, "Sleep Timer Cancelled", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                timePickerDialog.show();
                 break;
             case R.id.close:
                 return false;
