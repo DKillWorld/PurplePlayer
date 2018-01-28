@@ -43,7 +43,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -358,20 +357,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
             result.addItem(new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day")
                     .withIcon(R.drawable.ic_drawer_buypro).withSelectable(false));
-            if (!getSupportFragmentManager().isDestroyed()) {
-                new MaterialDialog.Builder(this)
-                        .content(R.string.removeAdsForDay)
-                        .title(R.string.info)
-                        .positiveText(R.string.ok)
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                showRewardedVideo();
-                            }
-                        })
-                        .negativeText(R.string.later)
-                        .show();
-            }
+//            if (!getSupportFragmentManager().isDestroyed()) {
+//                new MaterialDialog.Builder(this)
+//                        .content(R.string.removeAdsForDay)
+//                        .title(R.string.info)
+//                        .positiveText(R.string.ok)
+//                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+//                            @Override
+//                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+//                                showRewardedVideo();
+//                            }
+//                        })
+//                        .negativeText(R.string.later)
+//                        .show();
+//            }
         }
     }
 
