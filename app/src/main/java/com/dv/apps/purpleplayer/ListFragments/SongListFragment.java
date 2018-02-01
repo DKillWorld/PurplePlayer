@@ -172,8 +172,8 @@ public class SongListFragment extends Fragment{
                     MusicService.getInstance().songList.add(adapter.getItem(info.position));
                     Toast.makeText(getActivity(), "Added to queue", Toast.LENGTH_SHORT).show();
                     break;
-                case R.id.add_to_playlist:
-                    break;
+//                case R.id.add_to_playlist:
+//                    break;
             }
         }else {
             Toast.makeText(getActivity(), R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();

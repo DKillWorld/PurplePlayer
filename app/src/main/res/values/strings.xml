@@ -120,6 +120,7 @@
     <string name="removeAdsForDay">Watch video ad and get ad-free experience for today.</string>
     <string name="changeTransition" translatable="false">Transition effect</string>
     <string name="sleep_timer">Sleep Timer</string>
+    <string name="add_playlist">New Playlist</string>
 
 
 </resources>

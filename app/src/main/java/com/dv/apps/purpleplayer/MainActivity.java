@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -36,6 +38,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,6 +46,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -729,6 +733,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
 
                 timePickerDialog.show();
+                break;
+            case R.id.add_playlist:
+                MaterialDialog dialog = new MaterialDialog.Builder(this)
+                        .title(R.string.add_playlist)
+                        .customView(R.layout.add_playlist, false)
+                        .positiveText(R.string.ok)
+                        .show();
+
+                final EditText editText = dialog.getCustomView().findViewById(R.id.add_playlist_name);
+
+                dialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        String name = editText.getText().toString();
+                        ContentValues cv = new ContentValues();
+                        cv.put(MediaStore.Audio.Playlists.NAME, name);
+
+                        getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
+                    }
+                });
+
                 break;
             case R.id.close:
                 return false;

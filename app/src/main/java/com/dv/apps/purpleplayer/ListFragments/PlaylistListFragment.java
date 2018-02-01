@@ -18,10 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.dv.apps.purpleplayer.ListAdapters.PlaylistAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
@@ -39,7 +39,7 @@ public class PlaylistListFragment extends Fragment {
     boolean in_detail_view = false;
     SearchView searchView;
 
-    ArrayAdapter<String> playlistAdapter;
+    PlaylistAdapter playlistAdapter;
     SongAdapter songAdapter;
     ArrayList<Song> tempSongList;
 
@@ -71,7 +71,7 @@ public class PlaylistListFragment extends Fragment {
                 arrayList.add(albumName);
             } while (playlistCursor.moveToNext());
         }
-        playlistAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item,R.id.songName, arrayList);
+        playlistAdapter = new PlaylistAdapter(getActivity(), arrayList);
         listView.setAdapter(playlistAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
