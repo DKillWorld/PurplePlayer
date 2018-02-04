@@ -40,6 +40,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -86,6 +87,7 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Context context;
     ArrayList<Song> songList;
     SongAdapter adapter;
+    ImageView tvMainImageView;
     ImageButton playPauseMain;
     TextView tvMain;
 //    SearchView searchView;
@@ -168,6 +171,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             super.onMetadataChanged(metadata);
             tvMain.setText(metadata.getDescription().getTitle());
+            Picasso.with(MainActivity.this)
+                    .load(metadata.getDescription().getIconUri())
+                    .placeholder(R.mipmap.ic_launcher_web)
+                    .into(tvMainImageView);
+
             LinearLayout tvMainView = findViewById(R.id.tvMainLayout);
             ViewAnimator
                     .animate(tvMainView)
@@ -232,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Getting Views & Applying Theme
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
         tvMain = (TextView) findViewById(R.id.tvMain);
+        tvMainImageView = (ImageView) findViewById(R.id.tvMainImageView);
     }
 
     public void buildTransportControls(){
@@ -255,6 +264,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else {
             tvMain.setText(R.string.select_song);
         }
+
+        tvMainImageView.setOnClickListener(this);
+        Picasso.with(this)
+                .load(mediaControllerCompat.getMetadata().getDescription().getIconUri())
+                .placeholder(R.mipmap.ic_launcher_web)
+                .into(tvMainImageView);
+
 
     }
 
@@ -399,10 +415,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new PrimaryDrawerItem().withIdentifier(5).withName(R.string.playlists).withIcon(R.drawable.ic_drawer_playlist).withSelectable(false),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withIdentifier(6).withName(R.string.settings).withIcon(R.drawable.ic_drawer_settings).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(10).withName(R.string.about).withIcon(R.drawable.ic_help_and_faq).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(7).withName(R.string.rateUs).withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
 //                        new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
-//                        new SecondaryDrawerItem().withIdentifier(10).withName("Radio").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
+//                        new SecondaryDrawerItem().withIdentifier(11).withName("Radio").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
                 .withTranslucentStatusBar(true)
                 .withDisplayBelowStatusBar(true)
@@ -465,8 +482,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                                 break;
                             case 10:
-                                Intent intent = new Intent(MainActivity.this, RadioActivity.class);
+                                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
                                 startActivity(intent);
+                                showInterstitial();
+                                break;
+                            case 11:
+                                Intent intent2 = new Intent(MainActivity.this, RadioActivity.class);
+                                startActivity(intent2);
+                                break;
                         }
 
                         result.getDrawerLayout().closeDrawers();
@@ -639,6 +662,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
 
             case R.id.tvMain:
+            case R.id.tvMainImageView:
                 Intent intent = new Intent(this, DetailActivity.class);
                 startActivity(intent);
                 showInterstitial();
@@ -669,16 +693,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }
         switch (item.getItemId()) {
-            case R.id.setting_menu:
-                Intent sIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(sIntent);
-                showInterstitial();
-                break;
-            case R.id.about_menu:
-                Intent aIntent = new Intent(MainActivity.this, AboutActivity.class);
-                startActivity(aIntent);
-                showInterstitial();
-                break;
             case R.id.equilizer:
                 Intent bIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 bIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
@@ -751,10 +765,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         cv.put(MediaStore.Audio.Playlists.NAME, name);
 
                         getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
+
                     }
                 });
 
                 break;
+            case R.id.add_to_playlist:
+                return false;
             case R.id.close:
                 return false;
             case R.id.search:

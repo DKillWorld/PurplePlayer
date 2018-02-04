@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 
+import com.dv.apps.purpleplayer.Models.Genre;
 import com.dv.apps.purpleplayer.R;
 import com.github.florent37.viewanimator.ViewAnimator;
 
@@ -20,14 +21,14 @@ import java.util.ArrayList;
  * Created by Dhaval on 24-10-2017.
  */
 
-public class GenreAdapter extends ArrayAdapter<String>{
+public class GenreAdapter extends ArrayAdapter<Genre>{
 
     Context context;
-    private ArrayList<String> genreList, backupList;
+    private ArrayList<Genre> genreList, backupList;
     private String genreName;
 
 
-    public GenreAdapter(Context context, ArrayList<String> genreList){
+    public GenreAdapter(Context context, ArrayList<Genre> genreList){
         super(context, 0, genreList);
         this.context = context;
         this.genreList = genreList;
@@ -46,7 +47,7 @@ public class GenreAdapter extends ArrayAdapter<String>{
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         Myholder myholder = null;
-        genreName = getItem(position);
+        genreName = getItem(position).getGenreName();
         if (view == null){
             LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.list_item, parent, false);
@@ -96,7 +97,7 @@ public class GenreAdapter extends ArrayAdapter<String>{
             else if (constraint != null && constraint.toString().length() > 0){
                 ArrayList<String> tempList = new ArrayList<String>();
                 for (int i = 0, l = backupList.size(); i < l; i++){
-                    genreName = backupList.get(i);
+                    genreName = backupList.get(i).getGenreName();
                     if (genreName.toLowerCase().contains(constraint.toString().toLowerCase())){
                         tempList.add(genreName);
                     }
@@ -115,7 +116,7 @@ public class GenreAdapter extends ArrayAdapter<String>{
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            genreList = (ArrayList<String>) results.values;
+            genreList = (ArrayList<Genre>) results.values;
             if (genreList != null) {
                 if (genreList.size() > 0) {
                     notifyDataSetChanged();
@@ -128,7 +129,7 @@ public class GenreAdapter extends ArrayAdapter<String>{
 
     @Nullable
     @Override
-    public String getItem(int position) {
+    public Genre getItem(int position) {
         return genreList.get(position);
     }
 

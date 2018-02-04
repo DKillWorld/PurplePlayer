@@ -23,6 +23,7 @@ import android.widget.ListView;
 
 import com.dv.apps.purpleplayer.ListAdapters.PlaylistAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Playlist;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
@@ -63,12 +64,13 @@ public class PlaylistListFragment extends Fragment {
         listView = view.findViewById(R.id.fragment_playlist_list);
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.NAME};
-        final ArrayList<String> arrayList = new ArrayList<>();
+        final ArrayList<Playlist> arrayList = new ArrayList<>();
         final Cursor playlistCursor = getContext().getContentResolver().query(uri, projection, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
         if (playlistCursor != null && playlistCursor.moveToFirst()) {
             do {
-                String albumName = playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
-                arrayList.add(albumName);
+                String playlistName = playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
+                long id = playlistCursor.getLong(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists._ID));
+                arrayList.add(new Playlist(getContext(), playlistName, id));
             } while (playlistCursor.moveToNext());
         }
         playlistAdapter = new PlaylistAdapter(getActivity(), arrayList);
@@ -78,10 +80,11 @@ public class PlaylistListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!in_detail_view) {
-                    String s = playlistAdapter.getItem(position);
-                    playlistCursor.moveToPosition(arrayList.indexOf(s));
+//                    String s = playlistAdapter.getItem(position).;
+//                    playlistCursor.moveToPosition(arrayList.indexOf(s));
+                    Playlist playlist = playlistAdapter.getItem(position);
 
-                    Uri uri1 = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistCursor.getLong(0));
+                    Uri uri1 = MediaStore.Audio.Playlists.Members.getContentUri("external",playlist.getId());
 
                     tempSongList = new ArrayList<Song>();
                     Cursor songCursor = getActivity().getContentResolver().query(uri1, null, null, null, MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);

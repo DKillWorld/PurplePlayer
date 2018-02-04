@@ -23,6 +23,7 @@ import android.widget.ListView;
 
 import com.dv.apps.purpleplayer.ListAdapters.GenreAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Genre;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
@@ -64,12 +65,13 @@ public class GenreListFragment extends Fragment {
         listView = view.findViewById(R.id.fragment_genre_list);
         Uri uri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME};
-        final ArrayList<String> arrayList = new ArrayList<>();
+        final ArrayList<Genre> arrayList = new ArrayList<>();
         final Cursor genreCursor = getContext().getContentResolver().query(uri, projection, null, null, MediaStore.Audio.Genres.NAME);
         if (genreCursor != null && genreCursor.moveToFirst()) {
             do {
-                String albumName = genreCursor.getString(genreCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
-                arrayList.add(albumName);
+                String genreName = genreCursor.getString(genreCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
+                long id = genreCursor.getLong(genreCursor.getColumnIndex(MediaStore.Audio.Genres._ID));
+                arrayList.add(new Genre(getContext(), genreName, id));
             } while (genreCursor.moveToNext());
         }
         genreAdapter = new GenreAdapter(getActivity(), arrayList);
@@ -79,10 +81,10 @@ public class GenreListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!in_detail_view) {
-                    String s = genreAdapter.getItem(position);
-                    genreCursor.moveToPosition(arrayList.indexOf(s));
+                    Genre genre = genreAdapter.getItem(position);
+//                    genreCursor.moveToPosition(arrayList.indexOf(s));
 
-                    Uri uri1 = MediaStore.Audio.Genres.Members.getContentUri("external", genreCursor.getLong(0));
+                    Uri uri1 = MediaStore.Audio.Genres.Members.getContentUri("external", genre.getId());
 
                     tempSongList = new ArrayList<Song>();
                     Cursor songCursor = getActivity().getContentResolver().query(uri1, null, null, null, MediaStore.Audio.Genres.Members.DEFAULT_SORT_ORDER);

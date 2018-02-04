@@ -3,6 +3,7 @@ package com.dv.apps.purpleplayer.ListFragments;
 
 import android.animation.LayoutTransition;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +24,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.dv.apps.purpleplayer.ListAdapters.PlaylistAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
+import com.dv.apps.purpleplayer.Models.Playlist;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.MusicService;
 import com.dv.apps.purpleplayer.R;
@@ -172,8 +176,44 @@ public class SongListFragment extends Fragment{
                     MusicService.getInstance().songList.add(adapter.getItem(info.position));
                     Toast.makeText(getActivity(), "Added to queue", Toast.LENGTH_SHORT).show();
                     break;
-//                case R.id.add_to_playlist:
-//                    break;
+                case R.id.add_to_playlist:
+                    final MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                            .customView(R.layout.now_playing, false)
+                            .show();
+
+                    ArrayList<Playlist> arrayList = new ArrayList<>();
+                    final Cursor cursor = getContext().getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        do {
+                            String playlistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
+                            long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Playlists._ID));
+                            arrayList.add(new Playlist(getContext(), playlistName, id));
+                        } while (cursor.moveToNext());
+                    }
+                    ListView listView = dialog.getCustomView().findViewById(R.id.now_playing_list);
+                    final PlaylistAdapter playlistAdapter = new PlaylistAdapter(getActivity(), arrayList);
+                    listView.setAdapter(playlistAdapter);
+
+                    Song songToAdd = adapter.getItem(info.position);
+                    final ContentValues cv = new ContentValues();
+                    cv.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songToAdd.getId());
+                    cv.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, 0);
+
+
+                    //TODO : Fix this implementation
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Playlist playlist = playlistAdapter.getItem(position);
+                            Uri uri = getContext().getContentResolver().insert(
+                                    MediaStore.Audio.Playlists.Members.getContentUri("external", playlist.getId()), cv);
+                            Toast.makeText(getContext(), "Added to playlist", Toast.LENGTH_SHORT).show();
+                            dialog.cancel();
+
+
+                        }
+                    });
+                    break;
             }
         }else {
             Toast.makeText(getActivity(), R.string.emptyPlaylist, Toast.LENGTH_SHORT).show();

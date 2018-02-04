@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -749,6 +750,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .title(R.string.checkingForLyrics)
                     .progress(true, 0)
                     .content(R.string.pleaseWait)
+                    .cancelable(true)
+                    .canceledOnTouchOutside(true)
+                    .cancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            cancel(true);
+                        }
+                    })
                     .show();
         }
 

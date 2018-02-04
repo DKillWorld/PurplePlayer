@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 
+import com.dv.apps.purpleplayer.Models.Playlist;
 import com.dv.apps.purpleplayer.R;
 import com.github.florent37.viewanimator.ViewAnimator;
 
@@ -20,18 +21,18 @@ import java.util.ArrayList;
  * Created by Dhaval on 24-10-2017.
  */
 
-public class PlaylistAdapter extends ArrayAdapter<String>{
+public class PlaylistAdapter extends ArrayAdapter<Playlist>{
 
     Context context;
-    private ArrayList<String> playlistList, backupList;
+    private ArrayList<Playlist> playlistList, backupList;
     private String playlistName;
 
 
-    public PlaylistAdapter(Context context, ArrayList<String> genreList){
-        super(context, 0, genreList);
+    public PlaylistAdapter(Context context, ArrayList<Playlist> playlistList){
+        super(context, 0, playlistList);
         this.context = context;
-        this.playlistList = genreList;
-        this.backupList = genreList;
+        this.playlistList = playlistList;
+        this.backupList = playlistList;
     }
 
     class Myholder{
@@ -46,7 +47,7 @@ public class PlaylistAdapter extends ArrayAdapter<String>{
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         Myholder myholder = null;
-        playlistName = getItem(position);
+        playlistName = getItem(position).getPlaylistName();
         if (view == null){
             LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.list_item, parent, false);
@@ -96,7 +97,7 @@ public class PlaylistAdapter extends ArrayAdapter<String>{
             else if (constraint != null && constraint.toString().length() > 0){
                 ArrayList<String> tempList = new ArrayList<String>();
                 for (int i = 0, l = backupList.size(); i < l; i++){
-                    playlistName = backupList.get(i);
+                    playlistName = backupList.get(i).getPlaylistName();
                     if (playlistName.toLowerCase().contains(constraint.toString().toLowerCase())){
                         tempList.add(playlistName);
                     }
@@ -115,7 +116,7 @@ public class PlaylistAdapter extends ArrayAdapter<String>{
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            playlistList = (ArrayList<String>) results.values;
+            playlistList = (ArrayList<Playlist>) results.values;
             if (playlistList != null) {
                 if (playlistList.size() > 0) {
                     notifyDataSetChanged();
@@ -128,7 +129,7 @@ public class PlaylistAdapter extends ArrayAdapter<String>{
 
     @Nullable
     @Override
-    public String getItem(int position) {
+    public Playlist getItem(int position) {
         return playlistList.get(position);
     }
 
