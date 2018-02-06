@@ -764,7 +764,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         ContentValues cv = new ContentValues();
                         cv.put(MediaStore.Audio.Playlists.NAME, name);
 
-                        getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
+                        if (name.length() != 0) {
+                            getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
+                            Toast.makeText(MainActivity.this, "Playlist added", Toast.LENGTH_SHORT).show();
+                        }else {
+                            Toast.makeText(MainActivity.this, "Empty name not allowed", Toast.LENGTH_SHORT).show();
+                        }
+
 
                     }
                 });

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v7.widget.SearchView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.dv.apps.purpleplayer.ListAdapters.PlaylistAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -62,6 +64,7 @@ public class PlaylistListFragment extends Fragment {
         setHasOptionsMenu(true);
 
         listView = view.findViewById(R.id.fragment_playlist_list);
+        registerForContextMenu(listView);
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.NAME};
         final ArrayList<Playlist> arrayList = new ArrayList<>();
@@ -178,5 +181,27 @@ public class PlaylistListFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getActivity().getMenuInflater().inflate(R.menu.menu_playlist_context, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId()){
+            case R.id.remove_playlist:
+                Playlist playlist = playlistAdapter.getItem(info.position);
+                if (playlist != null){
+                    getContext().getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                            MediaStore.Audio.Playlists._ID + "=" + playlist.getId() , null);
+                    Toast.makeText(getActivity(), "Removed", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+        return true;
     }
 }

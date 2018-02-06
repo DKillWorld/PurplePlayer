@@ -122,6 +122,7 @@
     <string name="sleep_timer">Sleep Timer</string>
     <string name="add_playlist">New Playlist</string>
     <string name="cancel">Cancel</string>
+    <string name="remove_playlist">Remove playlist</string>
 
 
 </resources>
