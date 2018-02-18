@@ -67,6 +67,11 @@
             android:summaryOff="@string/normal"
             android:title="@string/inverseSwipeControl" />
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="Show_Timer"
+            android:title="@string/showTimer" />
+
 
     </PreferenceCategory>
 

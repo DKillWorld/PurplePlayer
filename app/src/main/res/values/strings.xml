@@ -124,6 +124,7 @@
     <string name="remove_playlist">Remove playlist</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="showTimer">Show Timer</string>
 
 
 </resources>

@@ -40,7 +40,8 @@
         <activity
             android:name=".DetailActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity">
+        </activity>
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity" />

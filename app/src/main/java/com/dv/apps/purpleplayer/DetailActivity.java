@@ -63,6 +63,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import jp.wasabeef.picasso.transformations.BlurTransformation;
 import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
@@ -73,7 +74,7 @@ import static com.dv.apps.purpleplayer.MusicService.userStopped;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    TextView textView1, textView2;
+    TextView textView1, textView2, timer1, timer2;
     ImageView imageView, rootBackground;
     ImageButton playPause, loop, next, prev, shuffle, showLyrics;
     int currentPrimaryColor;
@@ -343,16 +344,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                                 contentValues.put(MediaStore.Audio.Media.TITLE, eT1.getText().toString());
                                 contentValues.put(MediaStore.Audio.Media.ARTIST, eT2.getText().toString());
 
-                                boolean success = getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues,
-                                        MediaStore.Audio.Media.TITLE + "= \"" + textToSearch + "\"", null) == 1;
-                                if (success){
-                                    MusicService.getInstance().getSong().setTile(eT1.getText().toString());
-                                    MusicService.getInstance().getSong().setArtist(eT2.getText().toString());
-                                }
-                                MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().pause();
-                                MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().play();
-
-
+                                    boolean success = getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues,
+                                            MediaStore.Audio.Media.TITLE + "= \"" + textToSearch + "\"", null) == 1;
+                                    if (success) {
+                                        MusicService.getInstance().getSong().setTile(eT1.getText().toString());
+                                        MusicService.getInstance().getSong().setArtist(eT2.getText().toString());
+                                    }
+                                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().pause();
+                                    MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls().play();
                             }
                         });
                     }
@@ -448,6 +447,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         showLyrics = (ImageButton) findViewById(R.id.showLyrics);
         showLyrics.setOnClickListener(this);
 
+
+        //Timer Views
+        timer1 = (TextView) findViewById(R.id.timer1);
+        timer2 = (TextView) findViewById(R.id.timer2);
+        setShowTimer();
+
         //Seekbar
         seekBar = (SeekBar) findViewById(R.id.seekbar);
         seekBar.setOnSeekBarChangeListener(this);
@@ -461,13 +466,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         prev = (ImageButton) findViewById(R.id.prev);
         prev.setOnClickListener(this);
 
-
     }
 
     //Seekbar Mechanism
     public void updateSeekbar() {
         seekBar.setProgress((int) MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPosition());
         seekBar.setMax((int) MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
+        final boolean showTimer = preferences.getBoolean("Show_Timer", false);
         if (seekHandler == null){
             seekHandler = new Handler();
         }
@@ -486,6 +491,19 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         }
                         seekBar.setProgress(current);
                         seekHandler.postDelayed(this, 1000);
+
+                        if (showTimer) {
+                            timer1.setText(String.format("%02d:%02d",
+                                    TimeUnit.MILLISECONDS.toMinutes(current) -
+                                            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(current)), // The change is in this line
+                                    TimeUnit.MILLISECONDS.toSeconds(current) -
+                                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(current))));
+                            timer2.setText(String.format("%02d:%02d",
+                                    TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()) -
+                                            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(seekBar.getMax())), // The change is in this line
+                                    TimeUnit.MILLISECONDS.toSeconds(seekBar.getMax()) -
+                                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()))));
+                        }
                     }
                 }
             }
@@ -633,6 +651,18 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         startActivity(intent);
     }
 
+    public void setShowTimer(){
+        if (timer2 != null && timer1 != null) {
+            if (!preferences.getBoolean("Show_Timer", false)) {
+                timer1.setVisibility(View.GONE);
+                timer2.setVisibility(View.GONE);
+            } else {
+                timer1.setVisibility(View.VISIBLE);
+                timer2.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser){
@@ -726,6 +756,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     protected void onResume() {
         Aesthetic.resume(this);
         currentPrimaryColor = Aesthetic.get().colorPrimary().blockingFirst();
+        setShowTimer();
         super.onResume();
 
     }

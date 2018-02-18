@@ -219,6 +219,39 @@
                 app:layout_constraintLeft_toLeftOf="@+id/showLyrics"
                 app:layout_constraintRight_toRightOf="@+id/showLyrics" />
 
+            <TextView
+                android:id="@+id/timer1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-condensed"
+                android:shadowColor="#000000"
+                android:shadowRadius="3"
+                android:tag=":aesthetic_ignore"
+                android:text="00:00"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintStart_toEndOf="@+id/albumArt" />
+
+            <TextView
+                android:id="@+id/timer2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="00:00"
+                android:fontFamily="sans-serif-condensed"
+                android:shadowColor="#000000"
+                android:shadowRadius="3"
+                android:tag=":aesthetic_ignore"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginRight="8dp" />
+
         </android.support.constraint.ConstraintLayout>
 
 

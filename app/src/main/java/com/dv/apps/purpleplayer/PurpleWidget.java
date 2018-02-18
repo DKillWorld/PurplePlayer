@@ -22,26 +22,36 @@ public class PurpleWidget extends AppWidgetProvider {
 
         PendingIntent openActivity = PendingIntent
                 .getActivity(context, 0, new Intent(context.getApplicationContext(), MainActivity.class), 0);
+
         PendingIntent prev = MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
-        PendingIntent shuffle = MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+        PendingIntent fastRewind = MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_REWIND);
         PendingIntent playPause = MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PLAY_PAUSE);
-        PendingIntent repeat = MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+        PendingIntent fastForward = MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_FAST_FORWARD);
         PendingIntent next = MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT);
 
-        views.setOnClickPendingIntent(R.id.widgetRoot, openActivity);
-        views.setOnClickPendingIntent(R.id.widgetPrev, prev);
-        views.setOnClickPendingIntent(R.id.widgetShuffle, shuffle);
-        views.setOnClickPendingIntent(R.id.widgetPlayPause, playPause);
-        views.setOnClickPendingIntent(R.id.widgetLoop, repeat);
-        views.setOnClickPendingIntent(R.id.widgetNext, next);
+        views.setOnClickPendingIntent(R.id.widgetImageView, openActivity);
 
         if ((MusicService.getInstance().mediaSessionCompat != null) && (MusicService.getInstance().mediaSessionCompat.isActive())) {
             views.setImageViewBitmap(R.id.widgetImageView, MusicService.getInstance().getSong().getImageBitmap());
+
             if (MusicService.getInstance().mediaPlayer.isPlaying()) {
                 views.setImageViewResource(R.id.widgetPlayPause, R.drawable.ic_pause_white_24dp);
+                views.setTextViewText(R.id.widgetText, MusicService.getInstance().getSong().getTitle());
+
+                views.setOnClickPendingIntent(R.id.widgetPrev, prev);
+                views.setOnClickPendingIntent(R.id.widgetFastRewind, fastRewind);
+                views.setOnClickPendingIntent(R.id.widgetPlayPause, playPause);
+                views.setOnClickPendingIntent(R.id.widgetFastForward, fastForward);
+                views.setOnClickPendingIntent(R.id.widgetNext, next);
             } else {
                 views.setImageViewResource(R.id.widgetPlayPause, R.drawable.ic_play_arrow_white_24dp);
             }
+        }else {
+            views.setOnClickPendingIntent(R.id.widgetPrev, openActivity);
+            views.setOnClickPendingIntent(R.id.widgetFastRewind, openActivity);
+            views.setOnClickPendingIntent(R.id.widgetPlayPause, openActivity);
+            views.setOnClickPendingIntent(R.id.widgetFastForward, openActivity);
+            views.setOnClickPendingIntent(R.id.widgetNext, openActivity);
         }
 
         // Instruct the widget manager to update the widget

@@ -436,6 +436,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
             stopForeground(true);
             preferences.unregisterOnSharedPreferenceChangeListener(this);
             unregisterReceiver(becomingNoisyReceiver);
+            updateWidget();
         }
 
         if (mediaPlayer != null){
