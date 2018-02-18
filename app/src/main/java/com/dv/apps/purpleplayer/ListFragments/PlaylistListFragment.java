@@ -3,10 +3,12 @@ package com.dv.apps.purpleplayer.ListFragments;
 
 import android.animation.LayoutTransition;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -19,10 +21,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.dv.apps.purpleplayer.ListAdapters.PlaylistAdapter;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
 import com.dv.apps.purpleplayer.Models.Playlist;
@@ -45,6 +50,7 @@ public class PlaylistListFragment extends Fragment {
     PlaylistAdapter playlistAdapter;
     SongAdapter songAdapter;
     ArrayList<Song> tempSongList;
+    ArrayList<Playlist> arrayList;
 
     public PlaylistListFragment() {
         // Required empty public constructor
@@ -67,7 +73,7 @@ public class PlaylistListFragment extends Fragment {
         registerForContextMenu(listView);
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.NAME};
-        final ArrayList<Playlist> arrayList = new ArrayList<>();
+        arrayList = new ArrayList<>();
         final Cursor playlistCursor = getContext().getContentResolver().query(uri, projection, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
         if (playlistCursor != null && playlistCursor.moveToFirst()) {
             do {
@@ -135,7 +141,7 @@ public class PlaylistListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_playlist_fragment, menu);
 
         MenuItem searchItem = menu.findItem(R.id.search);
         MenuItem closeItem = menu.findItem(R.id.close);
@@ -171,12 +177,53 @@ public class PlaylistListFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.close:
                 in_detail_view = false;
+                if (songAdapter != null){
+                    songAdapter.clear();
+                }
                 listView.setAdapter(playlistAdapter);
                 playlistAdapter.getFilter().filter("");
                 getActivity().invalidateOptionsMenu();
 //                ContentValues cv = new ContentValues();
 //                cv.put(MediaStore.Audio.Playlists.NAME, "New 21/01");
 //                getActivity().getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
+                return true;
+
+            case R.id.add_playlist:
+                MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+                        .title(R.string.add_playlist)
+                        .customView(R.layout.add_playlist, false)
+                        .positiveText(R.string.ok)
+                        .show();
+
+                final EditText editText = dialog.getCustomView().findViewById(R.id.add_playlist_name);
+
+                dialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        String name = editText.getText().toString();
+                        ContentValues cv = new ContentValues();
+                        cv.put(MediaStore.Audio.Playlists.NAME, name);
+
+                        if (name.length() != 0) {
+                            Uri uri = getContext().getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
+                            if (uri != null) {
+                                Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null);
+                                cursor.moveToFirst();
+                                String pName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
+                                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Playlists._ID));
+                                Playlist playlist = new Playlist(getContext(), pName, id);
+                                playlistAdapter.add(playlist);
+                                Toast.makeText(getActivity(), "Playlist added", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }else {
+                            Toast.makeText(getActivity(), "Empty name not allowed", Toast.LENGTH_SHORT).show();
+                        }
+
+
+                    }
+                });
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -185,7 +232,12 @@ public class PlaylistListFragment extends Fragment {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        getActivity().getMenuInflater().inflate(R.menu.menu_playlist_context, menu);
+
+        if(listView.getAdapter().getItem(0) instanceof Playlist){
+            getActivity().getMenuInflater().inflate(R.menu.menu_playlist_context, menu);
+        }else {
+//            getActivity().getMenuInflater().inflate(R.menu.menu_song_context, menu);
+        }
     }
 
     @Override
@@ -198,6 +250,8 @@ public class PlaylistListFragment extends Fragment {
                 if (playlist != null){
                     getContext().getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                             MediaStore.Audio.Playlists._ID + "=" + playlist.getId() , null);
+                    arrayList.remove(info.position);
+                    playlistAdapter.notifyDataSetChanged();
                     Toast.makeText(getActivity(), "Removed", Toast.LENGTH_SHORT).show();
                 }
                 break;

@@ -2,7 +2,9 @@ package com.dv.apps.purpleplayer;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -262,6 +264,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         mediaSessionCompat.setPlaybackState(playbackStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                 mediaPlayer.getCurrentPosition(), 1.0f).build());
         updateNotification();
+        updateWidget();
     }
 
     public void startPlayer(){
@@ -286,6 +289,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
             //Starting Notification
             startForeground(NOTIFY_ID, setupNotification());
+
+            updateWidget();
         }
 
         //Updating Preferences
@@ -331,6 +336,18 @@ public class MusicService extends MediaBrowserServiceCompat implements
         //register after getting audio focus
         IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         registerReceiver(becomingNoisyReceiver, intentFilter);
+    }
+
+    public void updateWidget(){
+        //Update Widget
+        Intent intent = new Intent(this, PurpleWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        // Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
+        // since it seems the onUpdate() is only fired on that:
+        int[] ids = AppWidgetManager.getInstance(this)
+                .getAppWidgetIds(new ComponentName(getApplication(), PurpleWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(intent);
     }
 
     @Override

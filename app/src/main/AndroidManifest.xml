@@ -64,9 +64,19 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.dv.action.sleeptimer"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="com.dv.action.sleeptimer" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </receiver>
+        <receiver android:name=".PurpleWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/purple_widget_info" />
         </receiver>
     </application>
 

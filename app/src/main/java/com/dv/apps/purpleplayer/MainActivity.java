@@ -5,7 +5,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -38,7 +36,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -47,7 +44,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -417,9 +413,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new SecondaryDrawerItem().withIdentifier(6).withName(R.string.settings).withIcon(R.drawable.ic_drawer_settings).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(10).withName(R.string.about).withIcon(R.drawable.ic_help_and_faq).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(7).withName(R.string.rateUs).withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
-                        new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
+                        new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false),
 //                        new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
-//                        new SecondaryDrawerItem().withIdentifier(11).withName("Radio").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
+                        new SecondaryDrawerItem().withIdentifier(11).withName("Folders").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
                 .withTranslucentStatusBar(true)
                 .withDisplayBelowStatusBar(true)
@@ -749,33 +745,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 timePickerDialog.show();
                 break;
             case R.id.add_playlist:
-                MaterialDialog dialog = new MaterialDialog.Builder(this)
-                        .title(R.string.add_playlist)
-                        .customView(R.layout.add_playlist, false)
-                        .positiveText(R.string.ok)
-                        .show();
-
-                final EditText editText = dialog.getCustomView().findViewById(R.id.add_playlist_name);
-
-                dialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        String name = editText.getText().toString();
-                        ContentValues cv = new ContentValues();
-                        cv.put(MediaStore.Audio.Playlists.NAME, name);
-
-                        if (name.length() != 0) {
-                            getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, cv);
-                            Toast.makeText(MainActivity.this, "Playlist added", Toast.LENGTH_SHORT).show();
-                        }else {
-                            Toast.makeText(MainActivity.this, "Empty name not allowed", Toast.LENGTH_SHORT).show();
-                        }
-
-
-                    }
-                });
-
-                break;
+                return false;
             case R.id.add_to_playlist:
                 return false;
             case R.id.close:
