@@ -413,9 +413,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new SecondaryDrawerItem().withIdentifier(6).withName(R.string.settings).withIcon(R.drawable.ic_drawer_settings).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(10).withName(R.string.about).withIcon(R.drawable.ic_help_and_faq).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(7).withName(R.string.rateUs).withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
-                        new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
 //                        new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
-                        new SecondaryDrawerItem().withIdentifier(11).withName("Folders").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
+//                        new SecondaryDrawerItem().withIdentifier(11).withName("Folders").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
                 .withTranslucentStatusBar(true)
                 .withDisplayBelowStatusBar(true)
@@ -483,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 showInterstitial();
                                 break;
                             case 11:
-                                Intent intent2 = new Intent(MainActivity.this, RadioActivity.class);
+                                Intent intent2 = new Intent(MainActivity.this, FolderActivity.class);
                                 startActivity(intent2);
                                 break;
                         }
@@ -496,7 +496,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 })
                 .build();
 
+        TextView headerName = result.getStickyHeader().findViewById(R.id.header_name);
+        TextView headerVersion = result.getStickyHeader().findViewById(R.id.header_version);
+
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+            headerName.setText("Purple Player");
+            headerVersion.setText("v " + BuildConfig.VERSION_NAME);
+        }
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")){
+            headerName.setText("Purple Player Pro");
+            headerVersion.setText("v " + BuildConfig.VERSION_NAME);
             result.removeItem(8);
         }
 

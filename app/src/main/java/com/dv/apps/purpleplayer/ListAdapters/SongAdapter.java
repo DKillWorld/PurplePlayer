@@ -58,7 +58,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
         song = getItem(position);
         if (view == null){
             LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = layoutInflater.inflate(R.layout.list_item, parent, false);
+            view = layoutInflater.inflate(R.layout.grid_item, parent, false);
             myholder = new Myholder(view);
             view.setTag(myholder);
         }else {

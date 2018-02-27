@@ -11,4 +11,15 @@
         android:fastScrollEnabled="true"
         />
 
+    <GridView
+        android:id="@+id/fragment_artist_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="auto_fit"
+        android:columnWidth="100dp"
+        android:stretchMode="columnWidth"
+        android:horizontalSpacing="4dp"
+        android:verticalSpacing="4dp"
+        android:visibility="gone"/>
+
 </FrameLayout>

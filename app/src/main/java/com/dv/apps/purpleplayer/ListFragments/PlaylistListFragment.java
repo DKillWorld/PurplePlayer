@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class PlaylistListFragment extends Fragment {
 
 
     ListView listView;
+    GridView gridView;
     boolean in_detail_view = false;
     SearchView searchView;
 
@@ -70,6 +72,7 @@ public class PlaylistListFragment extends Fragment {
         setHasOptionsMenu(true);
 
         listView = view.findViewById(R.id.fragment_playlist_list);
+        gridView = view.findViewById(R.id.fragment_playlist_grid);
         registerForContextMenu(listView);
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.NAME};
@@ -119,14 +122,26 @@ public class PlaylistListFragment extends Fragment {
                         songCursor.close();
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
                     }
-                    listView.setAdapter(songAdapter);
+                    gridView.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.GONE);
+//                    listView.setAdapter(songAdapter);
+                    gridView.setAdapter(songAdapter);
+                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Song tempSong = songAdapter.getItem(position);
+                            MusicService.getInstance().setSongList(tempSongList);
+                            MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                    .playFromSearch(tempSong.getTitle(), null);
+                        }
+                    });
                     in_detail_view = true;
                     getActivity().invalidateOptionsMenu();
                 } else {
-                    Song tempSong = songAdapter.getItem(position);
-                    MusicService.getInstance().setSongList(tempSongList);
-                    MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
-                            .playFromSearch(tempSong.getTitle(), null);
+//                    Song tempSong = songAdapter.getItem(position);
+//                    MusicService.getInstance().setSongList(tempSongList);
+//                    MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+//                            .playFromSearch(tempSong.getTitle(), null);
                 }
             }
         });
@@ -180,6 +195,8 @@ public class PlaylistListFragment extends Fragment {
                 if (songAdapter != null){
                     songAdapter.clear();
                 }
+                gridView.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
                 listView.setAdapter(playlistAdapter);
                 playlistAdapter.getFilter().filter("");
                 getActivity().invalidateOptionsMenu();

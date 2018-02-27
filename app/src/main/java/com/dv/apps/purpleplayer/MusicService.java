@@ -491,6 +491,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         @Override
         public void onStop() {
+            updateWidget();
             stopSelf();
 
         }

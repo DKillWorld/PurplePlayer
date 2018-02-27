@@ -35,9 +35,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -295,7 +295,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                             .customView(R.layout.now_playing, false)
                             .cancelable(true)
                             .show();
-                    ListView nowPlaying = dialog.getCustomView().findViewById(R.id.now_playing_list);
+                    GridView nowPlaying = dialog.getCustomView().findViewById(R.id.now_playing_list);
                     final SongAdapter songAdapter = new SongAdapter(DetailActivity.this, MusicService.getInstance().songList);
                     nowPlaying.setAdapter(songAdapter);
                     nowPlaying.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -473,9 +473,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         seekBar.setProgress((int) MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPosition());
         seekBar.setMax((int) MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
         final boolean showTimer = preferences.getBoolean("Show_Timer", false);
+        final long hours = TimeUnit.MILLISECONDS.toHours(seekBar.getMax());
         if (seekHandler == null){
             seekHandler = new Handler();
         }
+        seekHandler.removeMessages(0);
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -493,16 +495,31 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         seekHandler.postDelayed(this, 1000);
 
                         if (showTimer) {
-                            timer1.setText(String.format("%02d:%02d",
-                                    TimeUnit.MILLISECONDS.toMinutes(current) -
-                                            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(current)), // The change is in this line
-                                    TimeUnit.MILLISECONDS.toSeconds(current) -
-                                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(current))));
-                            timer2.setText(String.format("%02d:%02d",
-                                    TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()) -
-                                            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(seekBar.getMax())), // The change is in this line
-                                    TimeUnit.MILLISECONDS.toSeconds(seekBar.getMax()) -
-                                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()))));
+                            if (hours == 0) {
+                                timer1.setText(String.format("%02d:%02d",
+                                        TimeUnit.MILLISECONDS.toMinutes(current) -
+                                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(current)), // The change is in this line
+                                        TimeUnit.MILLISECONDS.toSeconds(current) -
+                                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(current))));
+                                timer2.setText(String.format("%02d:%02d",
+                                        TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()) -
+                                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(seekBar.getMax())), // The change is in this line
+                                        TimeUnit.MILLISECONDS.toSeconds(seekBar.getMax()) -
+                                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()))));
+                            }else {
+                                timer1.setText(String.format("%02d:%02d:%02d",
+                                        TimeUnit.MILLISECONDS.toHours(current),
+                                        TimeUnit.MILLISECONDS.toMinutes(current) -
+                                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(current)), // The change is in this line
+                                        TimeUnit.MILLISECONDS.toSeconds(current) -
+                                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(current))));
+                                timer2.setText(String.format("%02d:%02d:%02d",
+                                        TimeUnit.MILLISECONDS.toHours(seekBar.getMax()),
+                                        TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()) -
+                                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(seekBar.getMax())), // The change is in this line
+                                        TimeUnit.MILLISECONDS.toSeconds(seekBar.getMax()) -
+                                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(seekBar.getMax()))));
+                            }
                         }
                     }
                 }

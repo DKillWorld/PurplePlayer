@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ public class SongListFragment extends Fragment{
 
 
     ListView listView;
+    GridView gridView;
     public SongAdapter adapter;
     ArrayList<Song> songList;
     SearchView searchView;
@@ -61,16 +63,20 @@ public class SongListFragment extends Fragment{
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        listView = view.findViewById(R.id.fragment_song_list);
-        listView.setFastScrollEnabled(true);
-        registerForContextMenu(listView);
+//        listView = view.findViewById(R.id.fragment_song_list);
+        gridView = view.findViewById(R.id.fragment_song_grid);
+//        listView.setFastScrollEnabled(true);
+        gridView.setFastScrollEnabled(true);
+//        registerForContextMenu(listView);
+        registerForContextMenu(gridView);
         setHasOptionsMenu(true);
         this.songList = getSongs();
 
         adapter = new SongAdapter(getActivity(), this.songList);
-        listView.setAdapter(adapter);
+//        listView.setAdapter(adapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MusicService.getInstance().setSongList(songList);
@@ -83,6 +89,20 @@ public class SongListFragment extends Fragment{
                         .playFromUri(playUri, bundle);
             }
         });
+
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                MusicService.getInstance().setSongList(songList);
+//                Song tempSong = adapter.getItem(position);
+//                Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
+//                Bundle bundle = new Bundle();
+////                bundle.putParcelable("Song", Parcels.wrap(tempSong));
+//                bundle.putInt("Pos", songList.indexOf(tempSong));
+//                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+//                        .playFromUri(playUri, bundle);
+//            }
+//        });
 
     }
 
@@ -190,9 +210,9 @@ public class SongListFragment extends Fragment{
                             arrayList.add(new Playlist(getContext(), playlistName, id));
                         } while (cursor.moveToNext());
                     }
-                    ListView listView = dialog.getCustomView().findViewById(R.id.now_playing_list);
+                    GridView gridView = dialog.getCustomView().findViewById(R.id.now_playing_list);
                     final PlaylistAdapter playlistAdapter = new PlaylistAdapter(getActivity(), arrayList);
-                    listView.setAdapter(playlistAdapter);
+                    gridView.setAdapter(playlistAdapter);
 
                     Song songToAdd = adapter.getItem(info.position);
                     final ContentValues cv = new ContentValues();
@@ -201,7 +221,7 @@ public class SongListFragment extends Fragment{
 
 
                     //TODO : Fix this implementation
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             Playlist playlist = playlistAdapter.getItem(position);

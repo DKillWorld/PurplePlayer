@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -42,6 +43,7 @@ public class AlbumListFragment extends Fragment {
     boolean in_detail_view = false;
 
     ListView listView;
+    GridView gridView;
     ImageView imageView;
     SearchView searchView;
 
@@ -67,6 +69,7 @@ public class AlbumListFragment extends Fragment {
         setHasOptionsMenu(true);
 
         listView = view.findViewById(R.id.fragment_album_list);
+        gridView = view.findViewById(R.id.fragment_album_grid);
         imageView = view.findViewById(R.id.fragment_album_image);
         Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
         final ArrayList<Album> arrayList = new ArrayList<>();
@@ -127,14 +130,25 @@ public class AlbumListFragment extends Fragment {
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
                     }
                     imageView.setVisibility(View.VISIBLE);
-                    listView.setAdapter(songAdapter);
+                    gridView.setVisibility(View.VISIBLE);
+//                    listView.setAdapter(songAdapter);
+                    gridView.setAdapter(songAdapter);
+                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Song tempSong = songAdapter.getItem(position);
+                            MusicService.getInstance().setSongList(tempSongList);
+                            MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                    .playFromSearch(tempSong.getTitle(), null);
+                        }
+                    });
                     in_detail_view = true;
                     getActivity().invalidateOptionsMenu();
                 } else {
-                    Song tempSong = songAdapter.getItem(position);
-                    MusicService.getInstance().setSongList(tempSongList);
-                    MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
-                            .playFromSearch(tempSong.getTitle(), null);
+//                    Song tempSong = songAdapter.getItem(position);
+//                    MusicService.getInstance().setSongList(tempSongList);
+//                    MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+//                            .playFromSearch(tempSong.getTitle(), null);
                 }
 //                Glide.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
 //                        albumCursor.getLong(albumCursor.getColumnIndex(MediaStore.Audio.Albums._ID))))
@@ -145,7 +159,6 @@ public class AlbumListFragment extends Fragment {
 
                 Picasso.with(getActivity()).load(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),
                         albumAdapter.getItem(position).getId()))
-                        .fit()
                         .placeholder(R.mipmap.ic_launcher)
                         .into(imageView);
 
@@ -205,6 +218,7 @@ public class AlbumListFragment extends Fragment {
                 listView.setAdapter(albumAdapter);
                 albumAdapter.getFilter().filter("");
                 imageView.setVisibility(View.GONE);
+                gridView.setVisibility(View.GONE);
                 getActivity().invalidateOptionsMenu();
                 return true;
             default:

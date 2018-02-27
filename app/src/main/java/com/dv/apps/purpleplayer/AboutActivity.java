@@ -44,8 +44,9 @@ public class AboutActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/840546956122931"));
-                    startActivity(fbIntent);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://messaging/" + "840546956122931"));
+//                    Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/840546956122931"));
+                    startActivity(intent);
                 }catch (Exception e){
                     Intent fbIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/thepurpleplayer"));
                     startActivity(fbIntent);
