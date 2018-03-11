@@ -19,6 +19,14 @@
         android:fastScrollEnabled="true"
         android:layout_weight="1"
         />
+    <ListView
+        android:id="@+id/fragment_album_list_detail"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fastScrollEnabled="true"
+        android:layout_weight="1"
+        android:visibility="gone"
+        />
     <GridView
         android:id="@+id/fragment_album_grid"
         android:layout_width="match_parent"

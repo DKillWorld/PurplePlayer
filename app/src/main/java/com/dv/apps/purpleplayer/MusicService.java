@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -31,6 +32,7 @@ import android.support.v7.app.NotificationCompat;
 import com.dv.apps.purpleplayer.Models.Song;
 import com.dv.apps.purpleplayer.Utils.MediaStyleHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -425,6 +427,25 @@ public class MusicService extends MediaBrowserServiceCompat implements
         Collections.shuffle(Arrays.asList(nums));
         return new Random().nextInt(nums.length);
 
+    }
+
+    public Song getSongByName (File file){
+
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(file.getPath());
+        String songName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        if (songName == null) {
+            File file2 = new File(file.getName());
+            String temp = file.getName();
+            songName = temp.substring(0, temp.lastIndexOf("."));
+        }
+
+        for(Song song : globalSongList) {
+            if(song.getTitle().equals(songName)) {
+                return song;
+            }
+        }
+        return new Song(this, "Error", 555, 0, "Error", null);
     }
 
     @Override

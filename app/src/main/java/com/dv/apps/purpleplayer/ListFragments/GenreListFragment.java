@@ -6,6 +6,7 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -37,9 +38,9 @@ import java.util.ArrayList;
 public class GenreListFragment extends Fragment {
 
 
-    ListView listView;
+    ListView listView, listViewDetailMode;
     GridView gridView;
-    boolean in_detail_view = false;
+    public static boolean in_detail_view_genre = false;
     SearchView searchView;
 
     GenreAdapter genreAdapter;
@@ -65,6 +66,7 @@ public class GenreListFragment extends Fragment {
         setHasOptionsMenu(true);
 
         listView = view.findViewById(R.id.fragment_genre_list);
+        listViewDetailMode = view.findViewById(R.id.fragment_genre_list_detail);
         gridView = view.findViewById(R.id.fragment_genre_grid);
         Uri uri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
         String projection[] = {MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME};
@@ -83,7 +85,7 @@ public class GenreListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!in_detail_view) {
+                if (!in_detail_view_genre) {
                     Genre genre = genreAdapter.getItem(position);
 //                    genreCursor.moveToPosition(arrayList.indexOf(s));
 
@@ -113,20 +115,37 @@ public class GenreListFragment extends Fragment {
                         songCursor.close();
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
                     }
-                    gridView.setVisibility(View.VISIBLE);
-                    listView.setVisibility(View.GONE);
-//                    listView.setAdapter(songAdapter);
-                    gridView.setAdapter(songAdapter);
-                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Song tempSong = songAdapter.getItem(position);
-                            MusicService.getInstance().setSongList(tempSongList);
-                            MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
-                                    .playFromSearch(tempSong.getTitle(), null);
-                        }
-                    });
-                    in_detail_view = true;
+
+                    if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                        gridView.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.GONE);
+                        gridView.setAdapter(songAdapter);
+                        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }else {
+                        gridView.setVisibility(View.GONE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.VISIBLE);
+                        listViewDetailMode.setAdapter(songAdapter);
+                        listViewDetailMode.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }
+                    in_detail_view_genre = true;
                     getActivity().invalidateOptionsMenu();
                 } else {
 //                    Song tempSong = songAdapter.getItem(position);
@@ -141,7 +160,7 @@ public class GenreListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        in_detail_view = false;
+        in_detail_view_genre = false;
         listView.setAdapter(genreAdapter);
     }
 
@@ -152,7 +171,7 @@ public class GenreListFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.search);
         MenuItem closeItem = menu.findItem(R.id.close);
 
-        if (!in_detail_view) {
+        if (!in_detail_view_genre) {
             searchItem.setVisible(true);
             searchView = (SearchView) searchItem.getActionView();
             LinearLayout searchBar = (LinearLayout) searchView.findViewById(R.id.search_bar);
@@ -182,10 +201,15 @@ public class GenreListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.close:
-                in_detail_view = false;
+                in_detail_view_genre = false;
+                if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                    gridView.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }else {
+                    listViewDetailMode.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }
                 listView.setAdapter(genreAdapter);
-                gridView.setVisibility(View.GONE);
-                listView.setVisibility(View.VISIBLE);
                 genreAdapter.getFilter().filter("");
                 getActivity().invalidateOptionsMenu();
                 return true;

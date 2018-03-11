@@ -11,6 +11,14 @@
         android:fastScrollEnabled="true"
         />
 
+    <ListView
+        android:id="@+id/fragment_artist_list_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fastScrollEnabled="true"
+        android:visibility="gone"
+        />
+
     <GridView
         android:id="@+id/fragment_artist_grid"
         android:layout_width="match_parent"

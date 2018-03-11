@@ -1,8 +1,10 @@
 package com.dv.apps.purpleplayer.ListAdapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,12 +31,14 @@ public class SongAdapter extends ArrayAdapter<Song> {
     private ArrayList<Song> songList, backupList;
     private Song song;
     private Context context;
+    SharedPreferences preferences;
 
     public SongAdapter(@NonNull Context context, ArrayList<Song> songList) {
         super(context,0, songList);
         this.songList = songList;
         this.backupList = songList;
         this.context = context;
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     class Myholder{
@@ -58,7 +62,11 @@ public class SongAdapter extends ArrayAdapter<Song> {
         song = getItem(position);
         if (view == null){
             LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = layoutInflater.inflate(R.layout.grid_item, parent, false);
+            if (preferences.getBoolean("show_track_as", true)) {
+                view = layoutInflater.inflate(R.layout.grid_item, parent, false);
+            }else {
+                view = layoutInflater.inflate(R.layout.list_item, parent, false);
+            }
             myholder = new Myholder(view);
             view.setTag(myholder);
         }else {

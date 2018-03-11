@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,9 +45,9 @@ import java.util.ArrayList;
 public class PlaylistListFragment extends Fragment {
 
 
-    ListView listView;
+    ListView listView, listViewDetailMode;
     GridView gridView;
-    boolean in_detail_view = false;
+    public static boolean in_detail_view_playlist = false;
     SearchView searchView;
 
     PlaylistAdapter playlistAdapter;
@@ -72,6 +73,7 @@ public class PlaylistListFragment extends Fragment {
         setHasOptionsMenu(true);
 
         listView = view.findViewById(R.id.fragment_playlist_list);
+        listViewDetailMode = view.findViewById(R.id.fragment_playlist_list_detail);
         gridView = view.findViewById(R.id.fragment_playlist_grid);
         registerForContextMenu(listView);
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
@@ -91,7 +93,7 @@ public class PlaylistListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!in_detail_view) {
+                if (!in_detail_view_playlist) {
 //                    String s = playlistAdapter.getItem(position).;
 //                    playlistCursor.moveToPosition(arrayList.indexOf(s));
                     Playlist playlist = playlistAdapter.getItem(position);
@@ -122,20 +124,37 @@ public class PlaylistListFragment extends Fragment {
                         songCursor.close();
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
                     }
-                    gridView.setVisibility(View.VISIBLE);
-                    listView.setVisibility(View.GONE);
-//                    listView.setAdapter(songAdapter);
-                    gridView.setAdapter(songAdapter);
-                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Song tempSong = songAdapter.getItem(position);
-                            MusicService.getInstance().setSongList(tempSongList);
-                            MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
-                                    .playFromSearch(tempSong.getTitle(), null);
-                        }
-                    });
-                    in_detail_view = true;
+
+                    if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                        gridView.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.GONE);
+                        gridView.setAdapter(songAdapter);
+                        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }else {
+                        gridView.setVisibility(View.GONE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.VISIBLE);
+                        listViewDetailMode.setAdapter(songAdapter);
+                        listViewDetailMode.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }
+                    in_detail_view_playlist = true;
                     getActivity().invalidateOptionsMenu();
                 } else {
 //                    Song tempSong = songAdapter.getItem(position);
@@ -150,7 +169,7 @@ public class PlaylistListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        in_detail_view = false;
+        in_detail_view_playlist = false;
         listView.setAdapter(playlistAdapter);
     }
 
@@ -161,7 +180,7 @@ public class PlaylistListFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.search);
         MenuItem closeItem = menu.findItem(R.id.close);
 
-        if (!in_detail_view) {
+        if (!in_detail_view_playlist) {
             searchItem.setVisible(true);
             searchView = (SearchView) searchItem.getActionView();
             LinearLayout searchBar = (LinearLayout) searchView.findViewById(R.id.search_bar);
@@ -191,12 +210,17 @@ public class PlaylistListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.close:
-                in_detail_view = false;
+                in_detail_view_playlist = false;
                 if (songAdapter != null){
                     songAdapter.clear();
                 }
-                gridView.setVisibility(View.GONE);
-                listView.setVisibility(View.VISIBLE);
+                if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                    gridView.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }else {
+                    listViewDetailMode.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }
                 listView.setAdapter(playlistAdapter);
                 playlistAdapter.getFilter().filter("");
                 getActivity().invalidateOptionsMenu();

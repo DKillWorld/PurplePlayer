@@ -17,6 +17,12 @@
             android:key="accent_color"
             android:summary="@string/changeAccentColor"
             android:title="@string/accentColor"/>
+        <CheckBoxPreference
+            android:key="show_track_as"
+            android:defaultValue="true"
+            android:summaryOn="Grid"
+            android:summaryOff="List"
+            android:title="Show tracks as"/>
         <!--<CheckBoxPreference-->
             <!--android:key="auto_color"-->
             <!--android:title="Auto change theme with albumart"-->

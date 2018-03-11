@@ -6,6 +6,7 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -40,9 +41,9 @@ import java.util.ArrayList;
 public class AlbumListFragment extends Fragment {
 
 
-    boolean in_detail_view = false;
+    public static boolean in_detail_view_album = false;
 
-    ListView listView;
+    ListView listView, listViewDetailMode;
     GridView gridView;
     ImageView imageView;
     SearchView searchView;
@@ -69,6 +70,7 @@ public class AlbumListFragment extends Fragment {
         setHasOptionsMenu(true);
 
         listView = view.findViewById(R.id.fragment_album_list);
+        listViewDetailMode = view.findViewById(R.id.fragment_album_list_detail);
         gridView = view.findViewById(R.id.fragment_album_grid);
         imageView = view.findViewById(R.id.fragment_album_image);
         Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
@@ -97,7 +99,7 @@ public class AlbumListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!in_detail_view) {
+                if (!in_detail_view_album) {
                     String s = albumAdapter.getItem(position).getAlbumName();
                     albumCursor.moveToPosition(arrayList.indexOf(s));
 
@@ -130,19 +132,39 @@ public class AlbumListFragment extends Fragment {
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
                     }
                     imageView.setVisibility(View.VISIBLE);
-                    gridView.setVisibility(View.VISIBLE);
-//                    listView.setAdapter(songAdapter);
-                    gridView.setAdapter(songAdapter);
-                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Song tempSong = songAdapter.getItem(position);
-                            MusicService.getInstance().setSongList(tempSongList);
-                            MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
-                                    .playFromSearch(tempSong.getTitle(), null);
-                        }
-                    });
-                    in_detail_view = true;
+                    if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                        gridView.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.GONE);
+                        gridView.setAdapter(songAdapter);
+                        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }else {
+                        gridView.setVisibility(View.GONE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.VISIBLE);
+                        listViewDetailMode.setAdapter(songAdapter);
+                        listViewDetailMode.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }
+
+
+
+                    in_detail_view_album = true;
                     getActivity().invalidateOptionsMenu();
                 } else {
 //                    Song tempSong = songAdapter.getItem(position);
@@ -171,7 +193,7 @@ public class AlbumListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        in_detail_view = false;
+        in_detail_view_album = false;
         listView.setAdapter(albumAdapter);
     }
 
@@ -183,7 +205,7 @@ public class AlbumListFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.search);
         MenuItem closeItem = menu.findItem(R.id.close);
 
-        if (!in_detail_view) {
+        if (!in_detail_view_album) {
             searchItem.setVisible(true);
             searchView = (SearchView) searchItem.getActionView();
             LinearLayout searchBar = (LinearLayout) searchView.findViewById(R.id.search_bar);
@@ -214,11 +236,17 @@ public class AlbumListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.close:
-                in_detail_view = false;
+                in_detail_view_album = false;
+                if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                    gridView.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }else {
+                    listViewDetailMode.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }
                 listView.setAdapter(albumAdapter);
                 albumAdapter.getFilter().filter("");
                 imageView.setVisibility(View.GONE);
-                gridView.setVisibility(View.GONE);
                 getActivity().invalidateOptionsMenu();
                 return true;
             default:

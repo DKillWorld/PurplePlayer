@@ -276,6 +276,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mediaBrowserCompat.connect();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (AlbumListFragment.in_detail_view_album || ArtistListFragment.in_detail_view_artist ||
+                GenreListFragment.in_detail_view_genre || PlaylistListFragment.in_detail_view_playlist){
+            findViewById(R.id.close).performClick();
+        }else {
+            super.onBackPressed();
+        }
+    }
+
     public void setupInterstitialAd(){
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
             if (Calendar.getInstance().getTimeInMillis() > preferences.getLong("ad_free_till", 0)) {
@@ -409,13 +419,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new PrimaryDrawerItem().withIdentifier(3).withName(R.string.artists).withIcon(R.drawable.ic_drawer_artist).withSelectable(false),
                         new PrimaryDrawerItem().withIdentifier(4).withName(R.string.genres).withIcon(R.drawable.ic_drawer_genre).withSelectable(false),
                         new PrimaryDrawerItem().withIdentifier(5).withName(R.string.playlists).withIcon(R.drawable.ic_drawer_playlist).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(11).withName("Folders").withIcon(R.drawable.ic_folder_black_24dp).withSelectable(false),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withIdentifier(6).withName(R.string.settings).withIcon(R.drawable.ic_drawer_settings).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(10).withName(R.string.about).withIcon(R.drawable.ic_help_and_faq).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(7).withName(R.string.rateUs).withIcon(R.drawable.ic_drawer_support_development).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(8).withName(R.string.upgradeToPurplePlayerPro).withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
 //                        new SecondaryDrawerItem().withIdentifier(9).withName("Remove ads for a day").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
-//                        new SecondaryDrawerItem().withIdentifier(11).withName("Folders").withIcon(R.drawable.ic_drawer_buypro).withSelectable(false)
                 )
                 .withTranslucentStatusBar(true)
                 .withDisplayBelowStatusBar(true)

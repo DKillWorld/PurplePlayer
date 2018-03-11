@@ -6,6 +6,7 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -36,9 +37,9 @@ import java.util.ArrayList;
  */
 public class ArtistListFragment extends Fragment {
 
-    ListView listView;
+    ListView listView, listViewDetailMode;
     GridView gridView;
-    boolean in_detail_view = false;
+    public static boolean in_detail_view_artist = false;
     SearchView searchView;
 
     ArtistAdapter artistAdapter;
@@ -63,6 +64,7 @@ public class ArtistListFragment extends Fragment {
         setHasOptionsMenu(true);
 
         listView = view.findViewById(R.id.fragment_artist_list);
+        listViewDetailMode = view.findViewById(R.id.fragment_artist_list_detail);
         gridView = view.findViewById(R.id.fragment_artist_grid);
         Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
         final ArrayList<Artist> arrayList = new ArrayList<>();
@@ -85,7 +87,7 @@ public class ArtistListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!in_detail_view) {
+                if (!in_detail_view_artist) {
                     String s = artistAdapter.getItem(position).getArtistName();
                     artistCursor.moveToPosition(arrayList.indexOf(s));
 
@@ -118,20 +120,37 @@ public class ArtistListFragment extends Fragment {
                         songAdapter = new SongAdapter(getActivity(), tempSongList);
                     }
 
-                    gridView.setVisibility(View.VISIBLE);
-                    listView.setVisibility(View.GONE);
-//                    listView.setAdapter(songAdapter);
-                    gridView.setAdapter(songAdapter);
-                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Song tempSong = songAdapter.getItem(position);
-                            MusicService.getInstance().setSongList(tempSongList);
-                            MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
-                                    .playFromSearch(tempSong.getTitle(), null);
-                        }
-                    });
-                    in_detail_view = true;
+                    if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                        gridView.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.GONE);
+                        gridView.setAdapter(songAdapter);
+                        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }else {
+                        gridView.setVisibility(View.GONE);
+                        listView.setVisibility(View.GONE);
+                        listViewDetailMode.setVisibility(View.VISIBLE);
+                        listViewDetailMode.setAdapter(songAdapter);
+                        listViewDetailMode.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                MusicService.getInstance().setSongList(tempSongList);
+                                MediaControllerCompat.getMediaController(getActivity()).getTransportControls()
+                                        .playFromSearch(tempSong.getTitle(), null);
+                            }
+                        });
+                    }
+
+                    in_detail_view_artist = true;
                     getActivity().invalidateOptionsMenu();
                 }else {
 //                    Song tempSong = songAdapter.getItem(position);
@@ -146,7 +165,7 @@ public class ArtistListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        in_detail_view = false;
+        in_detail_view_artist = false;
         listView.setAdapter(artistAdapter);
     }
 
@@ -157,7 +176,7 @@ public class ArtistListFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.search);
         MenuItem closeItem = menu.findItem(R.id.close);
 
-        if (!in_detail_view) {
+        if (!in_detail_view_artist) {
             searchItem.setVisible(true);
             searchView = (SearchView) searchItem.getActionView();
             LinearLayout searchBar = (LinearLayout) searchView.findViewById(R.id.search_bar);
@@ -187,10 +206,15 @@ public class ArtistListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.close:
-                in_detail_view = false;
+                in_detail_view_artist = false;
+                if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("show_track_as", true)){
+                    gridView.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }else {
+                    listViewDetailMode.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }
                 listView.setAdapter(artistAdapter);
-                gridView.setVisibility(View.GONE);
-                listView.setVisibility(View.VISIBLE);
                 artistAdapter.getFilter().filter("");
                 getActivity().invalidateOptionsMenu();
                 return true;

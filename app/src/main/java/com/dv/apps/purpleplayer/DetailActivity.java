@@ -38,6 +38,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -295,20 +296,41 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                             .customView(R.layout.now_playing, false)
                             .cancelable(true)
                             .show();
-                    GridView nowPlaying = dialog.getCustomView().findViewById(R.id.now_playing_list);
+                    ListView nowPlayingList = dialog.getCustomView().findViewById(R.id.now_playing_list);
+                    GridView nowPlayingGrid = dialog.getCustomView().findViewById(R.id.now_playing_grid);
                     final SongAdapter songAdapter = new SongAdapter(DetailActivity.this, MusicService.getInstance().songList);
-                    nowPlaying.setAdapter(songAdapter);
-                    nowPlaying.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Song tempSong = songAdapter.getItem(position);
-                            Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("Pos", MusicService.getInstance().songList.indexOf(tempSong));
-                            MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls()
-                                    .playFromUri(playUri, bundle);
-                        }
-                    });
+                    if (preferences.getBoolean("show_track_as", true)){
+                        nowPlayingGrid.setVisibility(View.VISIBLE);
+                        nowPlayingList.setVisibility(View.GONE);
+                        nowPlayingGrid.setAdapter(songAdapter);
+                        nowPlayingGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
+                                Bundle bundle = new Bundle();
+                                bundle.putInt("Pos", MusicService.getInstance().songList.indexOf(tempSong));
+                                MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls()
+                                        .playFromUri(playUri, bundle);
+                            }
+                        });
+                    }else {
+                        nowPlayingList.setVisibility(View.VISIBLE);
+                        nowPlayingGrid.setVisibility(View.GONE);
+                        nowPlayingList.setAdapter(songAdapter);
+                        nowPlayingList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Song tempSong = songAdapter.getItem(position);
+                                Uri playUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, tempSong.getId());
+                                Bundle bundle = new Bundle();
+                                bundle.putInt("Pos", MusicService.getInstance().songList.indexOf(tempSong));
+                                MediaControllerCompat.getMediaController(DetailActivity.this).getTransportControls()
+                                        .playFromUri(playUri, bundle);
+                            }
+                        });
+                    }
+
 //                    FloatingActionButton floatingActionButton = dialog.getCustomView().findViewById(R.id.playFab);
 //                    floatingActionButton.setOnClickListener(new View.OnClickListener() {
 //                        @Override
