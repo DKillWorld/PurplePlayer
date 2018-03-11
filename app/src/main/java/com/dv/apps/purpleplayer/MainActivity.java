@@ -44,6 +44,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.CircleView;
 import com.dv.apps.purpleplayer.ListAdapters.SongAdapter;
@@ -493,8 +494,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 showInterstitial();
                                 break;
                             case 11:
-                                Intent intent2 = new Intent(MainActivity.this, FolderActivity.class);
-                                startActivity(intent2);
+                                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
+                                    Intent intent2 = new Intent(MainActivity.this, FolderActivity.class);
+                                    startActivity(intent2);
+                                }else {
+                                    MaterialDialog dialog = new MaterialDialog.Builder(MainActivity.this)
+                                            .content("• \"Folder Explorer\" is pro feature. \n• You can explore and play folders with it." +
+                                                    "\n• Get \"Folder Explorer\" + all transition effects + remove all ads by upgrading to pro.")
+                                            .cancelable(true)
+                                            .positiveText(R.string.upgradeToPurplePlayerPro)
+                                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                @Override
+                                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                                                    startActivity(intent);
+                                                }
+                                            })
+                                            .title(R.string.info)
+                                            .show();
+                                }
+
                                 break;
                         }
 
