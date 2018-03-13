@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.RemoteException;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -127,6 +128,9 @@ public class FolderActivity extends AppCompatActivity implements AdapterView.OnI
             item.add("../");
             path.add(f.getParent());
 
+        }else {
+            item.add("sdcard/");
+            path.add(Environment.getExternalStorageDirectory().getPath());
         }
 
         if (files != null) {
