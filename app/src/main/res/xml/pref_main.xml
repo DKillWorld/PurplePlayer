@@ -78,7 +78,6 @@
             android:key="Show_Timer"
             android:title="@string/showTimer" />
 
-
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/lyrics">

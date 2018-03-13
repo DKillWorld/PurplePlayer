@@ -254,6 +254,17 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginRight="8dp" />
 
+            <!--<SeekBar-->
+                <!--android:id="@+id/playbackSpeedSlider"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginBottom="8dp"-->
+                <!--android:layout_marginEnd="8dp"-->
+                <!--android:layout_marginStart="8dp"-->
+                <!--app:layout_constraintBottom_toTopOf="@+id/timer1"-->
+                <!--app:layout_constraintEnd_toStartOf="@+id/showLyrics"-->
+                <!--app:layout_constraintStart_toStartOf="parent" />-->
+
 
         </android.support.constraint.ConstraintLayout>
 

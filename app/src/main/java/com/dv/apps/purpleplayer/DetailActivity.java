@@ -79,7 +79,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     ImageView imageView, rootBackground;
     ImageButton playPause, loop, next, prev, shuffle, showLyrics;
     int currentPrimaryColor;
-    SeekBar seekBar;
+    SeekBar seekBar, playbackSpeed;
 
     Handler seekHandler;
 
@@ -487,6 +487,34 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         //Prev Song Button
         prev = (ImageButton) findViewById(R.id.prev);
         prev.setOnClickListener(this);
+
+//        //Playback Speed
+//        playbackSpeed = findViewById(R.id.playbackSpeedSlider);
+//        playbackSpeed.setMax(150);
+//        playbackSpeed.setProgress(16);
+//        playbackSpeed.incrementProgressBy(25);
+//        playbackSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                float f = (progress + 50)/100f;
+//                if (fromUser){
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                        MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setSpeed((float) (progress + 50)/100));
+//
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
 
     }
 

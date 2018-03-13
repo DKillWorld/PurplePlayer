@@ -281,7 +281,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onBackPressed() {
         if (AlbumListFragment.in_detail_view_album || ArtistListFragment.in_detail_view_artist ||
                 GenreListFragment.in_detail_view_genre || PlaylistListFragment.in_detail_view_playlist){
-            findViewById(R.id.close).performClick();
+            try {
+                findViewById(R.id.close).performClick();
+            }catch (NullPointerException e){
+                super.onBackPressed();
+            }
         }else {
             super.onBackPressed();
         }
