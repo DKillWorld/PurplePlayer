@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.AudioEffect;
@@ -68,6 +69,10 @@ import java.util.concurrent.TimeUnit;
 
 import jp.wasabeef.picasso.transformations.BlurTransformation;
 import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+import uk.co.deanwild.materialshowcaseview.shape.CircleShape;
+import uk.co.deanwild.materialshowcaseview.shape.RectangleShape;
 
 import static com.dv.apps.purpleplayer.MusicService.looping;
 import static com.dv.apps.purpleplayer.MusicService.randomize;
@@ -488,6 +493,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         prev = (ImageButton) findViewById(R.id.prev);
         prev.setOnClickListener(this);
 
+        //Setup Tutorial
+        setupTutorial();
+
 //        //Playback Speed
 //        playbackSpeed = findViewById(R.id.playbackSpeedSlider);
 //        playbackSpeed.setMax(150);
@@ -577,6 +585,48 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    public void setupTutorial(){
+        ShowcaseConfig configCircle = new ShowcaseConfig();
+        ShowcaseConfig configRect = new ShowcaseConfig();
+
+        configCircle.setMaskColor(Color.WHITE);
+        configCircle.setShape(new CircleShape(10));
+        configCircle.setShapePadding(10);
+        configCircle.setDelay(500); // half second between each showcase view
+
+        configRect.setMaskColor(Color.WHITE);
+        configRect.setShape(new RectangleShape(0,0));
+        configRect.setShapePadding(10);
+        configRect.setDelay(500); // half second between each showcase view
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, "ShowIdDetail1");
+
+        sequence.setConfig(configRect);
+
+        sequence.addSequenceItem(findViewById(R.id.linearLayout),
+                "Dock","This is your main dock for controls.", "NEXT")
+                .setConfig(configCircle);
+
+        sequence.addSequenceItem(findViewById(R.id.showLyrics),
+                "Lyrics","Get lyrics for currently playing song.", "NEXT");
+
+        sequence.addSequenceItem(findViewById(R.id.equilizerDetail),
+                "Equalizer","Optimize audio output according to your mood.", "NEXT");
+
+        sequence.addSequenceItem(findViewById(R.id.settingsDetail),
+                "Settings","Customize everything else from here.", "NEXT");
+
+        sequence.addSequenceItem(new View(this),
+                "The Big Button","Albumart is gesture controlled big button. \n\n" +
+                        "Swipe up : Tag editor \n" +
+                        "Swipe down : Now playing tracks list \n" +
+                        "Swipe left/right : Change to next/previous tracks \n\n" +
+                        "Explore and have fun !!", "GOT IT");
+
+
+        sequence.start();
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -584,7 +634,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
             case R.id.showLyrics:
                 //boolean to check if use QuickLyric OR https://api.lyrics.ovh/v1/
-                boolean useQuickLyric = preferences.getBoolean(getString(R.string.key_use_quicklyric), false);
+                boolean useQuickLyric = preferences.getBoolean(getString(R.string.key_use_quicklyric), true);
 
                 String ArtName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getSubtitle();
                 String SongName = (String) MediaControllerCompat.getMediaController(this).getMetadata().getDescription().getTitle();

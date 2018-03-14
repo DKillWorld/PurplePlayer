@@ -20,7 +20,7 @@ import com.google.android.gms.ads.AdView;
 public class AboutActivity extends AppCompatActivity {
 
     ImageButton emailButton, fBPageButton;
-    TextView textView;
+    TextView textView, textView2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +38,13 @@ public class AboutActivity extends AppCompatActivity {
 
         textView = (TextView) findViewById(R.id.version_about);
         textView.setText("v " + BuildConfig.VERSION_NAME);
+
+        textView2 = (TextView) findViewById(R.id.name_about);
+        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+            textView2.setText("Purple Player");
+        }else {
+            textView2.setText("Purple Player Pro");
+        }
 
         fBPageButton = (ImageButton) findViewById(R.id.fb_message_icon);
         fBPageButton.setOnClickListener(new View.OnClickListener() {

@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -89,6 +90,11 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+import uk.co.deanwild.materialshowcaseview.shape.CircleShape;
+import uk.co.deanwild.materialshowcaseview.shape.RectangleShape;
 
 import static com.dv.apps.purpleplayer.MusicService.PERMISSION_GRANTED;
 import static com.dv.apps.purpleplayer.MusicService.userStopped;
@@ -267,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .load(mediaControllerCompat.getMetadata().getDescription().getIconUri())
                 .placeholder(R.mipmap.ic_launcher_web)
                 .into(tvMainImageView);
-
 
     }
 
@@ -696,6 +701,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void setupTutorial(){
+
+        ShowcaseConfig configCircle = new ShowcaseConfig();
+        ShowcaseConfig configRect = new ShowcaseConfig();
+
+        configCircle.setMaskColor(Color.WHITE);
+        configCircle.setShape(new CircleShape(10));
+        configCircle.setShapePadding(10);
+        configCircle.setDelay(500); // half second between each showcase view
+
+        configRect.setMaskColor(Color.WHITE);
+        configRect.setShape(new RectangleShape(0,0));
+        configRect.setShapePadding(10);
+        configRect.setDelay(500); // half second between each showcase view
+
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, "ShowIdMain1");
+
+        sequence.setConfig(configCircle);
+
+        sequence.addSequenceItem(new View(this),
+                "Welcome to Purple Player","Take a quick tour of player.", "NEXT");
+
+        sequence.addSequenceItem(findViewById(R.id.search),
+                "Search","Search for everything from a single place, it automatically determines in which section you are to provide relative results.", "NEXT");
+
+        sequence.addSequenceItem(findViewById(R.id.playPauseMain),
+                "Play/Pause","A quick play/pause button might come in handy while browsing for tracks", "NEXT")
+                .setConfig(configRect);
+
+        sequence.addSequenceItem(findViewById(R.id.tvMain),
+                "Touch here to open player screen", "NEXT");
+
+        sequence.addSequenceItem(new View(this),
+                "And last","Touch a track to start playing. Long press for more options.", "GOT IT");
+
+        sequence.start();
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -724,7 +768,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -840,12 +883,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
                 PERMISSION_GRANTED = true;
                 setupTabLayout();
+                setupTutorial();
             }else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
         }else {
             PERMISSION_GRANTED = true;
             setupTabLayout();
+            setupTutorial();
         }
     }
 

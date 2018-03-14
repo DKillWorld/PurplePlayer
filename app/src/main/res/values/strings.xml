@@ -105,7 +105,7 @@
     <string name="albumartAsBackgound">Albumart as background</string>
     <string name="inversed">Inversed</string>
     <string name="normal">Normal</string>
-    <string name="inverseSwipeControl">Inverse swipe controls</string>
+    <string name="inverseSwipeControl">Next/Prev swipe controls</string>
     <string name="quickLyric" translatable="false">QuickLyric</string>
     <string name="defaultServer" translatable="false">Default</string>
     <string name="lyricsServer">Lyrics server</string>
