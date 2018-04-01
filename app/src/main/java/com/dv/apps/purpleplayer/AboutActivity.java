@@ -3,11 +3,13 @@ package com.dv.apps.purpleplayer;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,12 +17,17 @@ import com.afollestad.aesthetic.Aesthetic;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.util.Calendar;
+import java.util.Date;
+
 
 //Icon credit = psdblast.com
 public class AboutActivity extends AppCompatActivity {
 
     ImageButton emailButton, fBPageButton;
+    ImageView aboutImage;
     TextView textView, textView2;
+    AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +53,21 @@ public class AboutActivity extends AppCompatActivity {
             textView2.setText("Purple Player Pro");
         }
 
-        fBPageButton = (ImageButton) findViewById(R.id.fb_message_icon);
+        aboutImage =  findViewById(R.id.icon_about);
+        aboutImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long freeOfAdTill = PreferenceManager.getDefaultSharedPreferences(AboutActivity.this).getLong("ad_free_till", 0);
+                Toast.makeText(AboutActivity.this, "You are free of ads till \n" + new Date(freeOfAdTill), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        adView = findViewById(R.id.adView);
+        if (Calendar.getInstance().getTimeInMillis() < PreferenceManager.getDefaultSharedPreferences(AboutActivity.this).getLong("ad_free_till", 0)){
+            adView.setVisibility(View.GONE);
+        }
+
+            fBPageButton = (ImageButton) findViewById(R.id.fb_message_icon);
         fBPageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

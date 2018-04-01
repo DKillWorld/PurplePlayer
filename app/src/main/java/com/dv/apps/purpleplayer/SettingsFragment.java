@@ -9,8 +9,10 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
@@ -125,15 +127,31 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         rateUs.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
-                    startActivity(intent);
-                }else {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
-                    startActivity(intent);
-                }
+                MaterialDialog rateUsDialog = new MaterialDialog.Builder(getActivity())
+                        .customView(R.layout.rating_bar_layout, false)
+                        .positiveText("Submit")
+                        .show();
+
+                final RatingBar bar = rateUsDialog.getCustomView().findViewById(R.id.ratingBar);
+
+                rateUsDialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        if (bar.getRating() >= 4){
+                            if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
+                                startActivity(intent);
+                            }else {
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                                startActivity(intent);
+                            }
+                        }else {
+                            Toast.makeText(getActivity(), "Thanks for rating. Help us improve by providing feedback.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
                 return true;
             }
         });

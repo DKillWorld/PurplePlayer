@@ -11,9 +11,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.media.PlaybackParams;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -84,7 +86,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     ImageView imageView, rootBackground;
     ImageButton playPause, loop, next, prev, shuffle, showLyrics;
     int currentPrimaryColor;
-    SeekBar seekBar, playbackSpeed;
+    SeekBar seekBar;
 
     Handler seekHandler;
 
@@ -456,6 +458,89 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             playPause.setImageResource(R.mipmap.ic_pause);
         }
         playPause.setOnClickListener(this);
+        playPause.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    MaterialDialog dialog = new MaterialDialog.Builder(DetailActivity.this)
+                            .customView(R.layout.speed_pitch_control, true)
+                            .positiveText(R.string.ok)
+                            .negativeText("Reset")
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setSpeed(1f));
+                                    MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setPitch(1f));
+                                    playPause.performClick();
+
+                                }
+                            })
+                            .show();
+                    SeekBar speedBar, pitchBar;
+                    speedBar = dialog.getCustomView().findViewById(R.id.seekBar_speed);
+                    speedBar.setMax(150);
+                    speedBar.setProgress(16);
+                    speedBar.incrementProgressBy(25);
+                    speedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            float f = (progress + 50) / 100f;
+                            if (fromUser) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    if (MusicService.getInstance().mediaPlayer.isPlaying()) {
+                                        MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setSpeed((float) (progress + 50) / 100));
+                                        MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setAudioFallbackMode(PlaybackParams.AUDIO_FALLBACK_MODE_DEFAULT));
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+                            int tempMax = (int) MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+                            DetailActivity.this.seekBar.setMax((int) (tempMax / MusicService.getInstance().mediaPlayer.getPlaybackParams().getSpeed()));
+//                        int tempProgressPercent = DetailActivity.this.seekBar.getProgress()/DetailActivity.this.seekBar.getMax();
+//                        DetailActivity.this.seekBar.setProgress((int) (DetailActivity.this.seekBar.getMax() * tempProgressPercent));
+
+                        }
+                    });
+
+                    pitchBar = dialog.getCustomView().findViewById(R.id.seekBar_pitch);
+                    pitchBar.setMax(150);
+                    pitchBar.setProgress(16);
+                    pitchBar.incrementProgressBy(25);
+                    pitchBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            float f = (progress + 50) / 100f;
+                            if (fromUser) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setPitch((float) (progress + 50) / 100));
+                                    MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setAudioFallbackMode(PlaybackParams.AUDIO_FALLBACK_MODE_DEFAULT));
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+                        }
+                    });
+
+                }else {
+                    Toast.makeText(DetailActivity.this, "Requires Android Version >= 6.0 !!", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+        });
 
         //Loop Button
         loop = (ImageButton) findViewById(R.id.loop);
@@ -495,34 +580,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         //Setup Tutorial
         setupTutorial();
-
-//        //Playback Speed
-//        playbackSpeed = findViewById(R.id.playbackSpeedSlider);
-//        playbackSpeed.setMax(150);
-//        playbackSpeed.setProgress(16);
-//        playbackSpeed.incrementProgressBy(25);
-//        playbackSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                float f = (progress + 50)/100f;
-//                if (fromUser){
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                        MusicService.getInstance().mediaPlayer.setPlaybackParams(MusicService.getInstance().mediaPlayer.getPlaybackParams().setSpeed((float) (progress + 50)/100));
-//
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//        });
 
     }
 
@@ -606,6 +663,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         sequence.addSequenceItem(findViewById(R.id.linearLayout),
                 "Dock","This is your main dock for controls.", "NEXT")
                 .setConfig(configCircle);
+
+        sequence.addSequenceItem(findViewById(R.id.playPause),
+                "Speed/Pitch Setting","Hold this button to open panel of speed/pitch control. (Requires Android >= 6.0)", "NEXT");
 
         sequence.addSequenceItem(findViewById(R.id.showLyrics),
                 "Lyrics","Get lyrics for currently playing song.", "NEXT");

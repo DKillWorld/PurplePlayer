@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -40,6 +41,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -103,6 +105,7 @@ import static com.dv.apps.purpleplayer.MusicService.userStopped;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, RewardedVideoAdListener {
 
     Context context;
+    boolean firstRun = true;
     ArrayList<Song> songList;
     SongAdapter adapter;
     ImageView tvMainImageView;
@@ -298,6 +301,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setupInterstitialAd(){
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")) {
+
+            firstRun = preferences.getBoolean("firstRun", true);
+            if (firstRun) {
+                firstRun = false;
+                preferences.edit().putBoolean("firstRun", firstRun).apply();
+                //checking for 15 days and for adfree one day
+                String packageName = BuildConfig.APPLICATION_ID;
+                PackageManager pm = context.getPackageManager();
+
+                try {
+                    PackageInfo packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+                    long firstInstallTime = packageInfo.firstInstallTime;
+                    Calendar cal = Calendar.getInstance(); //current date and time
+                    cal.add(Calendar.DAY_OF_MONTH, 15); //add a day
+                    cal.set(Calendar.HOUR_OF_DAY, 23); //set hour to last hour
+                    cal.set(Calendar.MINUTE, 59); //set minutes to last minute
+                    cal.set(Calendar.SECOND, 59); //set seconds to last second
+                    cal.set(Calendar.MILLISECOND, 999); //set milliseconds to last millisecond
+                    long millis = cal.getTimeInMillis();
+                    preferences.edit().putLong("ad_free_till", millis).apply();
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
             if (Calendar.getInstance().getTimeInMillis() > preferences.getLong("ad_free_till", 0)) {
                 interstitialAd = new InterstitialAd(this);
                 interstitialAd.setAdUnitId("ca-app-pub-9589539002030859/7346365267");
@@ -468,16 +497,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 startActivity(sIntent);
                                 break;
                             case 7:
-                                if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
-                                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
-                                    startActivity(intent);
-                                }else {
-                                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                                    intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
-                                    startActivity(intent);
-                                }
+                                MaterialDialog rateUsDialog = new MaterialDialog.Builder(MainActivity.this)
+                                        .customView(R.layout.rating_bar_layout, false)
+                                        .positiveText("Submit")
+                                        .show();
 
+                                final RatingBar bar = rateUsDialog.getCustomView().findViewById(R.id.ratingBar);
+
+                                rateUsDialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        if (bar.getRating() >= 4){
+                                            if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
+                                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayer"));
+                                                startActivity(intent);
+                                            }else {
+                                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                intent.setData(Uri.parse("market://details?id=com.dv.apps.purpleplayerpro"));
+                                                startActivity(intent);
+                                            }
+                                        }else {
+                                            Toast.makeText(MainActivity.this, "Thanks for rating. Help us improve by providing feedback.", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
                                 break;
                             case 8:
                                 if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
