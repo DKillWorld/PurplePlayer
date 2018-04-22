@@ -461,7 +461,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         playPause.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                if (MusicService.getInstance().mediaPlayer.isPlaying()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
                     MaterialDialog dialog = new MaterialDialog.Builder(DetailActivity.this)
                             .customView(R.layout.speed_pitch_control, true)
                             .positiveText(R.string.ok)
@@ -479,8 +481,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     SeekBar speedBar, pitchBar;
                     speedBar = dialog.getCustomView().findViewById(R.id.seekBar_speed);
                     speedBar.setMax(150);
-                    speedBar.setProgress(16);
-                    speedBar.incrementProgressBy(25);
+                    speedBar.setProgress(50);
+//                    speedBar.incrementProgressBy(25);
                     speedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -501,18 +503,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
                         @Override
                         public void onStopTrackingTouch(SeekBar seekBar) {
-                            int tempMax = (int) MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
-                            DetailActivity.this.seekBar.setMax((int) (tempMax / MusicService.getInstance().mediaPlayer.getPlaybackParams().getSpeed()));
+//                        int tempMax = (int) MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+//                        DetailActivity.this.seekBar.setMax((int) (tempMax / MusicService.getInstance().mediaPlayer.getPlaybackParams().getSpeed()));
 //                        int tempProgressPercent = DetailActivity.this.seekBar.getProgress()/DetailActivity.this.seekBar.getMax();
 //                        DetailActivity.this.seekBar.setProgress((int) (DetailActivity.this.seekBar.getMax() * tempProgressPercent));
 
                         }
+
                     });
+
 
                     pitchBar = dialog.getCustomView().findViewById(R.id.seekBar_pitch);
                     pitchBar.setMax(150);
-                    pitchBar.setProgress(16);
-                    pitchBar.incrementProgressBy(25);
+                    pitchBar.setProgress(50);
+//                    pitchBar.incrementProgressBy(25);
                     pitchBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -535,11 +539,16 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         }
                     });
 
-                }else {
+                } else {
                     Toast.makeText(DetailActivity.this, "Requires Android Version >= 6.0 !!", Toast.LENGTH_SHORT).show();
                 }
-                return true;
-            }
+
+
+            }else {
+                    Toast.makeText(DetailActivity.this,  R.string.nothingIsPlaying, Toast.LENGTH_SHORT).show();
+                }
+            return true;
+        }
         });
 
         //Loop Button
@@ -585,7 +594,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     //Seekbar Mechanism
     public void updateSeekbar() {
-        seekBar.setProgress((int) MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPosition());
+        seekBar.setProgress((int) (MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPosition()));
         seekBar.setMax((int) MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
         final boolean showTimer = preferences.getBoolean("Show_Timer", false);
         final long hours = TimeUnit.MILLISECONDS.toHours(seekBar.getMax());
@@ -602,7 +611,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         int current = (int) MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPosition();
                         long timeDelta = SystemClock.elapsedRealtime() - MediaControllerCompat.getMediaController(DetailActivity.this)
                                 .getPlaybackState().getLastPositionUpdateTime();
-                        current += timeDelta * MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPlaybackSpeed();
+//                        current += timeDelta * MediaControllerCompat.getMediaController(DetailActivity.this).getPlaybackState().getPlaybackSpeed();
+                        current = (int) ((current + timeDelta) * MusicService.getInstance().mediaPlayer.getPlaybackParams().getSpeed());
                         if (current > MediaControllerCompat.getMediaController(DetailActivity.this).getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION)) {
 
                         }
@@ -844,7 +854,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser){
             if (mediaBrowserCompat.isConnected()){
-                MediaControllerCompat.getMediaController(this).getTransportControls().seekTo(progress);
+                int resultProgress = (int) (progress / MusicService.getInstance().mediaPlayer.getPlaybackParams().getSpeed());
+                MediaControllerCompat.getMediaController(this).getTransportControls().seekTo(resultProgress);
             }
         }
     }

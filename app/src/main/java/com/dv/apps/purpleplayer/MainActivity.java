@@ -581,6 +581,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         TextView headerName = result.getStickyHeader().findViewById(R.id.header_name);
         TextView headerVersion = result.getStickyHeader().findViewById(R.id.header_version);
+        ImageView headerImage = result.getStickyHeader().findViewById(R.id.imageView);
 
         if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayer")){
             headerName.setText("Purple Player");

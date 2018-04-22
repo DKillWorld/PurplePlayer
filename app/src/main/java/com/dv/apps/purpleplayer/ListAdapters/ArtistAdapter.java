@@ -81,6 +81,12 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
 //                .transition(DrawableTransitionOptions.withCrossFade())
 //                .into(myholder.imageView);
 
+        myholder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_drawer_artist));
+//        Picasso.with(context)
+//                .load(R.drawable.ic_drawer_artist)
+//                .into(myholder.imageView);
+
+
 
         ViewAnimator
                 .animate(view)

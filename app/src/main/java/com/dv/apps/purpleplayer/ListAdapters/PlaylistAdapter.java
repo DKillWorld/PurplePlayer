@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dv.apps.purpleplayer.Models.Playlist;
@@ -36,9 +37,11 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist>{
     }
 
     class Myholder{
+        ImageView imageView;
         TextView textView;
         Myholder(View view) {
             textView = (TextView) view.findViewById(R.id.songName);
+            imageView = (ImageView) view.findViewById(R.id.image_view);
         }
     }
 
@@ -69,6 +72,10 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist>{
 //                .transition(DrawableTransitionOptions.withCrossFade())
 //                .into(myholder.imageView);
 
+        myholder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_drawer_playlist));
+//        Picasso.with(context)
+//                .load(R.drawable.ic_drawer_genre)
+//                .into(myholder.imageView);
 
         ViewAnimator
                 .animate(view)

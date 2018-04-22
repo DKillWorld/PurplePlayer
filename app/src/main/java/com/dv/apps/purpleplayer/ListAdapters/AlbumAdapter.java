@@ -86,7 +86,7 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
 
         Picasso.with(context)
                 .load(album.getImage())
-                .placeholder(R.mipmap.ic_launcher)
+                .placeholder(R.drawable.ic_drawer_album)
                 .into(myholder.imageView);
 
 

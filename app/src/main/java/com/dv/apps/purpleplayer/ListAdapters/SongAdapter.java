@@ -97,7 +97,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
 
         Picasso.with(context)
                 .load(song.getImage())
-                .placeholder(R.mipmap.ic_launcher)
+                .placeholder(R.drawable.ic_drawer_songs)
                 .into(myholder.imageView);
 
         ViewAnimator

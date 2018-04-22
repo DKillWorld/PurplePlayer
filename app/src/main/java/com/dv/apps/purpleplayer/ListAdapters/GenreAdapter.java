@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dv.apps.purpleplayer.Models.Genre;
@@ -37,8 +38,10 @@ public class GenreAdapter extends ArrayAdapter<Genre>{
 
     class Myholder{
         TextView textView;
+        ImageView imageView;
         Myholder(View view) {
             textView = (TextView) view.findViewById(R.id.songName);
+            imageView = (ImageView) view.findViewById(R.id.image_view);
         }
     }
 
@@ -69,6 +72,10 @@ public class GenreAdapter extends ArrayAdapter<Genre>{
 //                .transition(DrawableTransitionOptions.withCrossFade())
 //                .into(myholder.imageView);
 
+        myholder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_drawer_genre));
+//        Picasso.with(context)
+//                .load(R.drawable.ic_drawer_genre)
+//                .into(myholder.imageView);
 
         ViewAnimator
                 .animate(view)
