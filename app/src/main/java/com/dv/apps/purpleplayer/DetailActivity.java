@@ -1045,8 +1045,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                                 .title(R.string.lyrics)
                                 .content(s)
                                 .contentGravity(GravityEnum.CENTER)
-                                .positiveText("QuickLyric")
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                .neutralText("QuickLyric")
+                                .onNeutral(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
                                         boolean qLInstalled = isQLInstalled(getApplicationContext());
@@ -1058,7 +1058,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                                         }
                                     }
                                 })
-                                .neutralText(R.string.great)
+                                .positiveText(R.string.great)
                                 .show();
                     } else {
                         Toast.makeText(DetailActivity.this, R.string.noLyricsFoundTryQuickLyric, Toast.LENGTH_SHORT).show();

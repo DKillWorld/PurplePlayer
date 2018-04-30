@@ -28,7 +28,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Vietnamese Translation"
+        android:text="(Vietnamese Translation)"
         android:fontFamily="sans-serif-condensed"
         android:textColor="?colorAccent"
         android:textSize="16sp"

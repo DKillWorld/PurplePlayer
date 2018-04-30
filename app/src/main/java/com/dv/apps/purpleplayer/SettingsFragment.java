@@ -109,16 +109,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                         .positiveText(R.string.ok)
                         .title(R.string.faq)
-                        .content("Q. Is this project open-source? \nA: Shhh! Not Yet. \n\n" +
-                                "Q. How can I see Now Playing songs list? \nA: Just swipe down on albumart, as easy as that.\n\n" +
-                                "Q. How can I edit tags? \nA: Just swipe up on albumart.\n\n" +
-                                "Q. After changing app primary color, all songs disappeared. What to do? \nA: This happens when you change from dark actionbar theme to light or vice-versa. However, a quick restart will fix this issue. \n\n" +
-                                "Q. I found a bug. Where/How to report? \nA: Shoot an email describing the bug and steps to reproduce it.\n\n" +
-                                "Q. Why should I upgrade to Purple Player Pro? \nA: To get bunch of extra features and buy me a cup of coffee. ;)\n\n" +
-                                "Q. I have set sleep timer but its not stopping music playback at selected time. \nA: Sleep timer will not be triggered if you are using the app and 'stopping music playback' will be post-poned until you quit the app.\n\n" +
-                                "Q. I want to help translating app to my local language. How to? \nA: Thanks for interest. Soon, you will be able to help in translating the app.\n\n" +
-                                "Q. I have some other question outside of FAQ. \nA: Email us briefly describing you question. We will reply ASAP." )
+                        .customView(R.layout.faq_dialog, true)
                         .show();
+
                  return true;
             }
         });
