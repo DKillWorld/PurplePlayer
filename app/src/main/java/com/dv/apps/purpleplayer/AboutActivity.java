@@ -8,12 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.aesthetic.Aesthetic;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -28,6 +30,7 @@ public class AboutActivity extends AppCompatActivity {
     ImageView aboutImage;
     TextView textView, textView2;
     AdView adView;
+    Button credits;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,20 @@ public class AboutActivity extends AppCompatActivity {
             adView.setVisibility(View.GONE);
         }
 
-            fBPageButton = (ImageButton) findViewById(R.id.fb_message_icon);
+        credits = findViewById(R.id.creditsButton);
+        credits.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialDialog dialog = new MaterialDialog.Builder(AboutActivity.this).
+                        customView(R.layout.credits_dialog, true)
+                        .title("Credits")
+                        .positiveText(R.string.ok)
+                        .show();
+
+            }
+        });
+
+        fBPageButton = (ImageButton) findViewById(R.id.fb_message_icon);
         fBPageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -57,6 +57,7 @@ import com.dv.apps.purpleplayer.ListFragments.GenreListFragment;
 import com.dv.apps.purpleplayer.ListFragments.PlaylistListFragment;
 import com.dv.apps.purpleplayer.ListFragments.SongListFragment;
 import com.dv.apps.purpleplayer.Models.Song;
+import com.dv.apps.purpleplayer.Utils.PurpleHelper;
 import com.dv.apps.purpleplayer.Utils.SleepTimerReceiver;
 import com.eftimoff.viewpagertransformers.AccordionTransformer;
 import com.eftimoff.viewpagertransformers.BackgroundToForegroundTransformer;
@@ -72,8 +73,6 @@ import com.eftimoff.viewpagertransformers.ZoomOutSlideTransformer;
 import com.eftimoff.viewpagertransformers.ZoomOutTranformer;
 import com.github.florent37.viewanimator.ViewAnimator;
 import com.github.javiersantos.piracychecker.PiracyChecker;
-import com.github.javiersantos.piracychecker.enums.Display;
-import com.github.javiersantos.piracychecker.enums.InstallerID;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -241,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupDrawerLayout2();
         setupPermissions(); //This encloses setupTabLayout && Permissions
 
-        validate();
+        PurpleHelper.getInstance().validate(this, checker, preferences);
 
         //Getting Views & Applying Theme
         playPauseMain = (ImageButton) findViewById(R.id.playPauseMain);
@@ -885,23 +884,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
         }
         return true;
-    }
-
-    private void validate(){
-        if (BuildConfig.APPLICATION_ID.equals("com.dv.apps.purpleplayerpro")) {
-            checker = new PiracyChecker(this)
-//                    .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgBT+tKXqMH4FEejIu9Zhbs6+1N/UXFPN7TK11PYzkYe5qSvQnfENkdjXfJQ55h2aAbMn1jOXXB5xQwDHyRE2VNlrGBIplIRPFfDpZ4Vl/2niCwseLbke9VetHGIgx9vROBsJs9QMWJC0/yphxPqARXNJ+uYkQg164ZXaLcAl7/7pOxucZ9DKN0lbIqwE8eysFr6gcCeVutGfn5tDya5+cFj9zMGq6ImQSaCPTcWXm4/up2HyASKVw9TYuCgvGRvVF1BrP6ifs6uXFxZvK1mYCnVHGXPhAlQjlnTMp2k8Wy/KJdgCYRYjeMfvm+Z/KOp2mLZBW5QAc6Aro4jG9Pxr+wIDAQAB")
-//                    .saveResultToSharedPreferences(preferences, "valid_license")
-//                    .enableSigningCertificate("ldgUxo13aF54Jsqay5L9W/S4/g0=")     google
-//                    .enableSigningCertificate("uxh/RlppBQNr/6nlf3bO4UmKmNg=")
-                    .enableUnauthorizedAppsCheck()
-                    .enableInstallerId(InstallerID.GOOGLE_PLAY)
-                    .enableInstallerId(InstallerID.AMAZON_APP_STORE)
-                    .enableInstallerId(InstallerID.GALAXY_APPS)
-                    .blockIfUnauthorizedAppUninstalled(preferences, "app_unauth")
-                    .display(Display.ACTIVITY);
-            checker.start();
-        }
     }
 
     @Override
